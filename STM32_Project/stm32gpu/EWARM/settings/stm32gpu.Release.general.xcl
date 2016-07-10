@@ -1,0 +1,15 @@
+"C:\Program Files\IAR Systems\ARM 7.4.02\arm\bin\armproc.dll" 
+
+"C:\Program Files\IAR Systems\ARM 7.4.02\arm\bin\armstlink.dll" 
+
+"Z:\stm_arm\IAR_ARM\stm32gpu\EWARM\Release\Exe\stm32gpu.out" 
+
+--plugin "C:\Program Files\IAR Systems\ARM 7.4.02\arm\bin\armbat.dll" 
+
+--device_macro "C:\Program Files\IAR Systems\ARM 7.4.02\arm\config\debugger\ST\STM32F1xx_XL.dmac" 
+
+--flash_loader "C:\Program Files\IAR Systems\ARM 7.4.02\arm\config\flashloader\ST\FlashSTM32F10xx8.board" 
+
+
+
+

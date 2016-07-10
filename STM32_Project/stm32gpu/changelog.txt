@@ -1,0 +1,37 @@
+
+v.0.0.6 - add selection of interface;
+		- add busy protection;
+		- print info at start on LCD;
+		- move command buffer to dynamic size;
+		- add a lot of pointers;
+		- ADD A WORKING FATFS!!!!;
+
+v.0.0.5 - testing new STM32 controller;
+		- add FSMC (not tested);
+		- microscopic stack (RAM) usage improved;
+		- optimize UART1;
+
+v.0.0.4 - update tile engine;
+		- small optimizations in gpuWorker;
+		- again, change logic, when get commands;
+		- optimize UART1 even more;
+		- optimize SPI1, add DMA;
+		- extend UART1 command buffer;
+		- microscopic stack (RAM) usage improved;
+		- change logo to tiled version;
+		- update NES palette, add more gray levels;
+		- move sync_CPU to gpuWorker;
+		
+v.0.0.3 - small optimizations in gpuWorker;
+		- change logic, when get commands;
+		- add low level commands;
+		- optimize UART1;
+		
+v.0.0.2 - add new baud rate speed;
+		- add base tile engine;
+		
+v.0.0.1 - add base GFX commands;
+		- add extended NES palette;
+		- change logo;
+
+v.0.0.0 - first init, add all;

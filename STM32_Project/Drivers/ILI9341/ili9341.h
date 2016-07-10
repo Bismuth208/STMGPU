@@ -1,0 +1,374 @@
+#ifndef _ILI9341_H
+#define _ILI9341_H
+
+#include <stdbool.h>
+#include <stdint.h>
+
+#ifdef __AVR__
+ #include <avr/io.h>
+ #include <avr/pgmspace.h>
+#else
+ #define PROGMEM
+#endif
+
+
+#define ILI9341_TFTWIDTH  240
+#define ILI9341_TFTHEIGHT 320
+
+//-------------------------------------------------------------------------------------------//
+
+#define ILI9341_NOP     0x00
+#define ILI9341_SWRESET 0x01
+#define ILI9341_RDDID   0x04
+#define ILI9341_RDDST   0x09
+
+#define ILI9341_SLPIN   0x10
+#define ILI9341_SLPOUT  0x11
+#define ILI9341_PTLON   0x12
+#define ILI9341_NORON   0x13
+
+#define ILI9341_RDMODE  0x0A
+#define ILI9341_RDMADCTL  0x0B
+#define ILI9341_RDPIXFMT  0x0C
+#define ILI9341_RDIMGFMT  0x0D
+#define ILI9341_RDSELFDIAG  0x0F
+
+#define ILI9341_INVOFF  0x20
+#define ILI9341_INVON   0x21
+#define ILI9341_GAMMASET 0x26
+#define ILI9341_DISPOFF 0x28
+#define ILI9341_DISPON  0x29
+
+#define ILI9341_CASET   0x2A
+#define ILI9341_RASET   0x2B
+#define ILI9341_RAMWR   0x2C
+#define ILI9341_RAMRD   0x2E
+
+#define ILI9341_PTLAR   0x30
+#define ILI9341_VSCRDEF 0x33
+#define ILI9341_MADCTL  0x36
+#define ILI9341_VSCRSADD 0x37
+#define ILI9341_IDLEOFF 0x38
+#define ILI9341_IDLEON  0x39
+#define ILI9341_PIXFMT  0x3A
+#define ILI9341_WRCC    0x3C  // Write Continue Command
+
+#define ILI9341_WRDBR   0x51  // display Brightness
+#define ILI9341_WRCABC  0x55  // Content Adaptive Brightness Control 
+
+#define ILI9341_FRMCTR1 0xB1
+#define ILI9341_FRMCTR2 0xB2
+#define ILI9341_FRMCTR3 0xB3
+#define ILI9341_INVCTR  0xB4
+#define ILI9341_DFUNCTR 0xB6
+
+#define ILI9341_PWCTR1  0xC0
+#define ILI9341_PWCTR2  0xC1
+#define ILI9341_PWCTR3  0xC2
+#define ILI9341_PWCTR4  0xC3
+#define ILI9341_PWCTR5  0xC4
+#define ILI9341_VMCTR1  0xC5
+#define ILI9341_VMCTR2  0xC7
+
+#define ILI9341_RDID1   0xDA
+#define ILI9341_RDID2   0xDB
+#define ILI9341_RDID3   0xDC
+#define ILI9341_RDID4   0xDD
+
+#define ILI9341_GMCTRP1 0xE0
+#define ILI9341_GMCTRN1 0xE1
+
+//#define ILI9341_PWCTR6  0xFC
+
+#define MADCTL_MY       0x80
+#define MADCTL_MX       0x40
+#define MADCTL_MV       0x20
+#define MADCTL_ML       0x10
+#define MADCTL_RGB      0x00
+#define MADCTL_BGR      0x08
+#define MADCTL_MH       0x04
+
+//-------------------------------------------------------------------------------------------//
+
+#define DELAY           0x80  // delay marker
+
+#define TFT_BOT_FIXED_AREA 0  // Number of lines in bottom fixed area (lines counted from bottom of screen)
+#define TFT_TOP_FIXED_AREA 0 // Number of lines in top fixed area (lines counted from top of screen)
+
+#define WIDTH  ILI9341_TFTWIDTH
+#define HEIGHT ILI9341_TFTHEIGHT
+
+//-------------------------------------------------------------------------------------------//
+
+
+#if defined (__AVR__)
+//#ifndef TFT_PINS
+//# warning "TFT_PINS for ili9341.h defined here"
+//#endif
+
+#define TFT_RES_PIN     PB0
+#define TFT_DC_PIN      PB1
+#define TFT_CS_PIN      PB2
+
+#define TFT_DDRX        DDRB
+#define TFT_PORTX       PORTB
+/*
+ PB0 - D8;  Res
+ PB1 - D9;  D/C (a0)
+ PB2 - D10; CS (SS)
+ */
+
+#define SET_BIT(x, y)       ((x) |= (1 << y));
+#define RESET_BIT(x, y)     ((x) &= ~(1 << y));
+
+#define SET_TFT_RES_HI      SET_BIT(TFT_PORTX, TFT_RES_PIN);
+#define SET_TFT_RES_LOW     RESET_BIT(TFT_PORTX, TFT_RES_PIN);
+#define SET_TFT_DC_HI       SET_BIT(TFT_PORTX, TFT_DC_PIN);
+#define SET_TFT_DC_LOW      RESET_BIT(TFT_PORTX, TFT_DC_PIN);
+#define SET_TFT_CS_HI       SET_BIT(TFT_PORTX, TFT_CS_PIN);
+#define SET_TFT_CS_LOW      RESET_BIT(TFT_PORTX, TFT_CS_PIN);
+
+
+#define TFT_SPCR (0<<SPIE) | (1<<SPE) | (0<<DORD) | (1<<MSTR)|(0<<CPOL)|(0<<CPHA)|(0<<SPR1)|(0<<SPR0)
+/* Iterrupt: disable;
+ * SPI: enable;
+ * Data order: MSB;
+ * Master/slave: Master;
+ * Clock polarity: Rising;
+ * Clock [hase: Leading -> Tralling edge;
+ * Clock Rate: fclk/4 */
+
+#define USE_DMA       0
+#define WAIT_FREE_TX  // arm rudiment, prevent compiler warns
+
+#else
+
+//nss - pb10; dc - pb11; res - pb1
+#define TFT_SS_PIN      GPIO_Pin_10     //CS
+#define TFT_DC_PIN      GPIO_Pin_11     //DC
+#define TFT_RES_PIN     GPIO_Pin_1      //RES
+
+#define GPIO_SET_PIN(GPIOx, GPIO_Pin)     GPIOx->BSRR = GPIO_Pin;
+#define GPIO_RESET_PIN(GPIOx, GPIO_Pin)   GPIOx->BRR = GPIO_Pin;
+
+#define SET_TFT_RES_HI    (GPIOB->BSRR = TFT_RES_PIN);
+#define SET_TFT_RES_LOW   (GPIOB->BRR = TFT_RES_PIN);
+
+#define SET_TFT_DC_HI     (GPIOB->BSRR = TFT_DC_PIN);
+#define SET_TFT_DC_LOW    (GPIOB->BRR = TFT_DC_PIN);
+
+#define SET_TFT_CS_HI     (GPIOB->BSRR = TFT_SS_PIN);
+#define SET_TFT_CS_LOW    (GPIOB->BRR = TFT_SS_PIN);
+
+//#define SET_TFT_RES_HI    GPIO_SetBits(GPIOB,     TFT_RES_PIN);
+//#define SET_TFT_RES_LOW   GPIO_ResetBits(GPIOB,   TFT_RES_PIN);
+//#define SET_TFT_DC_HI     GPIO_SetBits(GPIOB,     TFT_DC_PIN);
+//#define SET_TFT_DC_LOW    GPIO_ResetBits(GPIOB,   TFT_DC_PIN);
+//#define SET_TFT_CS_HI     GPIO_SetBits(GPIOB,     TFT_SS_PIN);
+//#define SET_TFT_CS_LOW    GPIO_ResetBits(GPIOB,   TFT_SS_PIN);
+   
+#define USE_DMA       1
+#define USE_FSMC      0
+
+
+#if USE_FSMC
+// Use 1st bank of FSMC
+#define LCD_FSMC_DATA   0x60020000      // for write data
+#define LCD_FSMC_CMD    0x60000000      // for write commands
+
+// 16 bit 8080 pins
+#define FSMC_PIN_D0     GPIO_Pin_14     // PD14
+#define FSMC_PIN_D1     GPIO_Pin_15     // PD15
+#define FSMC_PIN_D2     GPIO_Pin_0      // PD0
+#define FSMC_PIN_D3     GPIO_Pin_1      // PD1
+#define FSMC_PIN_D4     GPIO_Pin_7      // PE7
+#define FSMC_PIN_D5     GPIO_Pin_8      // PE8
+#define FSMC_PIN_D6     GPIO_Pin_9      // PE9
+#define FSMC_PIN_D7     GPIO_Pin_10     // PE10
+#define FSMC_PIN_D8     GPIO_Pin_11     // PE11
+#define FSMC_PIN_D9     GPIO_Pin_12     // PE12
+#define FSMC_PIN_D10    GPIO_Pin_13     // PE13
+#define FSMC_PIN_D11    GPIO_Pin_14     // PE14
+#define FSMC_PIN_D12    GPIO_Pin_15     // PE15
+#define FSMC_PIN_D13    GPIO_Pin_8      // PD8
+#define FSMC_PIN_D14    GPIO_Pin_9      // PD9
+#define FSMC_PIN_D15    GPIO_Pin_10     // PD10
+
+// RD - read; WR - write
+#define FSMC_PIN_RD    GPIO_Pin_4      // PD4 (FSMC_PIN_NOE)
+#define FSMC_PIN_WR    GPIO_Pin_5      // PD5 (FSMC_PIN_NWE)
+
+// CS - chip select; RS - register select
+#define FSMC_PIN_CS    GPIO_Pin_7      // PD7 (FSMC_PIN_NE1)
+#define FSMC_PIN_RS    GPIO_Pin_11     // PD11 (FSMC_PIN_A16)
+
+
+#undef SET_TFT_CS_HI
+#undef SET_TFT_CS_LOW
+#define SET_TFT_CS_HI
+#define SET_TFT_CS_LOW
+
+#undef SET_TFT_DC_HI
+#undef SET_TFT_DC_LOW
+#define SET_TFT_DC_HI
+#define SET_TFT_DC_LOW
+   
+   
+#undef TFT_RES_PIN   
+#undef SET_TFT_RES_HI
+#undef SET_TFT_RES_LOW
+
+#define TFT_RES_PIN             GPIO_Pin_1      //RES On PE1
+#define SET_TFT_RES_HI          (GPIOE->BSRR = TFT_RES_PIN);
+#define SET_TFT_RES_LOW         (GPIOE->BRR = TFT_RES_PIN)
+   
+   
+#endif // USE_FSMC
+#endif // __AVR__
+
+
+#if USE_FSMC
+// just a protection
+#define TFT_CS_ALWAS_ACTIVE 0
+#else
+// free MCU from toggling CS GPIO
+// Set this to 0 if not only one TFT is slave on that SPI
+#define TFT_CS_ALWAS_ACTIVE 1
+#endif
+                        
+#if TFT_CS_ALWAS_ACTIVE
+  #undef SET_TFT_CS_HI
+  #undef SET_TFT_CS_LOW
+  #define SET_TFT_CS_HI
+  #define SET_TFT_CS_LOW
+  // make SET_TFT_CS_LOW; always active
+  #if defined (__AVR__)
+    #define GRAB_TFT_CS     RESET_BIT(TFT_PORTX, TFT_CS_PIN);
+  #else
+    #define GRAB_TFT_CS     (GPIOB->BRR = TFT_SS_PIN)
+  #endif
+#endif // TFT_CS_ALWAS_ACTIVE
+
+
+#define ENABLE_CMD()  SET_TFT_DC_LOW  \
+                      SET_TFT_CS_LOW
+
+#define ENABLE_DATA() SET_TFT_DC_HI   \
+                      SET_TFT_CS_LOW
+                      
+#define RELEASE_TFT() SET_TFT_CS_HI
+
+#define DISABLE_DATA() SET_TFT_CS_HI
+
+                       
+                        
+extern int16_t _width, _height;
+
+/*
+typedef union {
+  uint8_t data[14];
+  struct {
+    uint16_t par1;
+    uint16_t par2;
+    uint16_t par3;
+    uint16_t par4;
+    uint16_t par5;
+    uint16_t par6;
+    uint16_t par7;
+  };
+} gfx_t;
+
+typedef union {
+  uint8_t data[14];
+  struct {
+    uint16_t x0;
+    uint16_t y0;
+    uint16_t x1;
+    uint16_t y1;
+    uint16_t x2;
+    uint16_t y2;
+    uint16_t color;
+  };
+} gfx_3P1C_t; // 3 point 1 color
+
+typedef union {
+  uint8_t data[10];
+  struct {
+    uint16_t x0;
+    uint16_t y0;
+    uint16_t x1;
+    uint16_t y1;
+    uint16_t color;
+  };
+} gfx_2P1C_t; // 2 point 1 color
+
+typedef union {
+  uint8_t data[6];
+  struct {
+    uint16_t x0;
+    uint16_t y0;
+    uint16_t color;
+  };
+} gfx_1P1C_t; // 1 point 1 color
+*/
+
+//-------------------------------------------------------------------------------------------//
+
+static const uint8_t init_commands[] PROGMEM = {
+    4, 0xEF, 0x03, 0x80, 0x02,
+    4, 0xCF, 0x00, 0XC1, 0X30,
+    5, 0xED, 0x64, 0x03, 0X12, 0X81,
+    4, 0xE8, 0x85, 0x00, 0x78,
+    6, 0xCB, 0x39, 0x2C, 0x00, 0x34, 0x02,
+    2, 0xF7, 0x20,
+    3, 0xEA, 0x00, 0x00,
+    2, ILI9341_PWCTR1, 0x23, // Power control  (VRH[5:0])
+    2, ILI9341_PWCTR2, 0x10, // Power control (SAP[2:0];BT[3:0])
+    3, ILI9341_VMCTR1, 0x3e, 0x28, // VCM control
+    2, ILI9341_VMCTR2, 0x86, // VCM control2
+    2, ILI9341_MADCTL, 0x48, // Memory Access Control
+    2, ILI9341_PIXFMT, 0x55,
+    3, ILI9341_FRMCTR1, 0x00, 0x18,
+    4, ILI9341_DFUNCTR, 0x08, 0x82, 0x27, // Display Function Control
+    2, 0xF2, 0x00, // Gamma Function Disable
+    2, ILI9341_GAMMASET, 0x01, // Gamma curve selected
+    16, ILI9341_GMCTRP1, 0x0F, 0x31, 0x2B, 0x0C, 0x0E, 0x08,
+      0x4E, 0xF1, 0x37, 0x07, 0x10, 0x03, 0x0E, 0x09, 0x00, // Set Gamma
+    16, ILI9341_GMCTRN1, 0x00, 0x0E, 0x14, 0x03, 0x11, 0x07,
+      0x31, 0xC1, 0x48, 0x08, 0x0F, 0x0C, 0x31, 0x36, 0x0F, // Set Gamma
+    0
+};
+
+//-------------------------------------------------------------------------------------------//
+#ifdef __cplusplus
+extern "C"{
+#endif
+
+void writeCommand(uint8_t c);
+void writeData(uint8_t d);
+void writeWordData(uint16_t c);
+  
+void commandList(const uint8_t *addr);
+
+void tftBegin(void);
+void tftSetAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
+void tftSetVAddrWindow(uint16_t x0, uint16_t y0, uint16_t y1);
+void tftSetHAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1);
+void tftSetAddrPixel(uint16_t x0, uint16_t y0);
+void tftSetRotation(uint8_t m);
+void tftSetScrollArea(uint16_t TFA, uint16_t BFA);
+void tftScrollAddress(uint16_t VSP);
+uint16_t tftScroll(uint16_t lines, uint16_t yStart);
+uint16_t tftScrollSmooth(uint16_t lines, uint16_t yStart, uint8_t wait);
+void tftSetSleep(bool enable);
+void tftSetIdleMode(bool mode);
+void tftSetDispBrightness(uint8_t brightness);
+void tftSetInvertion(bool i);
+void tftSetAdaptiveBrightness(uint8_t value);
+//void setGamma(uint8_t gamma);
+  
+#ifdef __cplusplus
+} // extern "C"
+#endif
+
+#endif /* _ILI9341_H */
