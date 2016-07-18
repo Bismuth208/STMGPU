@@ -1,4 +1,11 @@
+v.0.1.0 - add working 8x8 tiles code;
+		- add description for commands;
+		- cleanup SD card code;
 
+v.0.1.0 - moved from local to public repo;
+
+
+// ------------------------------------------------------------ //
 v.0.0.6 - add selection of interface;
 		- add busy protection;
 		- print info at start on LCD;
