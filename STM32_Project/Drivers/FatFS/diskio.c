@@ -1,236 +1,127 @@
-/*-----------------------------------------------------------------------*/
-/* Low level disk I/O module skeleton for FatFs     (C)ChaN, 2013        */
-/*-----------------------------------------------------------------------*/
-/* If a working storage control module is available, it should be        */
-/* attached to the FatFs via a glue function rather than modifying it.   */
-/* This is an example of glue functions to attach various exsisting      */
-/* storage control module to the FatFs module with a defined API.        */
-/*-----------------------------------------------------------------------*/
+/*
+* (c) Domen Puncer, Visionect, d.o.o.
+* BSD License
+*
+* v0.2 add support for SDHC
+*/
 
-#include "diskio.h"		/* FatFs lower layer API */
-//#include "usbdisk.h"	/* Example: USB drive control */
-//#include "atadrive.h"	/* Example: ATA drive control */
-//#include "sdcard.h"		/* Example: MMC/SDC contorl */
-
-/* Definitions of physical drive number for each media */
-#define ATA		0
-#define MMC		1
-#define USB		2
+#include <stdio.h>
+#include "diskio.h"
+#include "sdcard_spi.h"
+#include "integer.h"
 
 
-/*-----------------------------------------------------------------------*/
-/* Inidialize a Drive                                                    */
-/*-----------------------------------------------------------------------*/
+//===========================================================================//
 
-DSTATUS disk_initialize (
-	BYTE pdrv				/* Physical drive nmuber (0..) */
-)
+
+/*** fatfs code that uses the public API ***/
+
+
+DSTATUS disk_initialize(BYTE drv)
 {
-	DSTATUS stat;
-	int result;
-
-	switch (pdrv) {
-	case ATA :
-		result = ATA_disk_initialize();
-
-		// translate the reslut code here
-
-		return stat;
-
-	case MMC :
-		result = MMC_disk_initialize();
-
-		// translate the reslut code here
-
-		return stat;
-
-	case USB :
-		result = USB_disk_initialize();
-
-		// translate the reslut code here
-
-		return stat;
-	}
-	return STA_NOINIT;
+  if (hwif_init(&hw) == 0)
+    return 0;
+  
+  return STA_NOINIT;
 }
 
 
-
-/*-----------------------------------------------------------------------*/
-/* Get Disk Status                                                       */
-/*-----------------------------------------------------------------------*/
-
-DSTATUS disk_status (
-	BYTE pdrv		/* Physical drive nmuber (0..) */
-)
+DSTATUS disk_status(BYTE drv)
 {
-	DSTATUS stat;
-	int result;
-
-	switch (pdrv) {
-	case ATA :
-		result = ATA_disk_status();
-
-		// translate the reslut code here
-
-		return stat;
-
-	case MMC :
-		result = MMC_disk_status();
-
-		// translate the reslut code here
-
-		return stat;
-
-	case USB :
-		result = USB_disk_status();
-
-		// translate the reslut code here
-
-		return stat;
-	}
-	return STA_NOINIT;
+  if (hw.initialized)
+    return 0;
+  
+  return STA_NOINIT;
 }
 
 
-
-/*-----------------------------------------------------------------------*/
-/* Read Sector(s)                                                        */
-/*-----------------------------------------------------------------------*/
-
-DRESULT disk_read (
-	BYTE pdrv,		/* Physical drive nmuber (0..) */
-	BYTE *buff,		/* Data buffer to store read data */
-	DWORD sector,	/* Sector address (LBA) */
-	UINT count		/* Number of sectors to read (1..128) */
-)
+DRESULT disk_read(BYTE drv, BYTE *buff, DWORD sector, BYTE count)
 {
-	DRESULT res;
-	int result;
-
-	switch (pdrv) {
-	case ATA :
-		// translate the arguments here
-
-		result = ATA_disk_read(buff, sector, count);
-
-		// translate the reslut code here
-
-		return res;
-
-	case MMC :
-		// translate the arguments here
-
-		result = MMC_disk_read(buff, sector, count);
-
-		// translate the reslut code here
-
-		return res;
-
-	case USB :
-		// translate the arguments here
-
-		result = USB_disk_read(buff, sector, count);
-
-		// translate the reslut code here
-
-		return res;
-	}
-	return RES_PARERR;
+  int i;
+  
+  for (i=0; i<count; i++)
+    if (sd_read(&hw, sector+i, buff+512*i) != 0)
+      return RES_ERROR;
+  
+  return RES_OK;
 }
 
 
-
-/*-----------------------------------------------------------------------*/
-/* Write Sector(s)                                                       */
-/*-----------------------------------------------------------------------*/
-
-#if _USE_WRITE
-DRESULT disk_write (
-	BYTE pdrv,			/* Physical drive nmuber (0..) */
-	const BYTE *buff,	/* Data to be written */
-	DWORD sector,		/* Sector address (LBA) */
-	UINT count			/* Number of sectors to write (1..128) */
-)
+#if _READONLY == 0
+DRESULT disk_write(BYTE drv, const BYTE *buff, DWORD sector, BYTE count)
 {
-	DRESULT res;
-	int result;
-
-	switch (pdrv) {
-	case ATA :
-		// translate the arguments here
-
-		result = ATA_disk_write(buff, sector, count);
-
-		// translate the reslut code here
-
-		return res;
-
-	case MMC :
-		// translate the arguments here
-
-		result = MMC_disk_write(buff, sector, count);
-
-		// translate the reslut code here
-
-		return res;
-
-	case USB :
-		// translate the arguments here
-
-		result = USB_disk_write(buff, sector, count);
-
-		// translate the reslut code here
-
-		return res;
-	}
-	return RES_PARERR;
+  int i;
+  
+  for (i=0; i<count; i++)
+    if (sd_write(&hw, sector+i, buff+512*i) != 0)
+      return RES_ERROR;
+  
+  return RES_OK;
 }
-#endif
+#endif /* _READONLY */
 
 
-/*-----------------------------------------------------------------------*/
-/* Miscellaneous Functions                                               */
-/*-----------------------------------------------------------------------*/
 
-#if _USE_IOCTL
-DRESULT disk_ioctl (
-	BYTE pdrv,		/* Physical drive nmuber (0..) */
-	BYTE cmd,		/* Control code */
-	void *buff		/* Buffer to send/receive control data */
-)
+DRESULT disk_ioctl(BYTE drv, BYTE ctrl, void *buff)
 {
-	DRESULT res;
-	int result;
-
-	switch (pdrv) {
-	case ATA :
-		// pre-process here
-
-		result = ATA_disk_ioctl(cmd, buff);
-
-		// post-process here
-
-		return res;
-
-	case MMC :
-		// pre-process here
-
-		result = MMC_disk_ioctl(cmd, buff);
-
-		// post-process here
-
-		return res;
-
-	case USB :
-		// pre-process here
-
-		result = USB_disk_ioctl(cmd, buff);
-
-		// post-process here
-
-		return res;
-	}
-	return RES_PARERR;
+  switch (ctrl) {
+  case CTRL_SYNC:
+    return RES_OK;
+  case GET_SECTOR_SIZE:
+    *(WORD*)buff = 512;
+    return RES_OK;
+  case GET_SECTOR_COUNT:
+    *(DWORD*)buff = hw.sectors;
+    return RES_OK;
+  case GET_BLOCK_SIZE:
+    *(DWORD*)buff = hw.erase_sectors;
+    return RES_OK;
+  }
+  return RES_PARERR;
 }
-#endif
+
+// FAT time structure discription
+typedef struct
+{
+  DWORD sec: 	5;	// bits 0-4, 1 unit = 2 sec
+  DWORD	min:	6;	// bits 5-10
+  DWORD	hour:	5;	// bits 11-15
+  DWORD	day:	5;	// bits 16-20
+  DWORD	month:	4;	// bits 21-24
+  DWORD	year:	7;	// bits 25-31
+} fat_time_t;
+
+DWORD get_fattime(void)
+{
+  union
+  {
+    fat_time_t fat_time;
+    DWORD dword;
+  } time;
+  
+  time.fat_time.sec = 0;
+  time.fat_time.min = 0;
+  time.fat_time.hour = 12;
+  time.fat_time.day = 4;
+  time.fat_time.month = 9;
+  time.fat_time.year = 2013-1980;
+  
+  return time.dword;
+  
+}
+
+WCHAR ff_convert (	/* Converted character, Returns zero on error */
+                  WCHAR	src,	/* Character code to be converted */
+                  UINT	dir		/* 0: Unicode to OEMCP, 1: OEMCP to Unicode */
+                    )
+{
+  return src;
+}
+
+
+WCHAR ff_wtoupper (	/* Upper converted character */
+                   WCHAR chr		/* Input character */
+                     )
+{
+  return chr;
+}

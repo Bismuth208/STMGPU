@@ -30,6 +30,10 @@ typedef struct {
   
 extern const uint16_t *pCurrentPalette;
 
+extern uint8_t tileArr8x8[TILES_NUM_8x8][TILE_ARR_8X8_SIZE];
+extern uint8_t tileArr8x16[TILES_NUM_8x16][TILE_ARR_8X16_SIZE];
+extern uint8_t tileArr16x16[TILES_NUM_16x16][TILE_ARR_16X16_SIZE];
+
 // -------------------------------------------------------- //
 
 /*
@@ -43,6 +47,7 @@ void draw_PIC_RLE(int16_t x, int16_t y, uint8_t w, uint8_t h,
 
 void setCurrentPalette(const uint16_t *newPalette);
 
+uint8_t *getArrTilePointer8x8(uint8_t tileNum);
 void addTile8x8(uint8_t tileNum, uint8_t *pTile);
 
 

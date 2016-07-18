@@ -9,7 +9,7 @@
 *
 */
 
-#define SD 0 // Use FatFS
+#define SD 1 // Use FatFS
 
 #include <string.h>
 #include <stdint.h>
@@ -22,11 +22,7 @@
 #include <usart.h>
 #include <systicktimer.h>
 
-#if SD
-#include <ff.h>
-#include <diskio.h>
-#endif
-
+#include "sdWorker.h"
 #include "gpuWorker.h"
 #include "gpuTiles.h"
 
@@ -39,18 +35,6 @@
 //===========================================================================//
 
 static uint32_t nextInt = 9;
-
-
-
-#if SD
-
-FATFS SDfs;				/* File system object for each logical drive */
-FIL File;				/* File objects */
-FRESULT result;
-
-uint8_t buffer[50];
-
-#endif /* SD */
 
 //===========================================================================//
 uint32_t randNum(void)
@@ -65,60 +49,6 @@ void initRand(void)
 {
   nextInt += 5; // yes, it real, true dice roll "random"!
 }
-
-//===========================================================================//
-#if SD
-void sdCardTest(void)
-{  
-  UINT cnt;
-  uint8_t path[8] = "new.txt";
-  path[7] = '\0';
-  
-  setCursor(0, 30);
-  print("Mount sd...");
-  
-  result = f_mount(&SDfs, "0", 0);
-  
-  DIR dir;
-  FILINFO fileInfo;
-  int nFiles = 0;
-  
-  result = f_opendir(&dir, "/");
-  if (result == FR_OK)
-  {
-    while (((result = f_readdir(&dir, &fileInfo)) == FR_OK) && fileInfo.fname[0])
-    {
-      nFiles++;
-    }
-  }
-  f_closedir(&dir);
-  
-  
-  if(result == FR_OK) {
-    print(" ok!\n");
-    
-    print("open file...");
-    
-    result = f_open(&File, (char*)path, FA_OPEN_EXISTING | FA_READ);
-    
-    if(result == FR_OK) {
-      print(" ok!\n");
-      
-      f_read (&File, buffer, 10, &cnt);
-      
-      print((const char*)buffer);
-      
-    } else {
-      print(" failed!\n");
-    }
-    
-  } else {
-    print(" failed!\n");
-  }
-  
-  f_close(&File);
-}
-#endif
 
 //===========================================================================//
 // draw "STM GPU" pic whith mosaic effect
@@ -168,7 +98,50 @@ void drawSturtupScreen(void)
   setCursor(_width/5, _height-15);
   setTextColorBG(pCurrentPalette[0x0A], COLOR_BLACK); // 0x0A - dark green
   print("Powered by Bismuth208");
+  setCursor(0, 0);
   _delayMS(500); // he he he :[)
+}
+
+// debug
+void tileSetTest(void)
+{
+  uint16_t rndPosX, rndPosY;
+  uint8_t path[12] = "tileset.dat";
+  
+  // load 90 tiles from tile set  
+  SDLoadTileSet8x8(path, 9, 0, 90);
+  
+  while(1) {
+    rndPosX = randNum() % _width;
+    rndPosY = randNum() % _height;
+    
+    drawTile8x8(rndPosX, rndPosY, randNum()%90);
+  }
+}
+
+// debug
+void drawRamTileSet8x8(void)
+{
+  int16_t posX, posY;
+  uint8_t count =0;
+  uint8_t path[12] = "tileset.dat";
+  
+  // load 90 tiles from tile set  
+  SDLoadTileSet8x8(path, 9, 0, 90);
+  
+  for(uint8_t countY =0; countY <10; countY++) {
+    for(uint8_t countX =0; countX <9; countX++) {
+      
+      posX = (10 + ( countX * TILE_BASE_SIZE ));
+      posY = (10 + ( countY * TILE_BASE_SIZE ));
+      
+      drawTile8x8(posX, posY, count);
+      
+      ++count;
+    }
+  }
+  
+  while(1);
 }
 
 void init_GPIO_RCC(void)
@@ -220,9 +193,11 @@ void startupInit(void)
 
   drawSturtupScreen();
   
-#if SD
-  sdCardTest();
-#endif
+  // Init SD after all inited
+  init_sdCard();
+  
+  //drawRamTileSet8x8();
+  tileSetTest();
 }
 
 //------------------------- yep, here's how it all began... -------------------//

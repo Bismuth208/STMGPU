@@ -16,6 +16,7 @@
 #include <systicktimer.h>
 
 #include "gpuWorker.h"
+#include "sdWorker.h"
 #include "gpuTiles.h"
 
 //===========================================================================//
@@ -54,7 +55,7 @@
 
 static cmdBuffer_t cmdBuffer;
 static cmdBuffer2_t cmd_T_Buf;
-//static uint8_t cmdBufferStr[MAX_TEXT_SIZE];
+static uint8_t cmdBufferStr[MAX_TEXT_SIZE];
 
 // Actual numbers of commands: SERIAL_BUFFER_SIZE / 9
 // if SERIAL_BUFFER_SIZE = 2048 then max commands = 227 (if avg cmd size is 9 bytes)
@@ -120,14 +121,12 @@ void init_GPU(void)
   GPIO_Init(GPIOA, &GPIO_InitStruct);        // Apply settings to port A
   
   
-  GPIO_InitStruct.GPIO_Pin = GPU_BSY_LED; // LED BSY PIN
-  GPIO_Init(GPIOC, &GPIO_InitStruct);        // Apply settings to port С
+  //GPIO_InitStruct.GPIO_Pin = GPU_BSY_LED; // LED BSY PIN
+  //GPIO_Init(GPIOC, &GPIO_InitStruct);        // Apply settings to port С
   
-  GPIO_SET_PIN(GPIOC, GPU_BSY_LED); // turn off
+  //GPIO_SET_PIN(GPIOC, GPU_BSY_LED); // turn off
   
   // setup access to low level interface
-  setCursor(0, 0);
-  
   print(T_SELECT_WAY);
   
   if(/* GPIO_WAY_SELECT_HI */ 1) { // set USART
@@ -140,7 +139,7 @@ void init_GPU(void)
     pFuncWaitCutBuf = waitCutBuf_USART1;
     pFuncFlushBuf = fflush_USART1;
     
-    initBufStatus = init_UART1(USART_BAUD_9600);
+    initBufStatus = init_UART1(USART_BAUD_1M);
   } /* else {
     print(T_USER_WAY);
     
@@ -181,11 +180,11 @@ __noreturn __task void run_GPU(void)
     if((avaliableData > CALC_MAX_FILL_SIZE /*CALC_BUF_FILL(MAX_FILL_BUF)*/) && (!bsy)) { // buffer is allmost full, and no bsy flag
       bsy = 1;
       GPIO_SET_PIN(GPIOA, GPU_BSY_PIN); // say to CPU: "I`m bsy, do not send the data!"
-      GPIO_RESET_PIN(GPIOC, GPU_BSY_LED);
+      //GPIO_RESET_PIN(GPIOC, GPU_BSY_LED);
     } else if((avaliableData < CALC_MIN_FILL_SIZE /*CALC_BUF_FILL(MIN_FILL_BUF)*/) && (bsy)) { // buffer is allmost empty, and bsy flag
       bsy = 0;
       GPIO_RESET_PIN(GPIOA, GPU_BSY_PIN); // say to CPU: "I`m free, now send the data!"
-      GPIO_SET_PIN(GPIOC, GPU_BSY_LED);
+      //GPIO_SET_PIN(GPIOC, GPU_BSY_LED);
     }
 #endif
     
@@ -462,24 +461,43 @@ __noreturn __task void run_GPU(void)
       } break;
       
       // --------------- Tile/Sprite -------------- //
-      /*
-      case ADD_TLE_8: {
-      // get: tileNum || 1 bytes
       
-      // get: cmdBufferStr || from 64 to 256 bytes
+      case LDD_TLE_8: {
+        // get size of file name, tileset width, ram tile number, tile number in tileset
+        pFuncWaitCutBuf(cmdBuffer.data, 4);
+        // get file name
+        pFuncWaitCutBuf(cmdBufferStr, cmdBuffer.data[0]);
+        
+        SDLoadTileFromSet8x8(cmdBufferStr, cmdBuffer.data[1], cmdBuffer.data[2], cmdBuffer.data[3]);
+      } break;
       
-      // call: addTile8x8(tileNum, cmdBufferStr);
-      
+      case LDD_TLES_8: {
+        // get size of file name, tileset width, ram tile number, max number of tiles to load
+        pFuncWaitCutBuf(cmdBuffer.data, 4);
+        // get file name
+        pFuncWaitCutBuf(cmdBufferStr, cmdBuffer.data[0]);
+        
+        SDLoadTileSet8x8(cmdBufferStr, cmdBuffer.data[1], cmdBuffer.data[2], cmdBuffer.data[3]);
       } break;
       
       
-      case DRW_TLE_POS: {
-      // get: posX, posY, tileNum, tileType || 6 bytes
-      
-      // call: drawTileYxY(int16_t posX, int16_t posY, uint8_t tileNum);
-      
+      case LDD_TLES_RG_8: {
+        // get size of file name, tileset width, ram tile number,
+        // base tile number in tileset, max number of tiles to load
+        pFuncWaitCutBuf(cmdBuffer.data, 5);
+        // get file name
+        pFuncWaitCutBuf(cmdBufferStr, cmdBuffer.data[0]);
+        
+        SDLoadRegionOfTileSet8x8(cmdBufferStr, cmdBuffer.data[1], cmdBuffer.data[2], cmdBuffer.data[3], cmdBuffer.data[4]);
       } break;
-      */
+      
+      
+      case DRW_TLE_8_POS: {
+        pFuncWaitCutBuf(cmd_T_Buf.data, 5);
+        
+        drawTile8x8(cmd_T_Buf.par1, cmd_T_Buf.par2, cmd_T_Buf.par0);
+      } break;
+      
       
       
       // -------------  TO DO: ---------- //

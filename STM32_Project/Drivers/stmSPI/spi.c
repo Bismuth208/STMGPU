@@ -8,8 +8,6 @@
 
 #include "spi.h"
 
-#pragma diag_suppress=Pa082 // disable volatile warnings
-
 //---------------------------------------------------------------------------------------------//
 
 #define CR1_CLEAR_Mask       ((uint16_t)0x3040)
@@ -33,8 +31,8 @@ void init_SPI1(void)
   //Заполняем поля структуры нашими параметрами
   GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF_PP;      // Режим альтернативной функции
   GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;     // Скорость
-  GPIO_InitStruct.GPIO_Pin = MOSI_PIN | SCK_PIN ;
-  GPIO_Init(GPIOA, &GPIO_InitStruct);        // Применяем настроки на порт A
+  GPIO_InitStruct.GPIO_Pin = GPIO_Pin_SPI_LCD_MOSI | GPIO_Pin_SPI_LCD_SCK ;
+  GPIO_Init(GPIO_SPI_LCD, &GPIO_InitStruct);        // Применяем настроки на порт A
   
   uint16_t tmpreg = (uint16_t)((uint32_t)SPI_Direction_1Line_Tx |       // .SPI_Direction
                         SPI_Mode_Master |                       // .SPI_Mode
@@ -139,65 +137,6 @@ void sendData32_SPI1(uint16_t data0, uint16_t data1)
 #endif
 }
 
-
-//--------------------------------------- SPI_2 ------------------------------------------------//
-
-void init_SPI2(void)
-{
-  SET_BIT(RCC->APB1ENR, RCC_APB1ENR_SPI2EN);
-  
-  GPIO_InitTypeDef GPIO_InitStruct;
-  
-  GPIO_InitStruct.GPIO_Pin =  NSS_2_PIN | SCK_2_PIN |  MOSI_2_PIN;
-  GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF_PP;  // Режим альтернативной функции 
-  GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
-  GPIO_Init(GPIOB, &GPIO_InitStruct);
-  
-  
-  GPIO_InitStruct.GPIO_Pin =   MIS0_2_PIN;
-  GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN_FLOATING;
-  GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
-  GPIO_Init(GPIOB, &GPIO_InitStruct);
-  
-  
-  uint16_t tmpreg = (uint16_t)((uint32_t)SPI_Direction_2Lines_FullDuplex |       // .SPI_Direction
-                        SPI_Mode_Master |                       // .SPI_Mode
-                        SPI_DataSize_8b |                       // .SPI_DataSize
-                        SPI_CPOL_Low |                          // .SPI_CPOL
-                        SPI_CPHA_1Edge |                        // .SPI_CPHA
-                        SPI_NSS_Hard |                          // .SPI_NSS
-                        SPI_BaudRatePrescaler_256 |             // .SPI_BaudRatePrescaler
-                        SPI_FirstBit_MSB |                      // .SPI_FirstBit
-                        CR1_SPE_Set |                           // Enable SPI
-                        SPI_NSSInternalSoft_Set  );             // *see below PS
-  /*
-  * Tx and Rx
-  * Master mode
-  * transfer size 8 bit
-  * Polarity
-  * Clock phase of signal
-  * NSS by controled by soft
-  * SCK devider = 16
-  * First bit sended MSB
-  */
-  
-  /* Clear BIDIMode, BIDIOE, RxONLY, SSM, SSI, LSBFirst, BR, MSTR, CPOL and CPHA bits */
-  /* Write to SPIx CR1 */
-  MODIFY_REG(SPI2->CR1, CR1_CLEAR_Mask, tmpreg);
-  
-  /* Activate the SPI mode (Reset I2SMOD bit in I2SCFGR register) */
-  SPI2->I2SCFGR &= SPI_Mode_Select;
-  
-  /* *PS:
-  * Поскольку сигнал NSS контролируется программно, установим его в единицу
-  * Если сбросить его в ноль, то наш SPI модуль подумает, что
-  * у нас мультимастерная топология и его лишили полномочий мастера.
-  */ 
-}
-
-//---------------------------------------------------------------------------------------------//
-
-
 //---------------------------------- Code dump... ---------------------------------------------//
 #if 0
 void init_SPI1(void)
@@ -233,45 +172,6 @@ void init_SPI1(void)
   // Если сбросить его в ноль, то наш SPI модуль подумает, что
   // у нас мультимастерная топология и его лишили полномочий мастера.
   SPI_NSSInternalSoftwareConfig(SPI1, SPI_NSSInternalSoft_Set);
-}
-
-void init_SPI2(void)
-{
-  //RCC_APB1PeriphClockCmd(RCC_APB1Periph_SPI2, ENABLE);
-  SET_BIT(RCC->APB1ENR, RCC_APB1ENR_SPI2EN);
-  
-  GPIO_InitTypeDef GPIO_InitStruct;
-  
-  GPIO_InitStruct.GPIO_Pin =  NSS_2_PIN | SCK_2_PIN |  MOSI_2_PIN;
-  GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF_PP;  // Режим альтернативной функции 
-  GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
-  GPIO_Init(GPIOB, &GPIO_InitStruct);
-  
-  
-  GPIO_InitStruct.GPIO_Pin =   MIS0_2_PIN;
-  GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN_FLOATING;
-  GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
-  GPIO_Init(GPIOB, &GPIO_InitStruct);
-  
-  
-  // Configure SPI2 in Slave mode
-  SPI_InitTypeDef   SPI_InitStructure;
-  
-  SPI_InitStructure.SPI_Direction = SPI_Direction_2Lines_FullDuplex;
-  SPI_InitStructure.SPI_Mode = SPI_Mode_Master;
-  SPI_InitStructure.SPI_DataSize = SPI_DataSize_8b;
-  SPI_InitStructure.SPI_CPOL = SPI_CPOL_Low;
-  SPI_InitStructure.SPI_CPHA = SPI_CPHA_1Edge;
-  SPI_InitStructure.SPI_NSS = SPI_NSS_Soft;
-  SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_64;
-  SPI_InitStructure.SPI_FirstBit = SPI_FirstBit_MSB;
-  SPI_InitStructure.SPI_CRCPolynomial = 7;
-  
-  
-  SPI_Init(SPI2, &SPI_InitStructure);
-  SPI_Cmd(SPI2, ENABLE);
-  
-  SPI_NSSInternalSoftwareConfig(SPI2, SPI_NSSInternalSoft_Set);
 }
 
 void sendArrSPI(void *buf, uint16_t count)

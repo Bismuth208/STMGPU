@@ -124,16 +124,17 @@ __noreturn __task void run_GPU(void);
 
 
 // --------------- Tile/Sprite -------------- //
-#define ADD_TLE_8       0x30    // add tile 8x8 size
-#define DRW_TLE_POS     0x31    // draw tile on TFT screen
-#define SET_TLE_POS     0x33    // set tile position in tile screen
-#define LDD_TLE_SCR     0x34    // load tile screen
-#define DRW_TLE_SCR     0x35    // draw tile screen on TFT screen
-#define MAK_METTLE      0x36    // group tiles to metatile
-#define DRW_METTLE_SCR  0x37    // draw metatile on screen
-#define DRW_METTLE_POS  0x38    // draw metatile in tile screen
-#define DRW_METSCR_POS  0x39    // draw all tile screens on screen
-//#define NOT_USED        0x3A
+#define LDD_TLE_8       0x30    // load tile 8x8 size from SD
+#define LDD_TLES_8      0x31    // load tiles 8x8 size from SD
+#define LDD_TLES_RG_8   0x32    // load region of tiles 8x8 size from SD
+#define DRW_TLE_8_POS   0x33    // draw tile 8x8 size on TFT screen
+//#define SET_TLE_POS     0x34    // set tile position in tile screen
+//#define LDD_TLE_SCR     0x35    // load tile screen from SD
+//#define DRW_TLE_SCR     0x36    // draw tile screen on TFT screen
+//#define MAK_METTLE      0x37    // group tiles to metatile
+//#define DRW_METTLE_SCR  0x38    // draw metatile on screen
+//#define DRW_METTLE_POS  0x39    // draw metatile in tile screen
+//#define DRW_METSCR_POS  0x3A    // draw all tile screens on screen
 //#define NOT_USED        0x3B
 //#define NOT_USED        0x3C
 //#define NOT_USED        0x3D

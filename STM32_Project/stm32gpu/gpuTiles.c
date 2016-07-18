@@ -1,3 +1,5 @@
+#include <string.h>
+
 #include <gfx.h>
 #include <gfxDMA.h>
 #include <spi.h>
@@ -17,22 +19,22 @@
 // RAM size is limited and share to all type of sprites!
 // total: 10240
 // 6144 ( if 96x64 )
-static uint8_t tileArr8x8[TILES_NUM_8x8][TILE_ARR_8X8_SIZE] = {0, 0};
+uint8_t tileArr8x8[TILES_NUM_8x8][TILE_ARR_8X8_SIZE] = {0, 0};
 // 2048 ( if 16x128 )
-static uint8_t tileArr8x16[TILES_NUM_8x16][TILE_ARR_8X16_SIZE] = {0, 0};
+uint8_t tileArr8x16[TILES_NUM_8x16][TILE_ARR_8X16_SIZE] = {0, 0};
 // 2048 ( if 8x256 )
-static uint8_t tileArr16x16[TILES_NUM_16x16][TILE_ARR_16X16_SIZE] = {0, 0};
+uint8_t tileArr16x16[TILES_NUM_16x16][TILE_ARR_16X16_SIZE] = {0, 0};
 
 // total: 896
-static uint16_t lastTile8x8[TILE_ARR_8X8_SIZE];       // 128
-static uint16_t lastTile8x16[TILE_ARR_8X16_SIZE];     // 256
-static uint16_t lastTile16x16[TILE_ARR_16X16_SIZE];   // 512
+uint16_t lastTile8x8[TILE_ARR_8X8_SIZE];       // 128
+uint16_t lastTile8x16[TILE_ARR_8X16_SIZE];     // 256
+uint16_t lastTile16x16[TILE_ARR_16X16_SIZE];   // 512
 
 // on screen tile map background
 // total: 960 ( if 20x16 )
-static uint8_t rearBackGround[BACKGROUND_SIZE_W][BACKGROUND_SIZE_H] = {0, 0};
-static uint8_t middleBackGround[BACKGROUND_SIZE_W][BACKGROUND_SIZE_H] = {0, 0};
-static uint8_t frontBackGround[BACKGROUND_SIZE_W][BACKGROUND_SIZE_H] = {0, 0};
+uint8_t rearBackGround[BACKGROUND_SIZE_W][BACKGROUND_SIZE_H] = {0, 0};
+uint8_t middleBackGround[BACKGROUND_SIZE_W][BACKGROUND_SIZE_H] = {0, 0};
+uint8_t frontBackGround[BACKGROUND_SIZE_W][BACKGROUND_SIZE_H] = {0, 0};
 
 
 static uint16_t *pLastTileArr;
@@ -143,12 +145,18 @@ void draw_PIC_RLE(int16_t x, int16_t y, uint8_t w, uint8_t h,
 
 // -------------------------------------------------------- //
 
+// return the pointer to given tile array number
+uint8_t *getArrTilePointer8x8(uint8_t tileNum)
+{
+  return tileArr8x8[tileNum];
+}
+
 void addTile8x8(uint8_t tileNum, uint8_t *pTile)
 {
-  for(uint16_t count =0; count < TILE_ARR_8X8_SIZE; count++) {
-    tileArr8x8[tileNum][count] = pTile[count];
-  }
-  //memcpy(tileArr8x8[tileNum], pTile, TILE_ARR_8X8_SIZE);
+  //for(uint16_t count =0; count < TILE_ARR_8X8_SIZE; count++) {
+    //tileArr8x8[tileNum][count] = pTile[count];
+  //}
+  memcpy(tileArr8x8[tileNum], pTile, TILE_ARR_8X8_SIZE);
 }
 
 void loadTile8x8(uint8_t tileNum, uint8_t tileSetW, uint8_t *pTile, const uint8_t *pTileSet)
@@ -176,8 +184,6 @@ void drawTile8x8(int16_t posX, int16_t posY, uint8_t tileNum)
   
   // first set addr window (this is protection for DMA buffer data)
   tftSetAddrWindow(posX, posY, posX+7, posY+7);
-  
-  //pLastTileArr = lastTile8x8;
   
 #if USE_DMA
   for(uint16_t count =0; count < TILE_ARR_8X8_SIZE; count++) {
@@ -264,9 +270,9 @@ void drawTileMap(int16_t x, int16_t y, const uint8_t *pTileMap, uint8_t tileSize
       tileNum = pTileMap[2 + count];
       
       if(tileNumPrev == tileNum) {
-        pDrawTileFunc(posX, posY, tileNum);
-      } else {
         pRepeatTileFunc(posX, posY);
+      } else {
+        pDrawTileFunc(posX, posY, tileNum);
       }
       
       tileNumPrev = tileNum;

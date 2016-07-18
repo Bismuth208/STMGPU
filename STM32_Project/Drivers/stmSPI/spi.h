@@ -20,10 +20,10 @@
 
 // ------------------------- SPI_1 ------------------------- //
 //sck - pa5; miso - pa6; mosi - pa7;
- 
-#define SCK_PIN GPIO_Pin_5      // SCK
-#define MIS0_PIN GPIO_Pin_6     // DO
-#define MOSI_PIN GPIO_Pin_7     // DI
+#define GPIO_SPI_LCD            GPIOA
+#define GPIO_Pin_SPI_LCD_SCK    GPIO_Pin_5      // SCK
+#define GPIO_Pin_SPI_LCD_MISO   GPIO_Pin_6     // DO
+#define GPIO_Pin_SPI_LCD_MOSI   GPIO_Pin_7     // DI
 
 // remap
 //sck - pb3; miso - pb4; mosi - pb5;   
@@ -33,23 +33,14 @@
 #define MOSI_PIN GPIO_Pin_5     // DI   
 */
 
-#define SET_SCK_HI      (GPIOA->BSRR = SCK_PIN);
-#define SET_SCK_LOW     (GPIOA->BRR = SCK_PIN);
+#define SET_SCK_HI      (GPIO_SPI_LCD->BSRR = GPIO_Pin_SPI_LCD_SCK);
+#define SET_SCK_LOW     (GPIO_SPI_LCD->BRR = GPIO_Pin_SPI_LCD_SCK);
 
-#define SET_MOSI_HI     (GPIOA->BSRR = MOSI_PIN);
+#define SET_MOSI_HI     (GPIO_SPI_LCD->BSRR = GPIO_Pin_SPI_LCD_MOSI);
    
 // ждем пока данные передадутся до конца
 #define WAIT_FREE_TX    while ((SPI1->SR & SPI_I2S_FLAG_TXE) == (uint16_t)RESET);
 #define WAIT_FOR_BSY    while ((SPI1->SR & SPI_I2S_FLAG_BSY) != (uint16_t)RESET);
-
-// ------------------------- SPI_2 ------------------------- //
-// mosi - pb15; miso - pb14;
-// sck - pb13; nss - pb12;
-#define NSS_2_PIN GPIO_Pin_12
-#define SCK_2_PIN GPIO_Pin_13
-#define MIS0_2_PIN GPIO_Pin_14
-#define MOSI_2_PIN GPIO_Pin_15
-
 
 #endif // __AVR__
 
