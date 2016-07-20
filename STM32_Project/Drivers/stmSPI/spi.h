@@ -57,7 +57,8 @@ void init_SPI1(void);
 void sendData8_SPI1(uint8_t data);
 void sendData16_SPI1(uint16_t data);
 void sendData32_SPI1(uint16_t data0, uint16_t data1);
-void sendArrSPI(void *buf, uint16_t count);
+void sendArr16_SPI1(void *data, uint32_t size);
+void repeatData16_SPI1(uint16_t data, uint32_t size);
 //void endTrSPI(void);
 
 // ------------------------- SPI_2 ------------------------- //

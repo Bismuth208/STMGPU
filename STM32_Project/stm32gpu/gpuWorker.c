@@ -21,45 +21,12 @@
 
 //===========================================================================//
 
-#define MAX_TEXT_SIZE   256
-#define SYNC_SEQUENCE   0x42DD
-#define SYNC_OK         0xCC
-
-//===========================================================================//
-#define MAX_FILL_BUF    90      // in percent, warning if buffer overfilled
-#define MIN_FILL_BUF    5
-
-#define CALC_BUF_FILL(a)   ((SERIAL_BUFFER_SIZE/100)*a)
-
-// calculated value
-#define CALC_MAX_FILL_SIZE      3800    // for 95 %   \ __ and SERIAL_BUFFER_SIZE = 4096 
-#define CALC_MIN_FILL_SIZE      200     // for 5 %   /
-
-// Buffer bsy indication, CPU MUST check this pin EVERYTIME before send any command!
-// othervice, undefined behavor, can happen evething (buffer overflow, wrong commands)
-#define GPU_BSY_PIN GPIO_Pin_11
-#define GPU_BSY_LED GPIO_Pin_13
-
-//===========================================================================//
-#define T_SELECT_WAY    "Selected interface: "
-#define T_USART_WAY     "USART_1\n"
-#define T_INIT_BUF      "Init command buffer... "
-#define T_WAIT_SYNC     "Waiting for sync... "
-#define T_TFT_SIZE      "Sending TFT size to host... "
-#define T_GPU_START     "Start GPU...\n"
-
-#define T_OK            "ok.\n"
-#define T_FAIL          "fail.\n"
-
-//===========================================================================//
-
 static cmdBuffer_t cmdBuffer;
 static cmdBuffer2_t cmd_T_Buf;
 static uint8_t cmdBufferStr[MAX_TEXT_SIZE];
 
 // Actual numbers of commands: SERIAL_BUFFER_SIZE / 9
 // if SERIAL_BUFFER_SIZE = 2048 then max commands = 227 (if avg cmd size is 9 bytes)
-
 //===========================================================================//
 
 // This pointers is for low level access to interfeces (USART, SPI, I2C or other)
@@ -74,7 +41,6 @@ void (*pFuncFlushBuf)(void);
 
 // to reduce memory usage, malloc memory for buffer after select the interface
 //uint8_t (*pFuncInitBuffer)(void*);
-
 //===========================================================================//
 
 // Make sync whith CPU by read from USART buffer 
@@ -469,6 +435,7 @@ __noreturn __task void run_GPU(void)
         pFuncWaitCutBuf(cmdBufferStr, cmdBuffer.data[0]);
         
         SDLoadTileFromSet8x8(cmdBufferStr, cmdBuffer.data[1], cmdBuffer.data[2], cmdBuffer.data[3]);
+        // memset(cmdBufferStr, 0x00, cmdBuffer.data[0]); // remove name
       } break;
       
       case LDD_TLES_8: {
@@ -478,8 +445,8 @@ __noreturn __task void run_GPU(void)
         pFuncWaitCutBuf(cmdBufferStr, cmdBuffer.data[0]);
         
         SDLoadTileSet8x8(cmdBufferStr, cmdBuffer.data[1], cmdBuffer.data[2], cmdBuffer.data[3]);
-      } break;
-      
+        // memset(cmdBufferStr, 0x00, cmdBuffer.data[0]); // remove name
+      } break;    
       
       case LDD_TLES_RG_8: {
         // get size of file name, tileset width, ram tile number,
@@ -489,8 +456,8 @@ __noreturn __task void run_GPU(void)
         pFuncWaitCutBuf(cmdBufferStr, cmdBuffer.data[0]);
         
         SDLoadRegionOfTileSet8x8(cmdBufferStr, cmdBuffer.data[1], cmdBuffer.data[2], cmdBuffer.data[3], cmdBuffer.data[4]);
+        // memset(cmdBufferStr, 0x00, cmdBuffer.data[0]); // remove name
       } break;
-      
       
       case DRW_TLE_8_POS: {
         pFuncWaitCutBuf(cmd_T_Buf.data, 5);
@@ -516,7 +483,7 @@ __noreturn __task void run_GPU(void)
       
       default: {
         pFuncFlushBuf();
-        //TO DO:
+        // TO DO:
         // make sync;
         // buffer error alert
       } break;

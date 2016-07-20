@@ -27,12 +27,18 @@ typedef struct {
     uint8_t *pTilesIdArr;
     uint8_t tilesCount;
 } tileGroup_t;
+
+typedef struct {
+  uint8_t lasttileNum;
+  uint8_t drawed;
+  uint16_t *pLastTileArr;
+} lastTile_t;
   
 extern const uint16_t *pCurrentPalette;
 
-extern uint8_t tileArr8x8[TILES_NUM_8x8][TILE_ARR_8X8_SIZE];
-extern uint8_t tileArr8x16[TILES_NUM_8x16][TILE_ARR_8X16_SIZE];
-extern uint8_t tileArr16x16[TILES_NUM_16x16][TILE_ARR_16X16_SIZE];
+//extern uint8_t tileArr8x8[TILES_NUM_8x8][TILE_ARR_8X8_SIZE];
+//extern uint8_t tileArr8x16[TILES_NUM_8x16][TILE_ARR_8X16_SIZE];
+//extern uint8_t tileArr16x16[TILES_NUM_16x16][TILE_ARR_16X16_SIZE];
 
 // -------------------------------------------------------- //
 

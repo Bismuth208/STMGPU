@@ -137,6 +137,35 @@ void sendData32_SPI1(uint16_t data0, uint16_t data1)
 #endif
 }
 
+void sendArr16_SPI1(void *data, uint32_t size)
+{
+  SET_BIT(SPI1->CR1, SPI_DataSize_16b);
+  
+  for(uint32_t count =0; count < size; count++) {
+    WAIT_FREE_TX;
+    SPI1->DR = ((uint16_t*)data)[count];
+  }
+  
+  WAIT_FREE_TX;
+  WAIT_FOR_BSY;
+  CLEAR_BIT(SPI1->CR1, SPI_DataSize_16b);       // set 8bit size
+}
+
+void repeatData16_SPI1(uint16_t data, uint32_t size)
+{
+  SET_BIT(SPI1->CR1, SPI_DataSize_16b);
+  
+  while(size) {
+    WAIT_FREE_TX;
+    SPI1->DR = data;
+    --size;
+  }
+  
+  WAIT_FREE_TX;
+  WAIT_FOR_BSY;
+  CLEAR_BIT(SPI1->CR1, SPI_DataSize_16b);       // set 8bit size
+}
+
 //---------------------------------- Code dump... ---------------------------------------------//
 #if 0
 void init_SPI1(void)
@@ -172,23 +201,6 @@ void init_SPI1(void)
   // Если сбросить его в ноль, то наш SPI модуль подумает, что
   // у нас мультимастерная топология и его лишили полномочий мастера.
   SPI_NSSInternalSoftwareConfig(SPI1, SPI_NSSInternalSoft_Set);
-}
-
-void sendArrSPI(void *buf, uint16_t count)
-{
-    if (count == 0) return;
-    
-    uint8_t *p = (uint8_t *)buf;
-    SPDR = *p;
-    while (count--) {
-        uint8_t out = *(p + 1);
-        while (!(SPSR & _BV(SPIF))) ;
-        uint8_t in = SPDR;
-        SPDR = out;
-        *p++ = in;
-    }
-    while (!(SPSR & _BV(SPIF))) ;
-    *p = SPDR;
 }
 
 uint16_t readData8_SPI1(uint8_t data)

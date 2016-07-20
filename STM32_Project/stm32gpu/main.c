@@ -9,8 +9,6 @@
 *
 */
 
-#define SD 1 // Use FatFS
-
 #include <string.h>
 #include <stdint.h>
 
@@ -34,7 +32,7 @@
 
 //===========================================================================//
 
-static uint32_t nextInt = 9;
+static uint32_t nextInt = 9;  // yes, it real, true dice roll "random"!
 
 //===========================================================================//
 uint32_t randNum(void)
@@ -47,7 +45,7 @@ uint32_t randNum(void)
 
 void initRand(void)
 {
-  nextInt += 5; // yes, it real, true dice roll "random"!
+  /* TODO: add here something really randomised */
 }
 
 //===========================================================================//
@@ -82,10 +80,10 @@ void drawSturtupScreen(void)
       // 2 is offet from tileswide and tileshigh
       tileIndex = stmGpuTileMap[2 + tileIndex];
       
-      // reuse this vars to show where to draw;
-      // 10 and 40 is base position on sreen in px
-      rndTileX = ((_width/6) + ( rndTileX * TILE_BASE_SIZE ));          // old = 10
-      rndTileY = (( _height/4) + ( rndTileY * TILE_BASE_SIZE ));        // old = 40
+      // reuse rndTileX and rndTileY vars to show where to draw;
+      // trying to draw in centre of screen
+      rndTileX = ((_width/6) + ( rndTileX * TILE_BASE_SIZE ));
+      rndTileY = (( _height/4) + ( rndTileY * TILE_BASE_SIZE ));
       
       // draw tile
       drawTile8x8(rndTileX, rndTileY, tileIndex);
@@ -100,48 +98,6 @@ void drawSturtupScreen(void)
   print("Powered by Bismuth208");
   setCursor(0, 0);
   _delayMS(500); // he he he :[)
-}
-
-// debug
-void tileSetTest(void)
-{
-  uint16_t rndPosX, rndPosY;
-  uint8_t path[12] = "tileset.dat";
-  
-  // load 90 tiles from tile set  
-  SDLoadTileSet8x8(path, 9, 0, 90);
-  
-  while(1) {
-    rndPosX = randNum() % _width;
-    rndPosY = randNum() % _height;
-    
-    drawTile8x8(rndPosX, rndPosY, randNum()%90);
-  }
-}
-
-// debug
-void drawRamTileSet8x8(void)
-{
-  int16_t posX, posY;
-  uint8_t count =0;
-  uint8_t path[12] = "tileset.dat";
-  
-  // load 90 tiles from tile set  
-  SDLoadTileSet8x8(path, 9, 0, 90);
-  
-  for(uint8_t countY =0; countY <10; countY++) {
-    for(uint8_t countX =0; countX <9; countX++) {
-      
-      posX = (10 + ( countX * TILE_BASE_SIZE ));
-      posY = (10 + ( countY * TILE_BASE_SIZE ));
-      
-      drawTile8x8(posX, posY, count);
-      
-      ++count;
-    }
-  }
-  
-  while(1);
 }
 
 void init_GPIO_RCC(void)
@@ -176,28 +132,20 @@ void startupInit(void)
   
   init_GPIO_RCC();
   init_SPI1();
-  
-  tftBegin();         /* initialize a ILI9341 chip */
-  //initR(INITR_BLACKTAB);
-  
-  tftSetRotation(1); // Horizontal
-  //setTextColorBG(COLOR_GREEN, COLOR_BLACK);
-  //setTextColor(COLOR_GREEN);
-  
   //initRand();
   
-  setCurrentPalette(nesPalette_ext); // extended NES palette
-  
-  // 67 tiles, 17 wide, tiles array, tile size 8x8
-  loadTileSet(67, 17, stm_gpu_nes_tiles2_data, 1); // startup logo
+  tftBegin();         /* initialize a ILI9341 chip */
+  //initR(INITR_BLACKTAB);          /* initialize a ST7735 chip */
+  tftSetRotation(1); // Horizontal
 
+  // 67 tiles, 17 wide, tiles array, tile size 8x8
+  loadTileSet(67, 17, stm_gpu_nes_tiles2_data, 1);      // startup logo
+  setCurrentPalette(nesPalette_ext);                    // extended NES palette
+  
   drawSturtupScreen();
   
   // Init SD after all inited
   init_sdCard();
-  
-  //drawRamTileSet8x8();
-  tileSetTest();
 }
 
 //------------------------- yep, here's how it all began... -------------------//

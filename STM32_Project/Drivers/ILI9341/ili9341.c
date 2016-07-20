@@ -68,7 +68,7 @@ int16_t _height = ILI9341_TFTHEIGHT;
 void writeCommand(uint8_t c)
 {
 #if USE_FSMC
-  *(uint16_t *) (LCD_FSMC_CMD) = c;
+  FSMC_SEND_CMD(c);
 #else
   ENABLE_CMD();
   
@@ -80,7 +80,7 @@ void writeCommand(uint8_t c)
 void writeData(uint8_t c)
 {
 #if USE_FSMC
-  *(uint16_t *) (LCD_FSMC_DATA) = c;
+  FSMC_SEND_DATA(c);
 #else
   ENABLE_DATA();
   
@@ -92,7 +92,7 @@ void writeData(uint8_t c)
 void writeWordData(uint16_t c)
 {
 #if USE_FSMC
-  *(uint16_t *) (LCD_FSMC_DATA) = c;
+  FSMC_SEND_DATA(c);
 #else
   ENABLE_DATA();
   
@@ -260,16 +260,15 @@ void tftSetAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1)
 #endif
   
 #if USE_FSMC
-  *(uint16_t*)(LCD_FSMC_CMD) = ILI9341_CASET;    // Column addr set
-  *(uint16_t*)(LCD_FSMC_DATA) = x0;             // XSTART
-  *(uint16_t*)(LCD_FSMC_DATA) = x1;             // XEND
+  FSMC_SEND_CMD(ILI9341_CASET);    // Column addr set
+  FSMC_SEND_DATA(x0);           // XSTART
+  FSMC_SEND_DATA(x1);           // XEND
   
-  *(uint16_t*)(LCD_FSMC_CMD) = ILI9341_RASET;    // Row addr set
-  *(uint16_t*)(LCD_FSMC_DATA) = y0;             // YSTART
-  *(uint16_t*)(LCD_FSMC_DATA) = y1;             // YEND
+  FSMC_SEND_CMD(ILI9341_RASET);    // Row addr set
+  FSMC_SEND_DATA(y0);           // YSTART
+  FSMC_SEND_DATA(y1);           // YEND
   
-  *(uint16_t*)(LCD_FSMC_CMD) = ILI9341_RAMWR;    // write to RAM
-  
+  FSMC_SEND_CMD(ILI9341_RAMWR);     // write to RAM
 #else
   
   ENABLE_CMD();             // grab TFT CS and writecommand:
@@ -311,16 +310,15 @@ void tftSetVAddrWindow(uint16_t x0, uint16_t y0, uint16_t y1)
 #endif
   
 #if USE_FSMC
-  *(uint16_t*)(LCD_FSMC_CMD) = ILI9341_CASET;    // Column addr set
-  *(uint16_t*)(LCD_FSMC_DATA) = x0;             // XSTART
-  *(uint16_t*)(LCD_FSMC_DATA) = x0;             // XEND
+  FSMC_SEND_CMD(ILI9341_CASET);    // Column addr set
+  FSMC_SEND_DATA(x0);           // XSTART
+  FSMC_SEND_DATA(x0);           // XEND
   
-  *(uint16_t*)(LCD_FSMC_CMD) = ILI9341_RASET;    // Row addr set
-  *(uint16_t*)(LCD_FSMC_DATA) = y0;             // YSTART
-  *(uint16_t*)(LCD_FSMC_DATA) = y1;             // YEND
+  FSMC_SEND_CMD(ILI9341_RASET);    // Row addr set
+  FSMC_SEND_DATA(y0);           // YSTART
+  FSMC_SEND_DATA(y1);           // YEND
   
-  *(uint16_t*)(LCD_FSMC_CMD) = ILI9341_RAMWR;    // write to RAM
-  
+  FSMC_SEND_CMD(ILI9341_RAMWR);     // write to RAM  
 #else
   
   ENABLE_CMD();             // grab TFT CS and writecommand:
@@ -362,16 +360,15 @@ void tftSetHAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1)
 #endif
   
 #if USE_FSMC
-  *(uint16_t*)(LCD_FSMC_CMD) = ILI9341_CASET;    // Column addr set
-  *(uint16_t*)(LCD_FSMC_DATA) = x0;             // XSTART
-  *(uint16_t*)(LCD_FSMC_DATA) = x1;             // XEND
+  FSMC_SEND_CMD(ILI9341_CASET);    // Column addr set
+  FSMC_SEND_DATA(x0);           // XSTART
+  FSMC_SEND_DATA(x1);           // XEND
   
-  *(uint16_t*)(LCD_FSMC_CMD) = ILI9341_RASET;    // Row addr set
-  *(uint16_t*)(LCD_FSMC_DATA) = y0;             // YSTART
-  *(uint16_t*)(LCD_FSMC_DATA) = y0;             // YEND
+  FSMC_SEND_CMD(ILI9341_RASET);    // Row addr set
+  FSMC_SEND_DATA(y0);           // YSTART
+  FSMC_SEND_DATA(y0);           // YEND
   
-  *(uint16_t*)(LCD_FSMC_CMD) = ILI9341_RAMWR;    // write to RAM
-  
+  FSMC_SEND_CMD(ILI9341_RAMWR);     // write to RAM
 #else
   
   ENABLE_CMD();             // grab TFT CS and writecommand:
@@ -413,16 +410,15 @@ void tftSetAddrPixel(uint16_t x0, uint16_t y0)
 #endif
   
 #if USE_FSMC
-  *(uint16_t*)(LCD_FSMC_CMD) = ILI9341_CASET;    // Column addr set
-  *(uint16_t*)(LCD_FSMC_DATA) = x0;             // XSTART
-  *(uint16_t*)(LCD_FSMC_DATA) = x0;             // XEND
+  FSMC_SEND_CMD(ILI9341_CASET);    // Column addr set
+  FSMC_SEND_DATA(x0);           // XSTART
+  FSMC_SEND_DATA(x0);           // XEND
   
-  *(uint16_t*)(LCD_FSMC_CMD) = ILI9341_RASET;    // Row addr set
-  *(uint16_t*)(LCD_FSMC_DATA) = y0;             // YSTART
-  *(uint16_t*)(LCD_FSMC_DATA) = y0;             // YEND
+  FSMC_SEND_CMD(ILI9341_RASET);    // Row addr set
+  FSMC_SEND_DATA(y0);           // YSTART
+  FSMC_SEND_DATA(y0);           // YEND
   
-  *(uint16_t*)(LCD_FSMC_CMD) = ILI9341_RAMWR;    // write to RAM
-  
+  FSMC_SEND_CMD(ILI9341_RAMWR);     // write to RAM
 #else
   
   ENABLE_CMD();             // grab TFT CS and writecommand:

@@ -326,16 +326,15 @@ void tftFillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color)
   
   //SET_TFT_DC_HI;
   //SET_TFT_CS_LOW;
-  
+#if USE_FSMC
   for(y=h; y>0; y--) {
     for(x=w; x>0; x--) {
-#if USE_FSMC
-      *(uint16_t *) (LCD_FSMC_DATA) = color;
-#else
-      sendData16_SPI1(color);
-#endif // USE_FSMC
+      FSMC_SEND_DATA(color);
     }
   }
+#else
+  repeatData16_SPI1(color, w*h,);
+#endif // USE_FSMC
   RELEASE_TFT();
   
 #endif // USE_DMA
@@ -726,7 +725,7 @@ void drawChar(int16_t x, int16_t y, uint8_t c, uint16_t fgcolor, uint16_t bgcolo
             charBuffer[bufCount++] = color;
 #else
 #if USE_FSMC
-            *(uint16_t *) (LCD_FSMC_DATA) = color;
+            FSMC_SEND_DATA(color);
 #else
             sendData16_SPI1(color);
 #endif // USE_FSMC
@@ -738,7 +737,7 @@ void drawChar(int16_t x, int16_t y, uint8_t c, uint16_t fgcolor, uint16_t bgcolo
           charBuffer[bufCount++] = bgcolor;
 #else
 #if USE_FSMC
-          *(uint16_t *) (LCD_FSMC_DATA) = bgcolor;
+          FSMC_SEND_DATA(bgcolor);
 #else
           sendData16_SPI1(bgcolor);
 #endif // USE_FSMC
@@ -838,7 +837,7 @@ int16_t height(void)
 void tftPushColor(uint16_t color)
 {
 #if USE_FSMC
-  *(uint16_t *) (LCD_FSMC_DATA) = color;
+  FSMC_SEND_DATA(color);
 #else
   //SET_TFT_DC_HI;
   //SET_TFT_CS_LOW;
@@ -857,7 +856,7 @@ void tftDrawPixel(int16_t x, int16_t y, uint16_t color)
   tftSetAddrPixel(x, y);
 
 #if USE_FSMC
-  *(uint16_t *) (LCD_FSMC_DATA) = color;
+  *FSMC_SEND_DATA(color);
 #else
   //SET_TFT_DC_HI;
   //SET_TFT_CS_LOW;
@@ -883,14 +882,13 @@ void tftDrawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color)
   fillColor_DMA1_SPI1(h, color);
   //SET_TFT_CS_HI;
 #else
-  
-  while (h--) {
 #if USE_FSMC
-    *(uint16_t *) (LCD_FSMC_DATA) = color;
-#else
-    sendData16_SPI1(color);
-#endif // USE_FSMC
+  while (h--) {
+    FSMC_SEND_DATA(color);
   }
+#else
+  repeatData16_SPI1(color, h);
+#endif // USE_FSMC
   RELEASE_TFT();
 #endif // USE_DMA
   
@@ -912,16 +910,15 @@ void tftDrawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color)
   fillColor_DMA1_SPI1(w, color);
   //SET_TFT_CS_HI;
 #else
-  
-  while (w--) {
 #if USE_FSMC
-    *(uint16_t *) (LCD_FSMC_DATA) = color;
-#else
-    sendData16_SPI1(color);
-#endif // USE_FSMC
+  while (w--) {
+    FSMC_SEND_DATA(color);
   }
+#else
+  repeatData16_SPI1(color, w);
+#endif // USE_FSMC
   RELEASE_TFT();
-#endif  // USE_DMA
+#endif // USE_DMA
   
 }
 

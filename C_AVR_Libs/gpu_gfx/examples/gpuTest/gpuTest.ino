@@ -3,15 +3,8 @@
 
 #include <systicktimer.h>
 
-#if 1
 #include <uart.h>
 #include <gpu_gfx.h>
-#else
-//#include <avrspi.h>
-//#include <ili9341.h>
-//#include <st7735.h>
-//#include <gfx.h>
-#endif
 
 #include "gpuTest.h"
 
@@ -25,15 +18,7 @@
 
 #define TEST_SAMPLE_SIZE 2000
 
-//#define BAUDRATE 9600
-//#define BAUDRATE 57600
-//#define BAUDRATE 115200
-#define BAUDRATE 1000000
-
-//static uint16_t nextInt = 4;
 static uint32_t nextInt = 1;
-
-uint16_t roundsPassed =0;
 
 void (*pArrExecGFXFunc[])(void) = {
     testdrawtext,
@@ -57,30 +42,6 @@ void (*pArrExecGFXFunc[])(void) = {
     matrixScreen
   };
 
-/*
-// xorshift + LCPRNG
-uint16_t randNum(void)
-{
-  nextInt ^= nextInt >> 2; // 4
-  nextInt ^= nextInt << 5; // 7
-  nextInt ^= nextInt >> 9; // 9
-  //nextInt = (nextInt * 214013 ) & 0x7fff;
-  nextInt = (nextInt * 27103 ) & 0x7fff;
-  return nextInt;
-}
-*/
-// xorshift
-/*
-uint32_t randNum(void)
-{
-  nextInt ^= nextInt >> 6; // 12
-  nextInt ^= nextInt << 11; // 25
-  nextInt ^= nextInt >> 15; // 27
-  nextInt = ( nextInt * 3538123 ) & 0x7fffffff;
-  //nextInt = ( nextInt * 2348138948 ) & 0x7fffffff;
-  return nextInt;
-}
-*/
 uint32_t randNum(void)
 {
   nextInt ^= nextInt >> 6;
@@ -118,35 +79,6 @@ void initRand(void)
 {
   nextInt += getTemp();  // yes, it real "random"!
 }
-
-#if 0
-void reverse(char s[])
-{
-  int i, j;
-  char c;
-  for (i = 0, j = strlen(s)-1; i<j; i++, j--) {
-    c = s[i];
-    s[i] = s[j];
-    s[j] = c;
-  }
-}
-
-void itoa(int n, char s[])
-{
-  int i, sign;
-  if ((sign = n) < 0) //записываем знак 
-    n = -n; // делаем n положительным числом 
-  i = 0;
-  do { //генерируем цифры в обратном порядке 
-    s[i++] = n % 10 + '0'; //берем следующую цифру 
-  } while ((n /= 10) > 0); // удаляем 
-  
-  if (sign < 0)
-    s[i++] = '-';
-  s[i] = '\0';
-  reverse(s);
-}
-#endif
 
 // --------------------------------------------------------- //
 
@@ -512,24 +444,6 @@ void testdrawtext(void)
 
   //tftPrintPGR((char*)Loremipsum);
   tftPrintPGR((char*)Loremipsum2);
-  //print("Lorem ipsum dolor sit amet, consectetur adipiscing elit. Curabitur adipiscing ante sed nibh tincidunt feugiat. Maecenas enim massa, fringilla sed malesuada et, malesuada sit amet turpis. Sed porttitor neque ut ante pretium vitae malesuada nunc bibendum. Nullam aliquet ultrices massa eu hendrerit. Ut sed nisi lorem. In vestibulum purus a tortor imperdiet posuere. ");
-}
-
-// ---------------------------------------------------------- //
-void drawRounds(void)
-{
-  char buf[10];
-
-  memset(buf, 0, 10);
-
-  setCursor(0, 0);
-  setTextColor(COLOR_WHITE);
-
-  ++roundsPassed;
-
-  print("Rounds passed: ");
-  itoa(roundsPassed, buf, 10);
-  print(buf);
 }
 
 // ---------------------------------------------------------- //
@@ -538,16 +452,8 @@ __attribute__ ((noreturn)) int main(void)
   initSysTickTimer(); //it`s enable timer0 on atmega328p;
   initRand();
 
-  #if 1
-  uartSetup(BAUDRATE);
+  uartSetup(USART_BAUD_1M);
   sync_gpu();
-  #else
-  initSPI();
-
-  //tftBegin();         // initialize a ILI9341 chip
-  initR(INITR_BLACKTAB);
-  tftSetRotation(1);
-  #endif
 
   tftFillScreen(COLOR_BLACK);
 
@@ -564,15 +470,5 @@ __attribute__ ((noreturn)) int main(void)
        _delayMS(1000);  // actual 500
       tftFillScreen(COLOR_BLACK);
     }
-    
-
-    /* hardtest 
-    pArrExecGFXFunc[randNum() % 14]();
-    tftFillScreen(COLOR_BLACK);
-    */
-    
-    //drawRounds();
-    //_delayMS(4000);  // actual 2000
-    //tftFillScreen(COLOR_BLACK);
   }
 }

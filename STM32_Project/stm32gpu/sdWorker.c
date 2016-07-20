@@ -23,25 +23,25 @@ FATFS SDfs;				/* File system object for each logical drive */
 FIL File;				/* File objects */
 FRESULT result;
 
-uint8_t buffer[50];
+//uint8_t buffer[50];
 
-#define BUFFPIXELCOUNT 320	// size of the buffer in pixels
+//#define BUFFPIXELCOUNT 320	// size of the buffer in pixels
 //===========================================================================//
 
 void init_sdCard(void)
 {
   sd_spi_init(); // init SPI_2 for SD card
   
-  print("Mount sd... ");
+  print( T_MOUNT_SD );
   
   // mount drive immedetly
   result = f_mount(&SDfs, "0", 1);
   
   if(result == FR_OK) {
-    print("ok.\n");
+    print(T_OK);
 
   } else {
-    print("fail.\n");
+    print(T_FAIL);
   }
 }
 
@@ -56,20 +56,16 @@ void SDLoadTileFromSet8x8(uint8_t *tileSetArrName, uint8_t tileSetW, uint8_t ram
   * and store loaded data to RAM
   */
   
-  UINT cnt;
+  UINT tileDataOffset =0;
   
-  uint8_t count =0;
-  uint8_t tileYcnt;
-  
+  uint8_t tileYcnt;                     // scanline counter
   uint16_t tileNumOffsetX = 0;
   uint16_t tileNewLineOffsetY = 0;
   uint16_t offset = 0;
   
-  //print("open tileSet Array... ");
   result = f_open(&File, (char*)tileSetArrName, FA_OPEN_EXISTING | FA_READ);
   
   if(result == FR_OK) {
-    //print("ok.\n");
     
     uint8_t *pTileArr = getArrTilePointer8x8(ramTileNum);
     
@@ -80,17 +76,18 @@ void SDLoadTileFromSet8x8(uint8_t *tileSetArrName, uint8_t tileSetW, uint8_t ram
     
     f_lseek (&File, offset+tileNumOffsetX);
     
+    // load whole tile 8x8, layer by layer
     for(tileYcnt = 0; tileYcnt < TILE_BASE_SIZE; tileYcnt++) { // Y
+      // read 8 pixels
+      f_read(&File, &pTileArr[tileDataOffset], TILE_BASE_SIZE, &tileDataOffset);
       
-      f_read(&File, &pTileArr[count], TILE_BASE_SIZE, &cnt);
-      
-      count += TILE_BASE_SIZE;
+      // set next scanline
       offset += tileNewLineOffsetY;
       f_lseek (&File, offset+tileNumOffsetX);
     }
     
   } else {
-    //print("fail.\n");
+    // TODO: add some error code when return
     return;
   }
   
@@ -109,20 +106,16 @@ void SDLoadTileSet8x8(uint8_t *tileSetArrName, uint8_t tileSetW, uint8_t ramTile
   * Store loaded data to RAM from ramTileBase to (ramTileBase + tileMax);
   */
   
-  UINT cnt;
+  UINT tileDataOffset =0;
   
-  uint8_t tileDataOffset =0;
-  uint8_t tileYcnt;
-  
+  uint8_t tileYcnt;                     // scanline counter
   uint16_t tileNumOffsetX = 0;
   uint16_t tileNewLineOffsetY = 0;
   uint16_t offset = 0;
   
-  //print("open tileSet Array... ");
   result = f_open(&File, (char*)tileSetArrName, FA_OPEN_EXISTING | FA_READ);
   
   if(result == FR_OK) {
-    //print("ok.\n");
     
     uint8_t *pTileArr =0;
     
@@ -135,21 +128,21 @@ void SDLoadTileSet8x8(uint8_t *tileSetArrName, uint8_t tileSetW, uint8_t ramTile
       tileNumOffsetX = (tileCount % tileSetW)*TILE_BASE_SIZE;     // start position
       offset = ((tileCount)  / (tileSetW)) * (tileSetW * TILE_ARR_8X8_SIZE);
       
-      f_lseek (&File, offset);
+      f_lseek (&File, offset+tileNumOffsetX);
       
+      // load whole tile 8x8, layer by layer
       for(tileYcnt = 0; tileYcnt < TILE_BASE_SIZE; tileYcnt++) { // Y
-        
-        f_read(&File, &pTileArr[tileDataOffset], TILE_BASE_SIZE, &cnt);
-        
-        tileDataOffset += TILE_BASE_SIZE;
+        // read 8 pixels
+        f_read(&File, &pTileArr[tileDataOffset], TILE_BASE_SIZE, &tileDataOffset);
+
+        // set next scanline
         offset += tileNewLineOffsetY;
-        
         f_lseek (&File, offset+tileNumOffsetX);
       }
       tileDataOffset =0;
     }
   } else {
-    //print("fail.\n");
+    // TODO: add some error code when return
     return;
   }
   
@@ -169,20 +162,16 @@ void SDLoadRegionOfTileSet8x8(uint8_t *tileSetArrName, uint8_t tileSetW, uint8_t
   * Store loaded data to RAM from ramTileBase to (ramTileBase + tileMax);
   */
   
-  UINT cnt;
+  UINT tileDataOffset =0;
   
-  uint8_t tileDataOffset =0;
-  uint8_t tileYcnt;
-  
+  uint8_t tileYcnt;                     // scanline counter
   uint16_t tileNumOffsetX = 0;
   uint16_t tileNewLineOffsetY = 0;
   uint16_t offset = 0;
   
-  //print("open tileSet Array... ");
   result = f_open(&File, (char*)tileSetArrName, FA_OPEN_EXISTING | FA_READ);
   
   if(result == FR_OK) {
-    //print("ok.\n");
     
     uint8_t *pTileArr =0;
     
@@ -195,27 +184,26 @@ void SDLoadRegionOfTileSet8x8(uint8_t *tileSetArrName, uint8_t tileSetW, uint8_t
       tileNumOffsetX = (tileCount % tileSetW)*TILE_BASE_SIZE;     // start position
       offset = ((tileCount)  / (tileSetW)) * (tileSetW * TILE_ARR_8X8_SIZE);
       
-      f_lseek (&File, offset);
+      f_lseek (&File, offset+tileNumOffsetX);
       
+      // load whole tile 8x8, layer by layer
       for(tileYcnt = 0; tileYcnt < TILE_BASE_SIZE; tileYcnt++) { // Y
+        // read 8 pixels
+        f_read(&File, &pTileArr[tileDataOffset], TILE_BASE_SIZE, &tileDataOffset);
         
-        f_read(&File, &pTileArr[tileDataOffset], TILE_BASE_SIZE, &cnt);
-        
-        tileDataOffset += TILE_BASE_SIZE;
+        // set next scanline
         offset += tileNewLineOffsetY;
-        
         f_lseek (&File, offset+tileNumOffsetX);
       }
       tileDataOffset =0;
     }
   } else {
-    //print("fail.\n");
+    // TODO: add some error code when return
     return;
   }
   
   f_close(&File);
 }
-
 
 #if 0
 // These read 16- and 32-bit types from the SD card file.

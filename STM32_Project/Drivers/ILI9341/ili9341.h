@@ -175,6 +175,9 @@
 // Use 1st bank of FSMC
 #define LCD_FSMC_DATA   0x60020000      // for write data
 #define LCD_FSMC_CMD    0x60000000      // for write commands
+   
+#define FSMC_SEND_DATA(a)       (*(uint16_t *) (LCD_FSMC_DATA) = a)
+#define FSMC_SEND_CMD(a)       (*(uint16_t *) (LCD_FSMC_CMD) = a)
 
 // 16 bit 8080 pins
 #define FSMC_PIN_D0     GPIO_Pin_14     // PD14

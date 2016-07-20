@@ -162,3 +162,5 @@ void USART1_IRQHandler(void)
     //USART_ClearITPendingBit(USART1, USART_IT_RXNE);
   }
 }
+
+#pragma diag_default=Pa082

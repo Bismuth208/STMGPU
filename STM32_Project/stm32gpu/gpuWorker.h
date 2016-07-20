@@ -31,8 +31,9 @@ typedef union {
   };
 } cmdBuffer_t;
 
+
 typedef union {
-  uint8_t data[10];
+  uint8_t data[12];
   struct {
     uint8_t  par0;
     uint16_t par1;
@@ -42,11 +43,48 @@ typedef union {
     uint8_t par5;
   };
 } cmdBuffer2_t;
+
 // -------------------------------- //
 
 void init_GPU(void);
 void sync_CPU(void);
 __noreturn __task void run_GPU(void);
+
+
+//===========================================================================//
+
+#define MAX_TEXT_SIZE   256
+#define SYNC_SEQUENCE   0x42DD
+#define SYNC_OK         0xCC
+
+//===========================================================================//
+#define MAX_FILL_BUF    90      // in percent, warning if buffer overfilled
+#define MIN_FILL_BUF    5
+
+#define CALC_BUF_FILL(a)   ((SERIAL_BUFFER_SIZE/100)*a)
+
+// calculated value
+#define CALC_MAX_FILL_SIZE      3800    // for 95 %   \ __ and SERIAL_BUFFER_SIZE = 4096 
+#define CALC_MIN_FILL_SIZE      200     // for 5 %   /
+
+// Buffer bsy indication, CPU MUST check this pin EVERYTIME before send any command!
+// othervice, undefined behavor, can happen evething (buffer overflow, wrong commands)
+#define GPU_BSY_PIN GPIO_Pin_11
+#define GPU_BSY_LED GPIO_Pin_13
+
+//===========================================================================//
+#define T_SELECT_WAY    "Selected interface: "
+#define T_USART_WAY     "USART_1\n"
+#define T_INIT_BUF      "Init command buffer... "
+#define T_WAIT_SYNC     "Waiting for sync... "
+#define T_TFT_SIZE      "Sending TFT size to host... "
+#define T_GPU_START     "Start GPU...\n"
+
+#define T_OK            "ok.\n"
+#define T_FAIL          "fail.\n"
+
+//===========================================================================//
+
 
 // -------------------------- Command list --------------------------- //
 // CLR  - CLEAR

@@ -28,7 +28,7 @@
 #define SYNC_SEQUENCE   0x42DD
 #define SYNC_OK         0xCC
 
-#define MAX_TEXT_SIZE   80
+#define MAX_TEXT_SIZE   30
 
 #define CHK_GPU_BSY_PIN     (PIND & (1 << PD2)) // check bsy GPU pin
 
@@ -534,6 +534,56 @@ void writeWordData(uint16_t c)
   cmdBuffer.par1 = c;
   
   sendCommand(cmdBuffer.data, 3);
+}
+
+// --------------- Tile/Sprite -------------- //
+void SDLoadTileFromSet8x8(const char *tileSetArrName, uint8_t tileSetW, uint8_t ramTileNum, uint8_t tileNum)
+{
+  cmdBuffer.cmd = LDD_TLE_8;
+  cmdBuffer.data[1] = strlen(tileSetArrName);
+  cmdBuffer.data[2] = tileSetW;
+  cmdBuffer.data[3] = ramTileNum;
+  cmdBuffer.data[4] = tileNum;
+  
+  sendCommand(cmdBuffer.data, 5);
+  sendCommand(tileSetArrName, cmdBuffer.data[1]); // send name of file
+}
+
+
+void SDLoadTileSet8x8(const char *tileSetArrName, uint8_t tileSetW, uint8_t ramTileBase, uint8_t tileMax)
+{
+  cmdBuffer.cmd = LDD_TLES_8;
+  cmdBuffer.data[1] = strlen(tileSetArrName);
+  cmdBuffer.data[2] = tileSetW;
+  cmdBuffer.data[3] = ramTileBase;
+  cmdBuffer.data[4] = tileMax;
+  
+  sendCommand(cmdBuffer.data, 5);
+  sendCommand(tileSetArrName, cmdBuffer.data[1]); // send name of file
+}
+
+
+void SDLoadRegionOfTileSet8x8(const char *tileSetArrName, uint8_t tileSetW, uint8_t ramTileBase, uint8_t tileMin, uint8_t tileMax)
+{
+  cmdBuffer.cmd = LDD_TLES_RG_8;
+  cmdBuffer.data[1] = strlen(tileSetArrName);
+  cmdBuffer.data[2] = tileSetW;
+  cmdBuffer.data[3] = ramTileBase;
+  cmdBuffer.data[4] = tileMin;
+  cmdBuffer.data[5] = tileMax;
+  
+  sendCommand(cmdBuffer.data, 6);
+  sendCommand(tileSetArrName, cmdBuffer.data[1]); // send name of file
+}
+
+void drawTile8x8(int16_t posX, int16_t posY, uint8_t tileNum)
+{
+  cmd_T_Buf.cmd = DRW_TLE_8_POS;
+  cmd_T_Buf.par0 = tileNum;
+  cmd_T_Buf.par1 = posX;
+  cmd_T_Buf.par2 = posY;
+  
+  sendCommand(cmd_T_Buf.data, 6);
 }
 
 // -------------------- ___ ---------------------- //
