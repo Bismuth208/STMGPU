@@ -1,0 +1,42 @@
+/* current must be */
+
+draw *.bmp files;
+
+draw, load, tiles 8x16;
+draw, load, tiles 16x16;
+add BSY answer throw communication interface; +
+
+/* add this soon */
+
+add at least one tilecreen;
+load tilemap;
+draw tilecreen;
+
+tile grouping to metatile;
+rotate tiles (matrix transformation?);
+
+/* in nearly future */
+
+move tilecreen;
+draw only part of tilecreen;
+
+add GUI commands;
+draw GUI window;
+draw GUI window whith text;
+draw GUI button;
+draw GUI buttons;
+set GUI colors;
+
+add FSMC;
+
+improve main switch() section;
+improve BSY protection;
+
+add re-sync with CPU;
+
+reduce registers and stack usage by minimise number of params to func (struct); 
+
+/* veeeery veeeery far far future */
+load, draw 3d model(s);
+add sound engine;
+

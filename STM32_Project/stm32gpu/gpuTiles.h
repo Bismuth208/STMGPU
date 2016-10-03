@@ -1,6 +1,5 @@
-#pragma once
-#ifndef __gpuTiles_H
-#define __gpuTiles_H
+#ifndef _GPUTTILES_H
+#define _GPUTTILES_H
 
 #ifdef __cplusplus
 extern "C"{
@@ -21,6 +20,9 @@ extern "C"{
 #define BACKGROUND_SIZE_H       16
   
 #define MAX_TILES_GROUP         20  
+  
+  
+#define TILE_ARR_8X8_SIZE_32       64
 // -------------------------------------------------------- //
   
 typedef struct {
@@ -29,9 +31,9 @@ typedef struct {
 } tileGroup_t;
 
 typedef struct {
-  uint8_t lasttileNum;
-  uint8_t drawed;
-  uint16_t *pLastTileArr;
+  uint8_t  lasttileNum;          // last tile id in tileArrYxY
+  uint8_t  drawed;               // this is problemfix, just left it as is.
+  uint16_t *pLastTileArr;       // pointer to last tile array
 } lastTile_t;
   
 extern const uint16_t *pCurrentPalette;
@@ -41,15 +43,6 @@ extern const uint16_t *pCurrentPalette;
 //extern uint8_t tileArr16x16[TILES_NUM_16x16][TILE_ARR_16X16_SIZE];
 
 // -------------------------------------------------------- //
-
-/*
-void drawBMP_RLE_PGR(int16_t x, int16_t y, uint8_t w, uint8_t h,
-  const uint8_t *colorInd, const uint16_t *colorTable, uint16_t sizePic);
-*/
-  
-void draw_PIC_RLE(int16_t x, int16_t y, uint8_t w, uint8_t h,
-                     const uint8_t *colorInd, uint16_t sizePic);  
-
 
 void setCurrentPalette(const uint16_t *newPalette);
 
@@ -68,11 +61,11 @@ void repeatTile8x8(int16_t posX, int16_t posY);
 void drawTileMap(int16_t x, int16_t y, const uint8_t *pTileMap, const uint8_t tileSize);
 
 
+void *memcpy32(void *dst, void const *src, uint32_t len);
 // -------------------------------------------------------- //
   
 #ifdef __cplusplus
 } // extern "C"
 #endif
 
-
-#endif /* GPUTILES_H */
+#endif /* _GPUTTILES_H */

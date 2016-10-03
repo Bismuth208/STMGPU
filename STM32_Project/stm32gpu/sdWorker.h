@@ -2,9 +2,11 @@
 #define _SDWORKER_H
 
 
-#define T_MOUNT_SD      "Mount sd... "
-#define T_OK            "ok.\n"
-#define T_FAIL          "fail.\n"
+#define T_MOUNT_SD              "Mount sd... "
+#define T_OK                    "ok.\n"
+#define T_FAIL                  "fail.\n"
+//#define T_TLE_SET_EXT_NAME      ".tle"
+//define T_MAP_SET_EXT_NAME     ".map"
 
 void init_sdCard(void);
 

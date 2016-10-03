@@ -1,4 +1,4 @@
-static const uint8_t stmGpuTileMap[] = {
+static const unsigned char stmGpuTileMap[] = {
 18,	// tileswide
 6,	// tileshigh
 //8,	// tilewidth

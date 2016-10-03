@@ -12,9 +12,8 @@
 */
 // -------------------------------- //
 
-#pragma once
-#ifndef GPUWORKER_H
-#define GPUWORKER_H
+#ifndef _GPUWORKER_H
+#define _GPUWORKER_H
 
 // -------------------------------- //
 
@@ -69,8 +68,23 @@ __noreturn __task void run_GPU(void);
 
 // Buffer bsy indication, CPU MUST check this pin EVERYTIME before send any command!
 // othervice, undefined behavor, can happen evething (buffer overflow, wrong commands)
-#define GPU_BSY_PIN GPIO_Pin_11
-#define GPU_BSY_LED GPIO_Pin_13
+#define GPU_BSY_PIN             GPIO_Pin_11
+#define GPU_BSY_PORT            GPIOA
+
+// mini stm32 board
+//#define GPU_BSY_LED_PIN         GPIO_Pin_5
+//#define GPU_BSY_LED_PORT        GPIOE
+// maple mini board
+#define GPU_BSY_LED_PIN         GPIO_Pin_13
+#define GPU_BSY_LED_PORT        GPIOC
+
+
+#define USE_BSY_PROTECTION      1
+#define USE_HARD_BSY            0       // 1 - use GPIO, 0 - send message to CPU
+
+#define BSY_MSG_CODE_WAIT       0xEE
+#define BSY_MSG_CODE_READY      0xEA
+
 
 //===========================================================================//
 #define T_SELECT_WAY    "Selected interface: "
@@ -250,4 +264,4 @@ __noreturn __task void run_GPU(void);
 // ------------------------------------------------------------------- //
 
 
-#endif /* GPUWORKER_H */
+#endif /* _GPUWORKER_H */

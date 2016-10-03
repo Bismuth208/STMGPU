@@ -119,7 +119,6 @@ uint8_t init_UART1(uint32_t baud)
     initStatus = 1;
   }
   
-  //Заполняем структуру настройками UARTa
   USART_InitTypeDef USART_InitStruct;
   
   USART_InitStruct.USART_BaudRate            = baud;

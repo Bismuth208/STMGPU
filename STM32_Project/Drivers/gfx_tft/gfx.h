@@ -4,8 +4,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-//#include <st7735.h>
-#include "ili9341.h"
+#include "st7735.h"
+//#include "ili9341.h"
 
 
 // Color definitions

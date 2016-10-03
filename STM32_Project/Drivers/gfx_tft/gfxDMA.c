@@ -67,7 +67,7 @@ void init_DMA1_SPI1(void)
   NVIC_Init(&NVIC_InitStructure);
 }
 
-void fillColor_DMA1_SPI1(uint32_t transferSize, uint16_t color)
+void fillColor_DMA1_SPI1(uint16_t color, uint32_t transferSize)
 {  
   CR1_backup = SPI1->CR1;               //  \__ only 4 asm commands
   SPI1->CR1 = CR1_backup_16b_PS2;       // /
@@ -99,7 +99,7 @@ void fillColor_DMA1_SPI1(uint32_t transferSize, uint16_t color)
  * As you know vars created in func exist while in func!
  * Be carefull!
  */
-void sendData16_DMA1_SPI1(uint32_t transferSize, void *data)
+void sendData16_DMA1_SPI1(void *data, uint32_t transferSize)
 {
   CR1_backup = SPI1->CR1;
   SPI1->CR1 = CR1_backup_16b_PS2;

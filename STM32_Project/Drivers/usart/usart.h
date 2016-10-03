@@ -14,6 +14,7 @@ typedef struct {
 } ring_buffer_t;
 */
 
+// #pragma pack(push, 1)
 typedef struct {
   // just overflow, no check and additional code need
   uint16_t head         :12;
@@ -21,6 +22,7 @@ typedef struct {
   uint16_t tail         :12;
   uint16_t align2       :4;     // not used
 } ring_buffer_t;
+// #pragma pack(pop)
 
 /*
 typedef struct {

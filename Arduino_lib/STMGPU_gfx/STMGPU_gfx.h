@@ -1,21 +1,20 @@
-#include <stdbool.h>
+#ifndef _GPU_GFX_ARD_H
+#define _GPU_GFX_ARD_H
 
-#ifndef _GPU_GFX_H
-#define _GPU_GFX_H
+#include <stdint.h>
 
-
-// Check busy GPU`s pin before every transfer
-// Protect GPU`s buffer from overflow
-#define USE_BSY_PIN 0
-
-// This is which pin CPU must check for attached bsy line from GPU
-// PD2 is digital pin D2 on arduino
-#define CHK_GPU_BSY_DDRX  DDRD
-#define CHK_GPU_BSY_PORTX PORTD
-#define CHK_GPU_BSY_PINX  PIND
-#define CHK_GPU_BSY_PXY   PD2
-
-#define CHK_GPU_BSY_PIN     (CHK_GPU_BSY_PINX & (1 << CHK_GPU_BSY_PXY))
+#if ARDUINO >= 100
+#include "Arduino.h"
+#include "Print.h"
+#else
+#include "WProgram.h"
+#endif
+//#include <Adafruit_GFX.h>
+#ifdef __AVR
+#include <avr/pgmspace.h>
+#elif defined(ESP8266)
+#include <pgmspace.h>
+#endif
 
 // -------------------------- Command list --------------------------- //
 // CLR  - CLEAR
@@ -153,6 +152,7 @@
 // -------------- 0x60 - 0xFF --------------- //
 
 
+
 // Color definitions
 #define COLOR_BLACK       0x0000      //   0,   0,   0
 #define COLOR_NAVY        0x000F      //   0,   0, 128
@@ -174,11 +174,6 @@
 #define COLOR_WHITE       0xFFFF      // 255, 255, 255
 
 // ------------------------------------------------------------------- //
-
-#ifdef __cplusplus
- extern "C" {
-#endif
-   
 //#pragma pack(push, 1)
 typedef union {
   uint8_t data[15];
@@ -195,7 +190,7 @@ typedef union {
 } cmdBuffer_t;
    
 typedef union {
-  uint8_t data[11];
+  uint8_t data[12];
   struct {
     uint8_t cmd;
     uint8_t  par0;
@@ -208,97 +203,143 @@ typedef union {
   };
 } cmdBuffer2_t;
 //#pragma pack(pop)
-   
 // ------------------------------------------------------------------- //
 
-void sync_gpu(void);
-void sendCommand(void *buf, uint8_t size);
+typedef enum {
+  USART_BAUD_9600 = 9600,
+  USART_BAUD_57600 = 57600,
+  USART_BAUD_115200 = 115200,
+  USART_BAUD_1M = 1000000
+} baudSpeed_t;
+   
+class STMGPU : public Print {
+public:
+  
+  STMGPU(int8_t bsyPin);
+  STMGPU();
+  
+  void begin(uint32_t);
+
+  void sync(uint32_t baudRate);
+  void sendCommand(void *buf, uint8_t size);
 
 // ------------------ Base ------------------ //
-void tftDrawPixel(int16_t x, int16_t y, uint16_t color);
-void tftFillScreen(uint16_t color);
+  void drawPixel(int16_t x, int16_t y, uint16_t color);
+  void fillScreen(uint16_t color);
    
 // ------------- Primitives/GFX ------------- //
-void tftFillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
-void tftDrawRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
-void drawRoundRect(int16_t x, int16_t y, int16_t w, int16_t h, int16_t radius, uint16_t color);
-void fillRoundRect(int16_t x, int16_t y, int16_t w, int16_t h, int16_t radius, uint16_t color);
-void tftDrawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint16_t color);
-void tftDrawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color);
-void tftDrawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color);
-
-void drawCircle(int16_t x, int16_t y, int16_t r, uint16_t color);
-void fillCircle(int16_t x, int16_t y0, int16_t r, uint16_t color);
-void drawTriangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t color);
-void fillTriangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t color);
-   
-void tftScroll(uint16_t lines, uint16_t yStart);
-void tftScrollSmooth(uint16_t lines, uint16_t yStart, uint8_t wait);
-
-//void drawBitmap(int16_t x, int16_t y, const uint8_t *bitmap, int16_t w, int16_t h, uint16_t color);
-//void drawBitmapBG(int16_t x, int16_t y, const uint8_t *bitmap, int16_t w, int16_t h, uint16_t color, uint16_t bg);
-void drawXBitmap(int16_t x, int16_t y, const uint8_t *bitmap, int16_t w, int16_t h, uint16_t color);
-
-uint16_t color565(uint8_t r, uint8_t g, uint8_t b);
-uint16_t conv8to16(uint8_t x);
-    
-//uint16_t columns(void);
-//uint16_t rows(void);
-
-//uint8_t getRotation(void);
-   
-void getResolution(void);
-int16_t tftHeight(void);
-int16_t tftWidth(void);
+  void fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
+  void drawRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
+  void drawRoundRect(int16_t x, int16_t y, int16_t w, int16_t h, int16_t radius, uint16_t color);
+  void fillRoundRect(int16_t x, int16_t y, int16_t w, int16_t h, int16_t radius, uint16_t color);
+  void drawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint16_t color);
+  void drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color);
+  void drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color);
+  
+  void drawCircle(int16_t x, int16_t y, int16_t r, uint16_t color);
+  void fillCircle(int16_t x, int16_t y0, int16_t r, uint16_t color);
+  void drawTriangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t color);
+  void fillTriangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t color);
+  
+  uint16_t scroll(uint16_t lines, uint16_t yStart);
+  uint16_t scrollSmooth(uint16_t lines, uint16_t yStart, uint8_t wait);
+  
+  //void drawBitmap(int16_t x, int16_t y, const uint8_t *bitmap, int16_t w, int16_t h, uint16_t color);
+  //void drawBitmapBG(int16_t x, int16_t y, const uint8_t *bitmap, int16_t w, int16_t h, uint16_t color, uint16_t bg);
+  void drawXBitmap(int16_t x, int16_t y, const uint8_t *bitmap, int16_t w, int16_t h, uint16_t color);
+  
+  uint16_t color565(uint8_t r, uint8_t g, uint8_t b);
+  uint16_t conv8to16(uint8_t x);
+  
+  //uint16_t columns(void);
+  //uint16_t rows(void);
+  
+  //uint8_t getRotation(void);
+  
+  void getResolution(void);
+  int16_t width(void);
+  int16_t height(void);
    
 // --------------- Font/Print --------------- //
 
 // get current cursor position (get rotation safe maximum values, using: width() for x, height() for y)
-//int16_t getCursorX(void);
-//int16_t getCursorY(void);
-
-//void setTextFont(unsigned char* f);
-void drawChar(int16_t x, int16_t y, uint8_t c, uint16_t color, uint16_t bg, uint8_t size);
-void setCursor(int16_t x, int16_t y);
-void setTextColor(uint16_t color);
-void setTextColorBG(uint16_t color, uint16_t bg);
-void setTextSize(uint8_t size);
-void setTextWrap(bool wrap);
-void cp437(bool cp);
-
-void print(const char *str);
-void tftPrintPGR(const char *str);
-void printChar(uint8_t c);
-void printCharPos(int16_t x, int16_t y, uint8_t c);
+  //int16_t getCursorX(void);
+  //int16_t getCursorY(void);
+  
+  //void setTextFont(unsigned char* f);
+  void drawChar(int16_t x, int16_t y, uint8_t c, uint16_t color, uint16_t bg, uint8_t size);
+  void setCursor(int16_t x, int16_t y);
+  void setTextColor(uint16_t color);
+  void setTextColor(uint16_t color, uint16_t bg);
+  void setTextSize(uint8_t size);
+  void setTextWrap(bool wrap);
+  void cp437(bool cp);
+  
+  void print(const char *str);
+  void printPGR(const char *str);
+  void printChar(uint8_t c);
+  void printCharPos(int16_t x, int16_t y, uint8_t c);
+  
+  
+#if ARDUINO >= 100
+  virtual size_t write(uint8_t);
+#else
+  virtual void   write(uint8_t);
+#endif
    
 // ---------------- Low Level --------------- //
-void tftSetAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
-void tftSetRotation(uint8_t m);
-void tftSetScrollArea(uint16_t TFA, uint16_t BFA);
-void tftScrollAddress(uint16_t VSP);
-void tftSetSleep(bool enable);
-void tftSetIdleMode(bool mode);
-void tftSetDispBrightness(uint8_t brightness);
-void tftSetInvertion(bool i);
-//void setGamma(uint8_t gamma);
-void tftPushColor(uint16_t color);
-   
-void writeCommand(uint8_t c);
-void writeData(uint8_t d);
-void writeWordData(uint16_t c);
-   
+  void setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
+  void setRotation(uint8_t m);
+  void setScrollArea(uint16_t TFA, uint16_t BFA);
+  void scrollAddress(uint16_t VSP);
+  void setSleep(bool enable);
+  void setIdleMode(bool mode);
+  void setDispBrightness(uint8_t brightness);
+  void setInvertion(bool i);
+  //void setGamma(uint8_t gamma);
+  void pushColor(uint16_t color);
+  
+  void writeCommand(uint8_t c);
+  void writeData(uint8_t d);
+  void writeWordData(uint16_t c);
+  
 // --------------- Tile/Sprite -------------- //
-void SDLoadTileFromSet8x8(const char *tileSetArrName, uint8_t tileSetW,
-                          uint8_t ramTileNum, uint8_t tileNum);
-void SDLoadTileSet8x8(const char *tileSetArrName, uint8_t tileSetW,
-                      uint8_t ramTileBase, uint8_t tileMax);
-void SDLoadRegionOfTileSet8x8(const char *tileSetArrName, uint8_t tileSetW,
-                              uint8_t ramTileBase, uint8_t tileMin, uint8_t tileMax);
-void drawTile8x8(int16_t posX, int16_t posY, uint8_t tileNum);
+  void SDLoadTileFromSet8x8(const char *tileSetArrName, uint8_t tileSetW,
+                            uint8_t ramTileNum, uint8_t tileNum);
+  void SDLoadTileSet8x8(const char *tileSetArrName, uint8_t tileSetW,
+                        uint8_t ramTileBase, uint8_t tileMax);
+  void SDLoadRegionOfTileSet8x8(const char *tileSetArrName, uint8_t tileSetW,
+                                uint8_t ramTileBase, uint8_t tileMin, uint8_t tileMax);
+  void drawTile8x8(int16_t posX, int16_t posY, uint8_t tileNum);
 
-#ifdef __cplusplus
-}
+  
+  
+#if defined (__AVR__) || defined(TEENSYDUINO)
+  //volatile *bsyPin;
+  int8_t  _bsyPin;
+  //uint8_t  bsyPinMask;
+  ////This def is for the Arduino.ORG M0!!!
+  //#elif defined(ARDUINO_SAM_ZERO)
+  //    volatile PORT_OUT_Type *bsyPin;
+  //    int32_t  _bsyPin;
+  //    PORT_OUT_Type  bsyPinMask;
+#elif defined (__arm__)
+  //volatile RwReg *bsyPin;
+  int32_t _bsyPin;
+  //uint32_t bsyPinMask;
+#elif defined (ARDUINO_ARCH_ARC32)
+  int8_t  _bsyPin;
+#elif defined (ESP8266)
+  int32_t  _bsyPin;
 #endif
 
+private:
+// at sync, GPU return it`s LCD resolution,
+// but you can ask GPU once again
+  int16_t _width;
+  int16_t _height;
+  bool _useSofwareBsy;
+
+};
 
 #endif /* _GPU_GFX_H */

@@ -7,6 +7,8 @@
 *
 */
 
+#include <string.h>
+
 #include <gfx.h>
 
 #include <ff.h>
@@ -56,9 +58,11 @@ void SDLoadTileFromSet8x8(uint8_t *tileSetArrName, uint8_t tileSetW, uint8_t ram
   * and store loaded data to RAM
   */
   
-  UINT tileDataOffset =0;
+  UINT cnt;
   
-  uint8_t tileYcnt;                     // scanline counter
+  uint8_t count =0;
+  uint8_t tileYcnt;
+  
   uint16_t tileNumOffsetX = 0;
   uint16_t tileNewLineOffsetY = 0;
   uint16_t offset = 0;
@@ -76,12 +80,11 @@ void SDLoadTileFromSet8x8(uint8_t *tileSetArrName, uint8_t tileSetW, uint8_t ram
     
     f_lseek (&File, offset+tileNumOffsetX);
     
-    // load whole tile 8x8, layer by layer
     for(tileYcnt = 0; tileYcnt < TILE_BASE_SIZE; tileYcnt++) { // Y
-      // read 8 pixels
-      f_read(&File, &pTileArr[tileDataOffset], TILE_BASE_SIZE, &tileDataOffset);
       
-      // set next scanline
+      f_read(&File, &pTileArr[count], TILE_BASE_SIZE, &cnt);
+      
+      count += TILE_BASE_SIZE;
       offset += tileNewLineOffsetY;
       f_lseek (&File, offset+tileNumOffsetX);
     }
@@ -106,9 +109,11 @@ void SDLoadTileSet8x8(uint8_t *tileSetArrName, uint8_t tileSetW, uint8_t ramTile
   * Store loaded data to RAM from ramTileBase to (ramTileBase + tileMax);
   */
   
-  UINT tileDataOffset =0;
+  UINT cnt;
   
-  uint8_t tileYcnt;                     // scanline counter
+  uint8_t tileDataOffset =0;
+  uint8_t tileYcnt;
+  
   uint16_t tileNumOffsetX = 0;
   uint16_t tileNewLineOffsetY = 0;
   uint16_t offset = 0;
@@ -130,13 +135,13 @@ void SDLoadTileSet8x8(uint8_t *tileSetArrName, uint8_t tileSetW, uint8_t ramTile
       
       f_lseek (&File, offset+tileNumOffsetX);
       
-      // load whole tile 8x8, layer by layer
       for(tileYcnt = 0; tileYcnt < TILE_BASE_SIZE; tileYcnt++) { // Y
-        // read 8 pixels
-        f_read(&File, &pTileArr[tileDataOffset], TILE_BASE_SIZE, &tileDataOffset);
-
-        // set next scanline
+        
+        f_read(&File, &pTileArr[tileDataOffset], TILE_BASE_SIZE, &cnt);
+        
+        tileDataOffset += TILE_BASE_SIZE;
         offset += tileNewLineOffsetY;
+        
         f_lseek (&File, offset+tileNumOffsetX);
       }
       tileDataOffset =0;
@@ -162,9 +167,11 @@ void SDLoadRegionOfTileSet8x8(uint8_t *tileSetArrName, uint8_t tileSetW, uint8_t
   * Store loaded data to RAM from ramTileBase to (ramTileBase + tileMax);
   */
   
-  UINT tileDataOffset =0;
+  UINT cnt;
   
-  uint8_t tileYcnt;                     // scanline counter
+  uint8_t tileDataOffset =0;
+  uint8_t tileYcnt;
+  
   uint16_t tileNumOffsetX = 0;
   uint16_t tileNewLineOffsetY = 0;
   uint16_t offset = 0;
@@ -186,13 +193,13 @@ void SDLoadRegionOfTileSet8x8(uint8_t *tileSetArrName, uint8_t tileSetW, uint8_t
       
       f_lseek (&File, offset+tileNumOffsetX);
       
-      // load whole tile 8x8, layer by layer
       for(tileYcnt = 0; tileYcnt < TILE_BASE_SIZE; tileYcnt++) { // Y
-        // read 8 pixels
-        f_read(&File, &pTileArr[tileDataOffset], TILE_BASE_SIZE, &tileDataOffset);
         
-        // set next scanline
+        f_read(&File, &pTileArr[tileDataOffset], TILE_BASE_SIZE, &cnt);
+        
+        tileDataOffset += TILE_BASE_SIZE;
         offset += tileNewLineOffsetY;
+        
         f_lseek (&File, offset+tileNumOffsetX);
       }
       tileDataOffset =0;
@@ -230,7 +237,7 @@ uint32_t read32(FIL *f)
   return result;
 }
 
-void printSdBMP(uint16_t posX, uint16_t posY, const char* name)
+void printSdBMP(uint16_t x, uint16_t y, const char* name)
 {
   FIL   bmpFile;
   UINT cnt;
@@ -246,7 +253,7 @@ void printSdBMP(uint16_t posX, uint16_t posY, const char* name)
   uint8_t  r, g, b;
   uint32_t pos = 0, startTime;
   
-  if ((x >= _width) || (y >= _height)) return;
+  if ((x >= width()) || (y >= height())) return;
   
   
   print("open file... ");
@@ -254,37 +261,29 @@ void printSdBMP(uint16_t posX, uint16_t posY, const char* name)
   
   if(result == FR_OK) {
     print("ok.\n");
-    
-    
-    
+
   } else {
     print("fail.\n");
     return;
   }
   
-  
   // Parse BMP header
   if (read16(&bmpFile) == 0x4D42) { // BMP signature
     fileSize = read32(&bmpFile);
-    //progmemPrint(PSTR("File size: ")); Serial.println(fileSize);
+
     (void)read32(&bmpFile); // Read & ignore creator bytes
     bmpImageoffset = read32(&bmpFile); // Start of image data
-    //progmemPrint(PSTR("Image Offset: ")); Serial.println(bmpImageoffset, DEC);
+
     // Read DIB header
     headerSize = read32(&bmpFile);
-    //progmemPrint(PSTR("Header size: ")); Serial.println(headerSize);
+
     bmpWidth = read32(&bmpFile);
     bmpHeight = read32(&bmpFile);
     if (read16(&bmpFile) == 1) { // # planes -- must be '1'
       bmpDepth = read16(&bmpFile); // bits per pixel
-      //progmemPrint(PSTR("Bit Depth: ")); Serial.println(bmpDepth);
-      if (read32(&bmpFile) == 0) // 0 = uncompressed
-      {
-        //progmemPrint(PSTR("Image size: "));
-        //Serial.print(bmpWidth);
-        //Serial.print('x');
-        //Serial.println(bmpHeight);
-        
+
+      if (read32(&bmpFile) == 0) { // 0 = uncompressed
+      
         // If bmpHeight is negative, image is in top-down order.
         // This is not canon but has been observed in the wild.
         if (bmpHeight < 0) {
@@ -295,39 +294,41 @@ void printSdBMP(uint16_t posX, uint16_t posY, const char* name)
         // Crop area to be loaded
         w = bmpWidth;
         h = bmpHeight;
-        if ((x + w - 1) >= _width)  w = _width - x;
-        if ((y + h - 1) >= _height) h = _height - y;
+        if ((x + w - 1) >= width())  w = width() - x;
+        if ((y + h - 1) >= width()) h = width() - y;
         
         // Set TFT address window to clipped image bounds
         tftSetAddrWindow(x, y, x + w - 1, y + h - 1);
         
-        if (bmpDepth == 16)	//565 format
-        {
+        if (bmpDepth == 16) {	//565 format
+        
           goodBmp = true; // Supported BMP format -- proceed!
           
           uint8_t buffer[2 * BUFFPIXELCOUNT]; // pixel buffer (contains already formatted data for ILI9341 display)
           
-          bmpFile.seekSet(54);	//skip header
+          f_lseek (&bmpFile, 54); //skip header
+          
           uint32_t totalPixels = bmpWidth*bmpHeight;
           uint16_t numFullBufferRuns = totalPixels / BUFFPIXELCOUNT;
           for (uint32_t p = 0; p < numFullBufferRuns; p++) {
             // read pixels into the buffer
-            bmpFile.read(buffer, 2 * BUFFPIXELCOUNT);
+            f_read(&bmpFile, buffer, 2 * BUFFPIXELCOUNT, &cnt);
             // push them to the diplay
-            tft.pushColors565(buffer, 0, 2 * BUFFPIXELCOUNT);
+            //tft.pushColors565(buffer, 0, 2 * BUFFPIXELCOUNT);
+            sendArr16_SPI1(buffer, 2 * BUFFPIXELCOUNT);
           }
           
           // render any remaining pixels that did not fully fit the buffer
           uint32_t remainingPixels = totalPixels % BUFFPIXELCOUNT;
           if (remainingPixels > 0)
           {
-            bmpFile.read(buffer, 2 * remainingPixels);
-            tft.pushColors565(buffer, 0, 2 * remainingPixels);
+            f_read(&bmpFile, buffer, 2 * remainingPixels, &cnt);
+            //tft.pushColors565(buffer, 0, 2 * remainingPixels);
+            sendArr16_SPI1(buffer, 2 * remainingPixels);
           }
           
-        }
-        else if (bmpDepth == 24)	// standard 24bit bmp
-        {
+        } else if (bmpDepth == 24) {	// standard 24bit bmp
+          
           goodBmp = true; // Supported BMP format -- proceed!
           uint16_t bufferSize = min(w, BUFFPIXELCOUNT);
           uint8_t  sdbuffer[3 * bufferSize]; // pixel in buffer (R+G+B per pixel)
@@ -349,62 +350,50 @@ void printSdBMP(uint16_t posX, uint16_t posY, const char* name)
             else     // Bitmap is stored top-to-bottom
               pos = bmpImageoffset + row * rowSize;
             if (bmpFile.curPosition() != pos) { // Need seek?
-              bmpFile.seekSet(pos);
+              f_lseek (&bmpFile, pos);
             }
             
-            for (col = 0; col < w; col += bufferSize)
-            {
+            for (col = 0; col < w; col += bufferSize) {
               // read pixels into the buffer
-              bmpFile.read(sdbuffer, 3 * bufferSize);
+              f_read(&bmpFile, sdbuffer, 3 * bufferSize, , &cnt);
               
               // convert color
-              for (int p = 0; p < bufferSize; p++)
-              {
+              for (int p = 0; p < bufferSize; p++) {
                 b = sdbuffer[3 * p];
                 g = sdbuffer[3 * p + 1];
                 r = sdbuffer[3 * p + 2];
-                lcdbuffer[p] = tft.color565(r, g, b);
+                lcdbuffer[p] = color565(r, g, b);
               }
               // push buffer to TFT
-              tft.pushColors(lcdbuffer, 0, bufferSize);
+              //tft.pushColors(lcdbuffer, 0, bufferSize);
+              sendArr16_SPI1(lcdbuffer, bufferSize);
             }
             
             // render any remaining pixels that did not fully fit the buffer
             uint16_t remainingPixels = w % bufferSize;
-            if (remainingPixels > 0)
-            {
-              bmpFile.read(sdbuffer, 3 * remainingPixels);
+            if (remainingPixels > 0) {
+              f_read(&bmpFile, sdbuffer, 3 * remainingPixels, , &cnt);
               
-              for (int p = 0; p < remainingPixels; p++)
-              {
+              for (int p = 0; p < remainingPixels; p++) {
                 b = sdbuffer[3 * p];
                 g = sdbuffer[3 * p + 1];
                 r = sdbuffer[3 * p + 2];
-                lcdbuffer[p] = tft.color565(r, g, b);
+                lcdbuffer[p] = color565(r, g, b);
               }
               
-              tft.pushColors(lcdbuffer, 0, remainingPixels);
+              //tft.pushColors(lcdbuffer, 0, remainingPixels);
+              sendArr16_SPI1(lcdbuffer, remainingPixels);
             }
           }
-        }
-        else
-        {
+        } else {
           //progmemPrint(PSTR("Unsupported Bit Depth."));
         }
         
-        if (goodBmp)
-        {
-          //progmemPrint(PSTR("Loaded in "));
-          //Serial.print(millis() - startTime);
-          //Serial.println(" ms");
-        }
       }
     }
   }
   
   f_close(&bmpFile);
-  //if (!goodBmp) progmemPrintln(PSTR("BMP format not recognized."));
-  
 }
 #endif
 

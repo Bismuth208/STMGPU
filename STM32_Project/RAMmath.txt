@@ -1,0 +1,48 @@
+HEAP size is limited and share to all type of tiles!
+uint16_t lastTile16x16[256];		// 512
+uint16_t lastTile8x16[128];		// 256
+uint16_t lastTile8x8[64];		// 128
+// total: 896
+
+
+// If RAM for tiles is 10240 then:
+8 tiles if 16x16;
+16 tiles if 8x16;
+96 tiles if 8x8;
+
+each 16x16 consume as 4 8x8
+each 8x16 consume as 2 8x8
+
+160x128 px
+20x16		| 8x8
+10x8		| 16x16
+
+20x16 = 320 bytes for one screen
+
+
+320x240 px
+40x30		| 8x8
+20x15		| 16x16
+
+40x30 = 1200 bytes for one screen
+
+
+Memory map:
+10240 bytes for tiles;
+3072 bytes for USART command buffer;
+1024 bytes for stack;
+363 bytes WTF;
+
+Free RAM:
+5781 bytes
+
+
+// if tiles 2 bytes
+4 x (16x16) = 2048
+8 x (8x16) = 2048
+48x (8x8) = 6144
+
+// if tiles 1 bytes
+8 x (16x16) = 2048
+16 x (8x16) = 2048
+96 x (8x8) = 6144

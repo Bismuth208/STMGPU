@@ -18,7 +18,10 @@
 
 #define TEST_SAMPLE_SIZE 2000
 
-static uint32_t nextInt = 1;
+static uint16_t nextInt = 1;
+
+unsigned long thisMicros = 0;
+unsigned long lastMicros = 0;
 
 void (*pArrExecGFXFunc[])(void) = {
     testdrawtext,
@@ -29,7 +32,7 @@ void (*pArrExecGFXFunc[])(void) = {
     testfillcircles,
     testroundrects,
     testtriangles,
-    //mediabuttons
+    //mediabuttons,
 
     drawRandPixels,
     drawRandLines,
@@ -42,12 +45,13 @@ void (*pArrExecGFXFunc[])(void) = {
     matrixScreen
   };
 
-uint32_t randNum(void)
+uint16_t randNum(void)
 {
-  nextInt ^= nextInt >> 6;
-  nextInt ^= nextInt << 11;
-  nextInt ^= nextInt >> 15;
-  return ( nextInt * 3538123 );
+  nextInt ^= nextInt >> 4;
+  nextInt ^= nextInt << 7;
+  nextInt ^= nextInt >> 9;
+  nextInt = (nextInt * 214013 );
+  return nextInt;
 }
 
 uint16_t getTemp(void)
@@ -232,7 +236,7 @@ void drawRandCircle(void)
     b = randNum() % ((255 + 1) - 64) + 64;
 
     drawCircle((randNum() % (TFT_W-1)), (randNum() % (TFT_H-1)),
-               ((randNum() % TFT_H)/2), color565(r, g, b));
+               ((randNum() % TFT_H)/4), color565(r, g, b));
   }
 }
 
@@ -246,11 +250,11 @@ void drawRandFillCircle(void)
     b = randNum() % ((255 + 1) - 64) + 64;
 
     fillCircle((randNum() % (TFT_W-1)), (randNum() % (TFT_H-1)),
-               ((randNum() % TFT_H)/2), color565(r, g, b));
+               ((randNum() % TFT_H)/4), color565(r, g, b));
   }
 }
 
-void matrixScreen()
+void matrixScreen(void)
 {
   uint8_t colX, rowsY;
   
@@ -262,18 +266,15 @@ void matrixScreen()
   for (uint16_t i = 0; i < TEST_SAMPLE_SIZE; i++) {
 
     cp437(randNum() % 2);
-/*
-    drawChar((randNum() % colX) * 6, (randNum() % rowsY) * 8,        // pos X and Y
-      (randNum() % 255),                                        // number of char
-      (((randNum() % 192 + 32) & 0xFC) << 3),                   // text color
-      COLOR_BLACK, 1);                                          // BG color and size
-  */
+
+    //drawChar((randNum() % colX) * 6, (randNum() % rowsY) * 8,        // pos X and Y
+      //(randNum() % 255),                                        // number of char
+      //(((randNum() % 192 + 32) & 0xFC) << 3),                   // text color
+      //COLOR_BLACK, 1);                                          // BG color and size
   
-    
-    setCursor((randNum() % colX) * 6, (randNum() % rowsY) * 8);
+  
     setTextColorBG((((randNum() % 192 + 32) & 0xFC) << 3), COLOR_BLACK);
-    printChar(randNum() % 255);
-    
+    printCharPos((randNum() % colX) * 6, (randNum() % rowsY) * 8, randNum() % 255);
   }
 }
 
@@ -333,7 +334,6 @@ void testdrawrects(void)
 
   for (int16_t x=0; x < TFT_W; x+=6) {
     tftDrawRect(((TFT_W/2) - (x/2)), ((TFT_H/2) -((x/2))), x, x, color);
-    //tftDrawRect(TFT_W/2 -x/2, TFT_H/2 -x/2 , x, x, color);
   }
 }
 
@@ -342,9 +342,9 @@ void testfillrects(void)
   uint16_t color1 = COLOR_YELLOW;
   uint16_t color2 = COLOR_MAGENTA;
 
-  for (int16_t x=TFT_W-1; x > 6; x-=6) {
-    tftFillRect(TFT_W/2 -x/2, TFT_H/2 -x/2 , x, x, color1);
-    tftDrawRect(TFT_W/2 -x/2, TFT_H/2 -x/2 , x, x, color2);
+  for (int16_t x=TFT_H-1; x > 6; x-=6) {
+    tftFillRect(TFT_W/2 - x/2, TFT_H/2 - x/2 , x, x, color1);
+    tftDrawRect(TFT_W/2 - x/2, TFT_H/2 - x/2 , x, x, color2);
   }
 }
 
@@ -383,7 +383,7 @@ void testtriangles(void)
   int y = 0;
   int z = TFT_W;
 
-  for(t = 0 ; t <= 15; t+=1) {
+  for(t = 0 ; t <= 20; t+=1) {
     drawTriangle(w, y, y, x, z, x, color);
     x-=4;
     y+=4;
@@ -394,16 +394,14 @@ void testtriangles(void)
 
 void testroundrects(void)
 {
-  int color = 100;
-  int i;
-  int t;
+  uint16_t color = 100;
 
-  for(t = 0 ; t <= 4; t+=1) {
+  for(uint8_t t = 0 ; t <= 4; t++) {
     int x = 0;
     int y = 0;
     int w = TFT_W-2;
     int h = TFT_H-2;
-    for(i = 0 ; i <= 16; i+=1) {
+    for(uint8_t i = 0 ; i <= 16; i++) {
       drawRoundRect(x, y, w, h, 5, color);
       x+=2;
       y+=3;
@@ -446,6 +444,19 @@ void testdrawtext(void)
   tftPrintPGR((char*)Loremipsum2);
 }
 
+void drawSpendedTime(void)
+{
+  static char buf[6];
+
+  itoa(thisMicros - lastMicros, buf, 10);
+
+  print(buf);
+
+  lastMicros = thisMicros;
+  thisMicros = uptime();
+
+}
+
 // ---------------------------------------------------------- //
 __attribute__ ((noreturn)) int main(void)
 {
@@ -457,7 +468,7 @@ __attribute__ ((noreturn)) int main(void)
 
   tftFillScreen(COLOR_BLACK);
 
-  uint32_t timerCount =0;
+  //uint32_t timerCount =0;
 
   uint8_t count =0;
   uint8_t testsCount = (sizeof(pArrExecGFXFunc)/sizeof(pArrExecGFXFunc[0]));
@@ -467,7 +478,7 @@ __attribute__ ((noreturn)) int main(void)
     for (count = 0; count < testsCount; count++) {
       pArrExecGFXFunc[count]();
 
-       _delayMS(1000);  // actual 500
+      _delayMS(1000);  // actual 500
       tftFillScreen(COLOR_BLACK);
     }
   }

@@ -118,16 +118,59 @@ void drawCircle(int16_t x0, int16_t y0, int16_t r, uint16_t color)
   } while (x <= 0);
 }
 
+#if 1
+void fillCircle(int16_t x0, int16_t y0, int16_t r, uint16_t color)
+{
+  if(r == 0)
+    return;
+  if (r == 1) {
+    tftDrawPixel(x0, y0, color);
+    return;
+  }
+  
+  tftDrawFastVLine(x0, y0-r, 2*r+1, color);
+  
+  int16_t f     = 1 - r;
+  int16_t ddF_x = 1;
+  int16_t ddF_y = -2 * r;
+  int16_t x     = 0;
+  int16_t y     = r;
+  
+  while (x<y) {
+    if (f >= 0) {
+      --y;
+      ddF_y += 2;
+      f     += ddF_y;
+    }
+    ++x;
+    ddF_x += 2;
+    f     += ddF_x;
+    
+    tftDrawFastVLine(x0+x, y0-y, 2*y+1, color);
+    tftDrawFastVLine(x0+y, y0-x, 2*x+1, color);
+    //left
+    tftDrawFastVLine(x0-x, y0-y, 2*y+1, color);
+    tftDrawFastVLine(x0-y, y0-x, 2*x+1, color);
+  }
+}
+#endif
+
 #if 0
 void fillCircle(int16_t x0, int16_t y0, int16_t r, uint16_t color)
 {
-  int16_t x = -r, y = 0, err = 2-2*r, e2;
+  if(r == 0)
+    return;
+  if (r == 1) {
+    tftDrawPixel(x0, y0, color);
+    return;
+  }
   
+  int16_t x = -r, y = 0, err = 2-2*r, e2;
   do {
-    //vline(x0-x, y0-y, y0+y, color);
-    //vline(x0+x, y0-y, y0+y, color);
-    tftDrawFastVLine(x0-x, y0-y, y0+y, color);
-    tftDrawFastVLine(x0+x, y0-y, y0+y, color);
+    
+    tftDrawFastVLine(x0-x, y0-y, 2*y, color);
+    tftDrawFastVLine(x0+x, y0-y, 2*y, color);
+    
     e2 = err;
     if (e2 <= y) {
       err += ++y*2+1;
@@ -135,14 +178,6 @@ void fillCircle(int16_t x0, int16_t y0, int16_t r, uint16_t color)
     }
     if (e2 > x) err += ++x*2+1;
   } while (x <= 0);
-}
-#endif
-
-#if 1
-void fillCircle(int16_t x0, int16_t y0, int16_t r, uint16_t color)
-{
-  tftDrawFastVLine(x0, y0-r, 2*r+1, color);
-  fillCircleHelper(x0, y0, r, 3, 0, color);
 }
 #endif
 
@@ -185,6 +220,13 @@ void drawCircleHelper( int16_t x0, int16_t y0, int16_t r, uint8_t cornername, ui
 // Used to do circles and roundrects
 void fillCircleHelper(int16_t x0, int16_t y0, int16_t r, uint8_t cornername, int16_t delta, uint16_t color)
 {
+  if (r == 0)
+    return;
+  if (r == 1) {
+    tftDrawPixel(x0, y0, color);
+    return;
+  }
+    
   int16_t f     = 1 - r;
   int16_t ddF_x = 1;
   int16_t ddF_y = -2 * r;
@@ -211,6 +253,7 @@ void fillCircleHelper(int16_t x0, int16_t y0, int16_t r, uint8_t cornername, int
     }
   }
 }
+
 
 // Bresenham's algorithm
 void tftDrawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint16_t color)
@@ -320,7 +363,7 @@ void tftFillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color)
   tftSetAddrWindow(x, y, x+w-1, y+h-1);
   
 #if USE_DMA
-  fillColor_DMA1_SPI1(w*h, color);
+  fillColor_DMA1_SPI1(color, w*h);
   //SET_TFT_CS_HI;
 #else
   
@@ -333,7 +376,7 @@ void tftFillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color)
     }
   }
 #else
-  repeatData16_SPI1(color, w*h,);
+  repeatData16_SPI1(color, w*h);
 #endif // USE_FSMC
   RELEASE_TFT();
   
@@ -749,7 +792,7 @@ void drawChar(int16_t x, int16_t y, uint8_t c, uint16_t fgcolor, uint16_t bgcolo
 #if USE_DMA
     bufCount++;
     
-    sendData16_DMA1_SPI1(bufCount, charBuffer);
+    sendData16_DMA1_SPI1(charBuffer, bufCount);
 #endif    
   }
 }
@@ -879,7 +922,7 @@ void tftDrawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color)
   //SET_TFT_CS_LOW;
   
 #if USE_DMA
-  fillColor_DMA1_SPI1(h, color);
+  fillColor_DMA1_SPI1(color, h);
   //SET_TFT_CS_HI;
 #else
 #if USE_FSMC
@@ -907,7 +950,7 @@ void tftDrawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color)
   //SET_TFT_CS_LOW;
   
 #if USE_DMA
-  fillColor_DMA1_SPI1(w, color);
+  fillColor_DMA1_SPI1(color, w);
   //SET_TFT_CS_HI;
 #else
 #if USE_FSMC
@@ -927,7 +970,7 @@ void tftFillScreen(uint16_t color)
 #if USE_DMA
   tftSetAddrWindow(0, 0, _width-1, _height-1);
   
-  fillColor_DMA1_SPI1(_width * _height, color);
+  fillColor_DMA1_SPI1(color, _width * _height);
   
 #else
   

@@ -75,22 +75,27 @@ void sync_CPU(void)
   }
 }
 
+void init_GPU_GPIO(void)
+{
+  GPIO_InitTypeDef GPIO_InitStruct;
+  
+  GPIO_InitStruct.GPIO_Mode = GPIO_Mode_Out_PP;         // Mode: output "Push-Pull"
+  GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;        // Set speed
+  GPIO_InitStruct.GPIO_Pin = GPU_BSY_PIN;
+  GPIO_Init(GPU_BSY_PORT, &GPIO_InitStruct);            // Apply settings to port A
+  
+  
+  GPIO_InitStruct.GPIO_Pin = GPU_BSY_LED_PIN;           // LED BSY PIN
+  GPIO_Init(GPU_BSY_LED_PORT, &GPIO_InitStruct);        // Apply settings to port С
+  
+  GPIO_SET_PIN(GPU_BSY_LED_PORT, GPU_BSY_LED_PIN);      // turn off
+}
+
 void init_GPU(void)
 {
   uint8_t initBufStatus =0;
   
-  GPIO_InitTypeDef GPIO_InitStruct;
-  
-  GPIO_InitStruct.GPIO_Mode = GPIO_Mode_Out_PP;     // Mode: output "Push-Pull"
-  GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;     // Set speed
-  GPIO_InitStruct.GPIO_Pin = GPU_BSY_PIN;
-  GPIO_Init(GPIOA, &GPIO_InitStruct);        // Apply settings to port A
-  
-  
-  //GPIO_InitStruct.GPIO_Pin = GPU_BSY_LED; // LED BSY PIN
-  //GPIO_Init(GPIOC, &GPIO_InitStruct);        // Apply settings to port С
-  
-  //GPIO_SET_PIN(GPIOC, GPU_BSY_LED); // turn off
+  init_GPU_GPIO();
   
   // setup access to low level interface
   print(T_SELECT_WAY);
@@ -133,26 +138,36 @@ __noreturn __task void run_GPU(void)
   //uint8_t count = 0;
   
   uint8_t cmd = 0;
-  uint8_t bsy =0;
+  uint8_t bsy = 0;
   uint16_t avaliableData =0;
   
   for(;;) {
     
     avaliableData = pFuncAvaliableData();
     
-#if 1   
     // this rules protect GPIO from togling everytime
     // and try to hold buffer always filled by some data
+#if USE_BSY_PROTECTION   
     if((avaliableData > CALC_MAX_FILL_SIZE /*CALC_BUF_FILL(MAX_FILL_BUF)*/) && (!bsy)) { // buffer is allmost full, and no bsy flag
       bsy = 1;
-      GPIO_SET_PIN(GPIOA, GPU_BSY_PIN); // say to CPU: "I`m bsy, do not send the data!"
-      //GPIO_RESET_PIN(GPIOC, GPU_BSY_LED);
+      GPIO_RESET_PIN(GPU_BSY_LED_PORT, GPU_BSY_LED_PIN);
+      // say to CPU: "I`m bsy, do not send the data!"
+#if USE_HARD_BSY
+      GPIO_SET_PIN(GPU_BSY_PORT, GPU_BSY_PIN);
+#else
+      pFuncSendData8(BSY_MSG_CODE_WAIT);
+#endif
     } else if((avaliableData < CALC_MIN_FILL_SIZE /*CALC_BUF_FILL(MIN_FILL_BUF)*/) && (bsy)) { // buffer is allmost empty, and bsy flag
       bsy = 0;
-      GPIO_RESET_PIN(GPIOA, GPU_BSY_PIN); // say to CPU: "I`m free, now send the data!"
-      //GPIO_SET_PIN(GPIOC, GPU_BSY_LED);
-    }
+      GPIO_SET_PIN(GPU_BSY_LED_PORT, GPU_BSY_LED_PIN);
+      // say to CPU: "I`m free, now send the data!"
+#if USE_HARD_BSY
+      GPIO_RESET_PIN(GPU_BSY_PORT, GPU_BSY_PIN);
+#else
+      pFuncSendData8(BSY_MSG_CODE_READY);
 #endif
+    }
+#endif /* USE_BSY_PROTECTION */
     
     if(avaliableData) {
       
@@ -257,9 +272,9 @@ __noreturn __task void run_GPU(void)
       // --------------- Font/Print --------------- //
       
       case DRW_CHAR: {
-        pFuncWaitCutBuf(cmd_T_Buf.data, 10);
+        pFuncWaitCutBuf(cmdBuffer.data, 12);
         
-        drawChar(cmd_T_Buf.par1, cmd_T_Buf.par2, cmd_T_Buf.par0, cmd_T_Buf.par3, cmd_T_Buf.par4, cmd_T_Buf.par5);
+        drawChar(cmdBuffer.par1, cmdBuffer.par2, cmdBuffer.par6, cmdBuffer.par3, cmdBuffer.par4, cmdBuffer.par5);
       } break;
       
       /* // fix this in future!
@@ -283,9 +298,9 @@ __noreturn __task void run_GPU(void)
       } break;
       
       case DRW_PRNT_POS_C: {
-        pFuncWaitCutBuf(cmd_T_Buf.data, 5);
+        pFuncWaitCutBuf(cmdBuffer.data, 5);
         
-        printCharPos(cmd_T_Buf.par1, cmd_T_Buf.par2, cmd_T_Buf.par0);
+        printCharPos(cmdBuffer.par1, cmdBuffer.par2, cmdBuffer.par3);
       } break;
       
       case SET_CURSOR: {
@@ -460,9 +475,9 @@ __noreturn __task void run_GPU(void)
       } break;
       
       case DRW_TLE_8_POS: {
-        pFuncWaitCutBuf(cmd_T_Buf.data, 5);
+        pFuncWaitCutBuf(cmdBuffer.data, 6);
         
-        drawTile8x8(cmd_T_Buf.par1, cmd_T_Buf.par2, cmd_T_Buf.par0);
+        drawTile8x8(cmdBuffer.par1, cmdBuffer.par2, cmdBuffer.par3);
       } break;
       
       

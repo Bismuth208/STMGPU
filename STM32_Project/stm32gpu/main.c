@@ -144,7 +144,7 @@ void startupInit(void)
   
   drawSturtupScreen();
   
-  // Init SD after all inited
+  // Init SD and SPI_2 after all inited
   init_sdCard();
 }
 

@@ -1,0 +1,41 @@
+// ------------------------- General Description -------------------- //
+#Tiles:
+-	up to 96 tiles 8x8;
+-	up to 16 tiles 8x16;
+-	up to 8 tiles 16x16;
+-	tiles group (metatile) up to 8 tiles*;
+-	any colors per sprite from palette of 80 colors;
+-	add tiles;
+-	delete tiles;
+-	draw tiles;
+
+#Draw functions:
+-	almost all from GFX lib;
+-	tiles;
+-	GUI*;
+
+#Interface:
+-	USART to interface GPU (1200*, 2400*, 9600, 57600, 115200, 1M);
+-	SPI2 to interface SD;
+-	Paralel (8080) to interface LCD (STM32F103VET6)*;
+-	SPI1 to interface LCD (STM32F103C8T6);
+
+#Input GPU buffer:
+-	at least 200 commands (depend on size of commands and size of MCU RAM);
+
+#Data packet size:
+-	CMD consume 1 byte;
+-	DATA consume max 6*uint16_t bytes;
+
+#MCU:
+-	STM32F103C8T6	64 Flash, 20 RAM;
+-	STM32F103VET6	512 Flash, 64 RAM;
+
+#DMA supported by:
+-	STM32F103C8T6	64 Flash, 20 RAM;
+-	STM32F103VET6	512 Flash, 64 RAM;
+
+#FSMC:
+-	only by STM32F103VET6	512 Flash, 64 RAM;
+
+* - not yet ready;

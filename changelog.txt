@@ -1,4 +1,14 @@
-v.0.1.0 - add working 8x8 tiles code;
+v.0.1.2 - add arduino lib for CPU;
+		- clean mercurial rudiments;
+		- add software BSY protection;
+		- add BSY answer throw communication interface;
+		- fix some glitches ( struct align );
+		- add pinout for GPU ( pic and txt forms);
+		- add TODO list;
+		- no one read the changelog;
+		- add little more comments to code;
+
+v.0.1.1 - add working 8x8 tiles code;
 		- add description for commands;
 		- cleanup SD card code;
 

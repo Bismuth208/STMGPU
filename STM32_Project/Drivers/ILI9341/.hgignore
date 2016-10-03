@@ -1,5 +1,0 @@
-syntax: glob
-*.DS_Store*
-*.user*
-*.orig*
-._*.**
