@@ -35,13 +35,15 @@ void SysTimerSetRuntine(void (*pFunc)(void))
 void SysTick_Handler(void)
 {
   ++systemCurrentMilis;
-  
+
+#if 0
   if(pUserRunTimeFunc != NULL) {
     if((++usrTimeOutCheck) >= PERIOD_CHECK_USER_FUNC) {
       usrTimeOutCheck=0;
       pUserRunTimeFunc();
     } 
   }
+#endif
 }
 
 void initSysTickTimer(void)

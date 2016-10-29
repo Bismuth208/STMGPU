@@ -31,15 +31,11 @@ ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE
 POSSIBILITY OF SUCH DAMAGE.
 */
 
-#ifdef __AVR__
-#include <avr/pgmspace.h>
-#else
 #define pgm_read_byte(addr) (*(const unsigned char *)(addr))
 #define strlen_P strlen
 
 #include <stm32f10x.h>
 #include <stm32f10x_dma.h>
-#endif
 
 #include <string.h>
 #include <stdbool.h>
@@ -47,18 +43,12 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #include <systicktimer.h>
 
-#ifdef __AVR__
-#include <avrspi.h>
-#else
 #include <spi.h>
-#endif
 
 #include "gfx.h"
 #include "glcdfont.h"
 
-#if USE_DMA
 #include "gfxDMA.h"
-#endif
 
 //-------------------------------------------------------------------------------------------//
 
@@ -92,10 +82,7 @@ static int16_t cursor_y = 0;
 static bool wrap = true;   // If set, 'wrap' text at right edge of display
 static bool _cp437 = false; // If set, use correct CP437 charset (default is off)
 
-
-#if USE_DMA
 uint16_t charBuffer[192]; // size == 5
-#endif
 
 //-------------------------------------------------------------------------------------------//
 
@@ -362,11 +349,9 @@ void tftFillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color)
   
   tftSetAddrWindow(x, y, x+w-1, y+h-1);
   
-#if USE_DMA
   fillColor_DMA1_SPI1(color, w*h);
   //SET_TFT_CS_HI;
-#else
-  
+
   //SET_TFT_DC_HI;
   //SET_TFT_CS_LOW;
 #if USE_FSMC
@@ -380,7 +365,6 @@ void tftFillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color)
 #endif // USE_FSMC
   RELEASE_TFT();
   
-#endif // USE_DMA
 }
 
 // Draw a rounded rectangle
@@ -568,12 +552,6 @@ void printCharPos(int16_t x, int16_t y, uint8_t c)
   printChar(c);
 }
 
-void tftPrintPGR(const char *str)
-{
-  for(uint16_t count=0; count < strlen_P(str); count++)
-    printChar(pgm_read_byte(str + count));
-}
-
 void printChar(uint8_t c)
 {
   if (c == '\n') {
@@ -596,59 +574,6 @@ void printChar(uint8_t c)
   }
 }
 
-#if 0 // work on avr;
-void drawChar(int16_t x, int16_t y, uint8_t c, uint16_t color, uint16_t bg, uint8_t size)
-{
-  if((x >= _width)            || // Clip right
-     (y >= _height)           || // Clip bottom
-       ((x + 6 * size - 1) < 0) || // Clip left
-         ((y + 8 * size - 1) < 0))   // Clip top
-    return;
-  
-  if(!_cp437 && (c >= 176)) c++; // Handle 'classic' charset behavior
-  
-  uint8_t line;
-  int8_t i, j;
-  
-  
-  if(size == 1) {
-    for (i=0; i<6; i++ ) {
-      
-      if (i == 5)
-        line = 0x0;
-      else
-        line = pgm_read_byte(font+(c*5)+i);
-      
-      for (j = 0; j<8; j++) {
-        if (line & 0x1) tftDrawPixel(x+i, y+j, color);
-        else if (bg != color) {
-          tftDrawPixel(x+i, y+j, bg);
-        }
-        line >>= 1;
-      }
-    }
-  } else {
-    for (i=0; i<6; i++ ) {
-      
-      if (i == 5)
-        line = 0x0;
-      else
-        line = pgm_read_byte(font+(c*5)+i);
-      
-      for (j = 0; j<8; j++) {
-        if (line & 0x1) {
-          tftFillRect(x+(i*size), y+(j*size), size, size, color);
-        } else if (bg != color) {
-          tftFillRect(x+i*size, y+j*size, size, size, bg);
-        }
-        line >>= 1;
-      }
-    }
-  }
-}
-#endif
-
-#if 1 // Experimental; work only on stm
 // Draw a character
 void drawChar(int16_t x, int16_t y, uint8_t c, uint16_t fgcolor, uint16_t bgcolor, uint8_t size)
 {
@@ -749,11 +674,8 @@ void drawChar(int16_t x, int16_t y, uint8_t c, uint16_t fgcolor, uint16_t bgcolo
     
     uint8_t xr, yr;
     uint8_t mask = 0x01;
-    uint16_t color;
-    
-#if USE_DMA    
+    uint16_t color;    
     uint8_t bufCount = 0;
-#endif
     
     for (y=0; y < 8; y++) {
       for (yr=0; yr < size; yr++) {
@@ -764,39 +686,31 @@ void drawChar(int16_t x, int16_t y, uint8_t c, uint16_t fgcolor, uint16_t bgcolo
             color = bgcolor;
           }
           for (xr=0; xr < size; xr++) {
-#if USE_DMA
             charBuffer[bufCount++] = color;
-#else
 #if USE_FSMC
             FSMC_SEND_DATA(color);
 #else
             sendData16_SPI1(color);
 #endif // USE_FSMC
-#endif // USE_DMA
           }
         }
         for (xr=0; xr < size; xr++) {
-#if USE_DMA
           charBuffer[bufCount++] = bgcolor;
-#else
 #if USE_FSMC
           FSMC_SEND_DATA(bgcolor);
 #else
           sendData16_SPI1(bgcolor);
 #endif // USE_FSMC
-#endif // USE_DMA
         }
       }
       mask = mask << 1;
     }
-#if USE_DMA
+    
     bufCount++;
     
     sendData16_DMA1_SPI1(charBuffer, bufCount);
-#endif    
   }
 }
-#endif
 
 uint16_t columns()
 {
@@ -921,10 +835,9 @@ void tftDrawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color)
   //SET_TFT_DC_HI;
   //SET_TFT_CS_LOW;
   
-#if USE_DMA
   fillColor_DMA1_SPI1(color, h);
   //SET_TFT_CS_HI;
-#else
+
 #if USE_FSMC
   while (h--) {
     FSMC_SEND_DATA(color);
@@ -933,8 +846,6 @@ void tftDrawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color)
   repeatData16_SPI1(color, h);
 #endif // USE_FSMC
   RELEASE_TFT();
-#endif // USE_DMA
-  
 }
 
 void tftDrawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color)
@@ -949,10 +860,8 @@ void tftDrawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color)
   //SET_TFT_DC_HI;
   //SET_TFT_CS_LOW;
   
-#if USE_DMA
   fillColor_DMA1_SPI1(color, w);
   //SET_TFT_CS_HI;
-#else
 #if USE_FSMC
   while (w--) {
     FSMC_SEND_DATA(color);
@@ -961,21 +870,13 @@ void tftDrawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color)
   repeatData16_SPI1(color, w);
 #endif // USE_FSMC
   RELEASE_TFT();
-#endif // USE_DMA
-  
 }
 
 void tftFillScreen(uint16_t color)
 {
-#if USE_DMA
   tftSetAddrWindow(0, 0, _width-1, _height-1);
   
   fillColor_DMA1_SPI1(color, _width * _height);
-  
-#else
-  
-  tftFillRect(0, 0,  _width, _height, color);
-#endif 
 }
 
 // Pass 8-bit (each) R,G,B, get back 16-bit packed color

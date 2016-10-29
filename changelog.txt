@@ -1,6 +1,18 @@
+v.0.1.3 - remove rudiment avr legacy in Drivers for stm32;
+		- add loading, drawing tilemap;
+		- add sprites (1x1, 1x2, 2x1, 2x2 for 8px tiles);
+		- improve tile draw part for 8x8 tiles;
+		- fix some important mistakes in commands;
+		- split func prototypes for avr to named headers;
+		- update only stm32gpu_USART_1MBaud.bin in Software_BSY;
+		- fixed VERY HUGE mistake in STM32_GPU_GPIO_Pinout.txt;
+		- extend some RAM description...;
+		- remove 8x16 tiles;
+		- extend 16x16 tiles to 16! (8 was)
+
 v.0.1.2 - add arduino lib for CPU;
 		- clean mercurial rudiments;
-		- add software BSY protection;
+		- add software BSY protection PC now also can talk;
 		- add BSY answer throw communication interface;
 		- fix some glitches ( struct align );
 		- add pinout for GPU ( pic and txt forms);

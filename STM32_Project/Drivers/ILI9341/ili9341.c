@@ -32,31 +32,21 @@ POSSIBILITY OF SUCH DAMAGE.
 */
 
 
-#ifdef __AVR__
-#include <avr/pgmspace.h>
-#else
 #define pgm_read_byte(addr) (*(const unsigned char *)(addr))
 
 #include <stm32f10x.h>
 #include <stm32f10x_dma.h>
-#endif
 
 #include <string.h>
 #include <stdbool.h>
 #include <stdlib.h>
 
 #include <systicktimer.h>
-#ifdef __AVR__
-#include <avrspi.h>
-#else
 #include <spi.h>
-#endif
 
 #include "ili9341.h"
 
-#if USE_DMA
 #include <gfxDMA.h>
-#endif
 
 //-------------------------------------------------------------------------------------------//
 
@@ -119,7 +109,7 @@ void initTFT_FSMC_GPIO(void)
 {
   GPIO_InitTypeDef GPIO_InitStruct;
   
-   // Init GPIO for FSMC
+  // Init GPIO for FSMC
   GPIO_InitStruct.GPIO_Pin = FSMC_PIN_D2 | FSMC_PIN_D3 | FSMC_PIN_RD | FSMC_PIN_WR | FSMC_PIN_CS | FSMC_PIN_D13 | FSMC_PIN_D14 | FSMC_PIN_D15 | FSMC_PIN_RS | FSMC_PIN_D0 | FSMC_PIN_D1;
   GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF_PP;
   GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
@@ -146,7 +136,7 @@ void initTFT_FSMC_GPIO(void)
   GPIO_SET_PIN(GPIOE, TFT_RES_PIN);
   GPIO_SET_PIN(GPIOD, FSMC_PIN_RD);
   GPIO_SET_PIN(GPIOD, FSMC_PIN_WR);
-
+  
   //GPIO_SetBits(GPIOD, FSMC_PIN_CS);
   //GPIO_ResetBits(GPIOE, TFT_RES_PIN);
   //GPIO_SetBits(GPIOD, FSMC_PIN_RD);
@@ -157,7 +147,7 @@ void initTFT_FSMC(void)
 {
   FSMC_NORSRAMInitTypeDef fsmc;
   FSMC_NORSRAMTimingInitTypeDef fsmcTiming;
-
+  
   
   RCC_AHBPeriphClockCmd(RCC_AHBPeriph_FSMC, ENABLE);
   
@@ -171,8 +161,8 @@ void initTFT_FSMC(void)
   fsmcTiming.FSMC_CLKDivision = 0x00;
   fsmcTiming.FSMC_DataLatency = 0x00;
   fsmcTiming.FSMC_AccessMode = FSMC_AccessMode_B;
-
-
+  
+  
   fsmc.FSMC_Bank = FSMC_Bank1_NORSRAM1;
   fsmc.FSMC_DataAddressMux = FSMC_DataAddressMux_Disable;
   fsmc.FSMC_MemoryType = FSMC_MemoryType_SRAM; //FSMC_MemoryType_NOR;
@@ -195,14 +185,6 @@ void initTFT_FSMC(void)
 
 void initTFT_GPIO()
 {
-#if defined (__AVR__)
-  SET_BIT(TFT_DDRX, TFT_RES_PIN);
-  SET_TFT_RES_LOW;
-  
-  SET_BIT(TFT_DDRX, TFT_DC_PIN);
-#else
-  
-
 #if USE_FSMC
   initTFT_FSMC();
 #else
@@ -213,17 +195,12 @@ void initTFT_GPIO()
   GPIO_InitStruct.GPIO_Pin = TFT_DC_PIN | TFT_RES_PIN | TFT_SS_PIN;
   GPIO_Init(GPIOB, &GPIO_InitStruct);        // Aply settings to port B
 #endif // USE_FSMC
-#endif // __AVR__
 }
 
 void tftBegin(void)
 {
-#if defined (__AVR__)
-  initTFT_GPIO();
-#else
   initTFT_GPIO();
   SET_TFT_RES_LOW;
-#endif
   
 #if TFT_CS_ALWAS_ACTIVE
   GRAB_TFT_CS;
@@ -231,7 +208,7 @@ void tftBegin(void)
   
   SET_TFT_CS_HI;
   SET_TFT_DC_HI;
-        
+  
   // toggle RST low to reset
   SET_TFT_RES_HI;
   _delayMS(5);
@@ -245,19 +222,15 @@ void tftBegin(void)
   writeCommand(ILI9341_SLPOUT);    //Exit Sleep
   _delayMS(120);
   writeCommand(ILI9341_DISPON);    //Display on
-
-#if USE_DMA
+  
   init_DMA1_SPI1();
-#endif
 }
 
 // blow your mind
 void tftSetAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1)
-{  
-#if USE_DMA  
+{    
   //while(DMA1_SPI1_busy());
   wait_DMA1_SPI1_busy();
-#endif
   
 #if USE_FSMC
   FSMC_SEND_CMD(ILI9341_CASET);    // Column addr set
@@ -275,23 +248,13 @@ void tftSetAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1)
   sendData8_SPI1(ILI9341_CASET); // Column addr set
   
   SET_TFT_DC_HI;          // writeData:
-#ifdef __AVR__
-  sendData16_SPI1(x0);    // XSTART
-  sendData16_SPI1(x1);    // XEND
-#else
-  sendData32_SPI1(x0, x1);
-#endif  // __AVR__
+  sendData32_SPI1(x0, x1); // XSTART, XEND
   
   SET_TFT_DC_LOW;             // writecommand:
   sendData8_SPI1(ILI9341_RASET); // Row addr set
   
   SET_TFT_DC_HI;           // writeData:
-#ifdef __AVR__
-  sendData16_SPI1(y0);     // YSTART
-  sendData16_SPI1(y1);     // YEND
-#else
-  sendData32_SPI1(y0, y1);
-#endif // __AVR__
+  sendData32_SPI1(y0, y1); // YSTART, YEND
   
   SET_TFT_DC_LOW;             // writecommand:
   sendData8_SPI1(ILI9341_RAMWR); // write to RAM
@@ -303,11 +266,9 @@ void tftSetAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1)
 }
 
 void tftSetVAddrWindow(uint16_t x0, uint16_t y0, uint16_t y1)
-{
-#if USE_DMA  
+{  
   //while(DMA1_SPI1_busy());
   wait_DMA1_SPI1_busy();
-#endif
   
 #if USE_FSMC
   FSMC_SEND_CMD(ILI9341_CASET);    // Column addr set
@@ -325,23 +286,13 @@ void tftSetVAddrWindow(uint16_t x0, uint16_t y0, uint16_t y1)
   sendData8_SPI1(ILI9341_CASET); // Column addr set
   
   SET_TFT_DC_HI;          // writeData:
-#ifdef __AVR__
-  sendData16_SPI1(x0);    // XSTART
-  sendData16_SPI1(x0);    // XEND
-#else
-  sendData32_SPI1(x0, x0);
-#endif // __AVR__
+  sendData32_SPI1(x0, x0); // XSTART, XEND
   
   SET_TFT_DC_LOW;             // writecommand:
   sendData8_SPI1(ILI9341_RASET); // Row addr set
   
   SET_TFT_DC_HI;           // writeData:
-#ifdef __AVR__
-  sendData16_SPI1(y0);     // YSTART
-  sendData16_SPI1(y1);     // YEND
-#else
-  sendData32_SPI1(y0, y1);
-#endif // __AVR__
+  sendData32_SPI1(y0, y1); // YSTART, YEND
   
   SET_TFT_DC_LOW;             // writecommand:
   sendData8_SPI1(ILI9341_RAMWR); // write to RAM
@@ -353,11 +304,9 @@ void tftSetVAddrWindow(uint16_t x0, uint16_t y0, uint16_t y1)
 }
 
 void tftSetHAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1)
-{
-#if USE_DMA  
+{ 
   //while(DMA1_SPI1_busy());
   wait_DMA1_SPI1_busy();
-#endif
   
 #if USE_FSMC
   FSMC_SEND_CMD(ILI9341_CASET);    // Column addr set
@@ -375,23 +324,13 @@ void tftSetHAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1)
   sendData8_SPI1(ILI9341_CASET); // Column addr set
   
   SET_TFT_DC_HI;          // writeData:
-#ifdef __AVR__
-  sendData16_SPI1(x0);    // XSTART
-  sendData16_SPI1(x1);    // XEND
-#else
-  sendData32_SPI1(x0, x1);
-#endif // __AVR__
+  sendData32_SPI1(x0, x1); // XSTART, XEND
   
   SET_TFT_DC_LOW;             // writecommand:
   sendData8_SPI1(ILI9341_RASET); // Row addr set
   
   SET_TFT_DC_HI;           // writeData:
-#ifdef __AVR__
-  sendData16_SPI1(y0);     // YSTART
-  sendData16_SPI1(y0);     // YEND
-#else
-  sendData32_SPI1(y0, y0);
-#endif // __AVR__
+  sendData32_SPI1(y0, y0); // YSTART, YEND
   
   SET_TFT_DC_LOW;             // writecommand:
   sendData8_SPI1(ILI9341_RAMWR); // write to RAM
@@ -403,11 +342,9 @@ void tftSetHAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1)
 }
 
 void tftSetAddrPixel(uint16_t x0, uint16_t y0)
-{
-#if USE_DMA  
+{ 
   //while(DMA1_SPI1_busy());
   wait_DMA1_SPI1_busy();
-#endif
   
 #if USE_FSMC
   FSMC_SEND_CMD(ILI9341_CASET);    // Column addr set
@@ -425,23 +362,13 @@ void tftSetAddrPixel(uint16_t x0, uint16_t y0)
   sendData8_SPI1(ILI9341_CASET); // Column addr set
   
   SET_TFT_DC_HI;          // writeData:
-#ifdef __AVR__
-  sendData16_SPI1(x0);    // XSTART
-  sendData16_SPI1(x0);    // XEND
-#else
-  sendData32_SPI1(x0, x0);
-#endif // __AVR__
+  sendData32_SPI1(x0, x0); // XSTART, XEND
   
   SET_TFT_DC_LOW;             // writecommand:
   sendData8_SPI1(ILI9341_RASET); // Row addr set
   
   SET_TFT_DC_HI;           // writeData:
-#ifdef __AVR__
-  sendData16_SPI1(y0);     // YSTART
-  sendData16_SPI1(y0);     // YEND
-#else
-  sendData32_SPI1(y0, y0);
-#endif // __AVR__
+  sendData32_SPI1(y0, y0); // YSTART, YEND
   
   SET_TFT_DC_LOW;             // writecommand:
   sendData8_SPI1(ILI9341_RAMWR); // write to RAM

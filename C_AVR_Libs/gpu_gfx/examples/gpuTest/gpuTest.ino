@@ -437,11 +437,23 @@ void mediabuttons(void)
 void testdrawtext(void)
 {
   setCursor(0, 0);
-  setTextColor(COLOR_WHITE);
   setTextWrap(true);
 
-  //tftPrintPGR((char*)Loremipsum);
-  tftPrintPGR((char*)Loremipsum2);
+  setTextSize(1);
+  setTextColor(COLOR_WHITE);
+  tftPrintPGR((char*)Loremipsum);
+
+  setTextSize(2);
+  setTextColor(COLOR_YELLOW);
+  tftPrintPGR((char*)textSize2);
+
+  setTextSize(3);
+  setTextColor(COLOR_RED);
+  tftPrintPGR((char*)textSize3);
+
+  setTextSize(4);
+  setTextColor(COLOR_GREEN);
+  tftPrintPGR((char*)textSize4);
 }
 
 void drawSpendedTime(void)

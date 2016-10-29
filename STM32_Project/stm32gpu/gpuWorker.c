@@ -18,11 +18,11 @@
 #include "gpuWorker.h"
 #include "sdWorker.h"
 #include "gpuTiles.h"
+#include "sprites.h"
 
 //===========================================================================//
 
 static cmdBuffer_t cmdBuffer;
-static cmdBuffer2_t cmd_T_Buf;
 static uint8_t cmdBufferStr[MAX_TEXT_SIZE];
 
 // Actual numbers of commands: SERIAL_BUFFER_SIZE / 9
@@ -82,11 +82,11 @@ void init_GPU_GPIO(void)
   GPIO_InitStruct.GPIO_Mode = GPIO_Mode_Out_PP;         // Mode: output "Push-Pull"
   GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;        // Set speed
   GPIO_InitStruct.GPIO_Pin = GPU_BSY_PIN;
-  GPIO_Init(GPU_BSY_PORT, &GPIO_InitStruct);            // Apply settings to port A
+  GPIO_Init(GPU_BSY_PORT, &GPIO_InitStruct);            // Apply settings
   
   
   GPIO_InitStruct.GPIO_Pin = GPU_BSY_LED_PIN;           // LED BSY PIN
-  GPIO_Init(GPU_BSY_LED_PORT, &GPIO_InitStruct);        // Apply settings to port С
+  GPIO_Init(GPU_BSY_LED_PORT, &GPIO_InitStruct);        // Apply settings
   
   GPIO_SET_PIN(GPU_BSY_LED_PORT, GPU_BSY_LED_PIN);      // turn off
 }
@@ -125,18 +125,15 @@ void init_GPU(void)
   } */
   
   if(initBufStatus) {
-    print(T_INIT_BUF T_OK);
+    print(T_INIT_BUF T_OK); // RAM for command buffer allocated
   } else {
-    print(T_INIT_BUF T_FAIL);
+    print(T_INIT_BUF T_FAIL);  // RAM for command buffer not allocated
     while(1);
   }
 }
 
 __noreturn __task void run_GPU(void)
 {
-  //uint8_t strSize =0;
-  //uint8_t count = 0;
-  
   uint8_t cmd = 0;
   uint8_t bsy = 0;
   uint16_t avaliableData =0;
@@ -148,7 +145,7 @@ __noreturn __task void run_GPU(void)
     // this rules protect GPIO from togling everytime
     // and try to hold buffer always filled by some data
 #if USE_BSY_PROTECTION   
-    if((avaliableData > CALC_MAX_FILL_SIZE /*CALC_BUF_FILL(MAX_FILL_BUF)*/) && (!bsy)) { // buffer is allmost full, and no bsy flag
+    if((avaliableData > CALC_MAX_FILL_SIZE ) && (!bsy)) { // buffer is allmost full, and no bsy flag
       bsy = 1;
       GPIO_RESET_PIN(GPU_BSY_LED_PORT, GPU_BSY_LED_PIN);
       // say to CPU: "I`m bsy, do not send the data!"
@@ -157,7 +154,7 @@ __noreturn __task void run_GPU(void)
 #else
       pFuncSendData8(BSY_MSG_CODE_WAIT);
 #endif
-    } else if((avaliableData < CALC_MIN_FILL_SIZE /*CALC_BUF_FILL(MIN_FILL_BUF)*/) && (bsy)) { // buffer is allmost empty, and bsy flag
+    } else if((avaliableData < CALC_MIN_FILL_SIZE ) && (bsy)) { // buffer is allmost empty, and bsy flag
       bsy = 0;
       GPIO_SET_PIN(GPU_BSY_LED_PORT, GPU_BSY_LED_PIN);
       // say to CPU: "I`m free, now send the data!"
@@ -272,35 +269,29 @@ __noreturn __task void run_GPU(void)
       // --------------- Font/Print --------------- //
       
       case DRW_CHAR: {
-        pFuncWaitCutBuf(cmdBuffer.data, 12);
+        pFuncWaitCutBuf(cmdBuffer.data, 10);
         
-        drawChar(cmdBuffer.par1, cmdBuffer.par2, cmdBuffer.par6, cmdBuffer.par3, cmdBuffer.par4, cmdBuffer.par5);
+        drawChar(cmdBuffer.par1, cmdBuffer.par2, cmdBuffer.data[8], cmdBuffer.par3, cmdBuffer.par4, cmdBuffer.data[9]);
       } break;
       
-      /* // fix this in future!
       case DRW_PRNT: {
-      while(dataAvailable_USART1() <= 1);
-      strSize = readData8_USART1();
-      while(dataAvailable_USART1() <= strSize);
-      
-      for(count =0; count <= strSize; count++) {
-      cmdBufferStr[count] = readData8_USART1();
-      }
-      
-      print((const char*)cmdBufferStr);
+        pFuncWaitCutBuf(cmdBuffer.data, 1);
+        
+        pFuncWaitCutBuf(cmdBufferStr, cmdBuffer.data[0]);
+        
+        print((const char*)cmdBufferStr);
       } break;
-      */
       
       case DRW_PRNT_C: {
-        pFuncWaitCutBuf(cmd_T_Buf.data, 1);
+        pFuncWaitCutBuf(cmdBuffer.data, 1);
         
-        printChar(cmd_T_Buf.par0);
+        printChar(cmdBuffer.data[0]);
       } break;
       
       case DRW_PRNT_POS_C: {
         pFuncWaitCutBuf(cmdBuffer.data, 5);
         
-        printCharPos(cmdBuffer.par1, cmdBuffer.par2, cmdBuffer.par3);
+        printCharPos(cmdBuffer.par1, cmdBuffer.par2, cmdBuffer.data[4]);
       } break;
       
       case SET_CURSOR: {
@@ -322,21 +313,21 @@ __noreturn __task void run_GPU(void)
       } break;
       
       case SET_TXT_SIZE: {
-        pFuncWaitCutBuf(cmd_T_Buf.data, 1);
+        pFuncWaitCutBuf(cmdBuffer.data, 1);
         
-        setTextSize(cmd_T_Buf.par0);
+        setTextSize(cmdBuffer.data[0]);
       } break;
       
       case SET_TXT_WRAP: {
-        pFuncWaitCutBuf(cmd_T_Buf.data, 1);
+        pFuncWaitCutBuf(cmdBuffer.data, 1);
         
-        setTextWrap(cmd_T_Buf.par0);
+        setTextWrap(cmdBuffer.data[0]);
       } break;
       
       case SET_TXT_437: {
-        pFuncWaitCutBuf(cmd_T_Buf.data, 1);
+        pFuncWaitCutBuf(cmdBuffer.data, 1);
         
-        cp437(cmd_T_Buf.par0);
+        cp437(cmdBuffer.data[0]);
       } break;
       
       /*
@@ -356,9 +347,9 @@ __noreturn __task void run_GPU(void)
       } break;
       
       case SET_ROTATION: {
-        pFuncWaitCutBuf(cmd_T_Buf.data, 1);
+        pFuncWaitCutBuf(cmdBuffer.data, 1);
         
-        tftSetRotation(cmd_T_Buf.par0);
+        tftSetRotation(cmdBuffer.data[0]);
       } break;
       
       case SET_SCRL_AREA: {
@@ -368,15 +359,15 @@ __noreturn __task void run_GPU(void)
       } break;
       
       case WRT_CMD: {
-        pFuncWaitCutBuf(cmd_T_Buf.data, 1);
+        pFuncWaitCutBuf(cmdBuffer.data, 1);
         
-        writeCommand(cmd_T_Buf.par0);
+        writeCommand(cmdBuffer.data[0]);
       } break;
       
       case WRT_DATA: {
-        pFuncWaitCutBuf(cmd_T_Buf.data, 1);
+        pFuncWaitCutBuf(cmdBuffer.data, 1);
         
-        writeData(cmd_T_Buf.par0);
+        writeData(cmdBuffer.data[0]);
       } break;
       
       case WRT_DATA_U16: {
@@ -392,27 +383,27 @@ __noreturn __task void run_GPU(void)
       } break;
       
       case SET_SLEEP: {
-        pFuncWaitCutBuf(cmd_T_Buf.data, 1);
+        pFuncWaitCutBuf(cmdBuffer.data, 1);
         
-        tftSetSleep(cmd_T_Buf.par0);
+        tftSetSleep(cmdBuffer.data[0]);
       } break;
       
       case SET_IDLE: {
-        pFuncWaitCutBuf(cmd_T_Buf.data, 1);
+        pFuncWaitCutBuf(cmdBuffer.data, 1);
         
-        tftSetIdleMode(cmd_T_Buf.par0);
+        tftSetIdleMode(cmdBuffer.data[0]);
       } break;
       
       case SET_BRIGHTNES: {
-        pFuncWaitCutBuf(cmd_T_Buf.data, 1);
+        pFuncWaitCutBuf(cmdBuffer.data, 1);
         
-        tftSetDispBrightness(cmd_T_Buf.par0);
+        tftSetDispBrightness(cmdBuffer.data[0]);
       } break;
       
       case SET_INVERTION: {
-        pFuncWaitCutBuf(cmd_T_Buf.data, 1);
+        pFuncWaitCutBuf(cmdBuffer.data, 1);
         
-        tftSetInvertion(cmd_T_Buf.par0);
+        tftSetInvertion(cmdBuffer.data[0]);
       } break;
       
       /*
@@ -430,9 +421,9 @@ __noreturn __task void run_GPU(void)
       } break;
       
       case MAK_SCRL_SMTH: {
-        pFuncWaitCutBuf(cmd_T_Buf.data, 5);
+        pFuncWaitCutBuf(cmdBuffer.data, 5);
         
-        tftScrollSmooth(cmd_T_Buf.par1, cmd_T_Buf.par2, cmd_T_Buf.par0);
+        tftScrollSmooth(cmdBuffer.par1, cmdBuffer.par2, cmdBuffer.data[5]);
       } break;
       
       case PSH_CR: {
@@ -441,7 +432,7 @@ __noreturn __task void run_GPU(void)
         tftPushColor(cmdBuffer.par1);
       } break;
       
-      // --------------- Tile/Sprite -------------- //
+      // ------------------- Tile ----------------- //
       
       case LDD_TLE_8: {
         // get size of file name, tileset width, ram tile number, tile number in tileset
@@ -450,6 +441,7 @@ __noreturn __task void run_GPU(void)
         pFuncWaitCutBuf(cmdBufferStr, cmdBuffer.data[0]);
         
         SDLoadTileFromSet8x8(cmdBufferStr, cmdBuffer.data[1], cmdBuffer.data[2], cmdBuffer.data[3]);
+        //SDLoadTileFromSet8x8(cmdBufferStr, (tileParam_t*)&cmdBuffer);
         // memset(cmdBufferStr, 0x00, cmdBuffer.data[0]); // remove name
       } break;
       
@@ -460,6 +452,7 @@ __noreturn __task void run_GPU(void)
         pFuncWaitCutBuf(cmdBufferStr, cmdBuffer.data[0]);
         
         SDLoadTileSet8x8(cmdBufferStr, cmdBuffer.data[1], cmdBuffer.data[2], cmdBuffer.data[3]);
+        //SDLoadTileSet8x8(cmdBufferStr, (tileParam_t*)&cmdBuffer);
         // memset(cmdBufferStr, 0x00, cmdBuffer.data[0]); // remove name
       } break;    
       
@@ -471,16 +464,85 @@ __noreturn __task void run_GPU(void)
         pFuncWaitCutBuf(cmdBufferStr, cmdBuffer.data[0]);
         
         SDLoadRegionOfTileSet8x8(cmdBufferStr, cmdBuffer.data[1], cmdBuffer.data[2], cmdBuffer.data[3], cmdBuffer.data[4]);
+        //SDLoadRegionOfTileSet8x8(cmdBufferStr, (tileParam_t*)&cmdBuffer);
         // memset(cmdBufferStr, 0x00, cmdBuffer.data[0]); // remove name
       } break;
       
       case DRW_TLE_8_POS: {
+        pFuncWaitCutBuf(cmdBuffer.data, 5);
+        
+        drawTile8x8(cmdBuffer.par1, cmdBuffer.par2, cmdBuffer.data[4]);
+      } break;
+      
+      case LDD_TLE_MAP: {
+        // get size of file name
+        pFuncWaitCutBuf(cmdBuffer.data, 1);
+        
+        // get file name
+        pFuncWaitCutBuf(cmdBufferStr, cmdBuffer.data[0]);
+        
+        SDLoadTileMap(cmdBufferStr);
+      } break;
+      
+      case DRW_TLE_MAP: {
+        drawBackgroundMap();
+      } break;
+      
+      // ----------------- Sprite ----------------- //
+      
+      case SET_SPR_POS: {
         pFuncWaitCutBuf(cmdBuffer.data, 6);
         
-        drawTile8x8(cmdBuffer.par1, cmdBuffer.par2, cmdBuffer.par3);
+        setSpritePosition(cmdBuffer.par1, cmdBuffer.par2, cmdBuffer.par3);
+      } break;
+      
+      case SET_SPR_TYPE: {
+        pFuncWaitCutBuf(cmdBuffer.data, 2);
+        
+        setSpriteType(cmdBuffer.data[0], cmdBuffer.data[1]);
+      } break;
+      
+      case SET_SPR_VISBL: {
+        pFuncWaitCutBuf(cmdBuffer.data, 2);
+        
+        setSpriteVisible(cmdBuffer.data[0], cmdBuffer.data[1]);
+      } break;
+      
+      case SET_SPR_TLE: {
+        pFuncWaitCutBuf(cmdBuffer.data, 5);
+        
+        setSpriteTiles(cmdBuffer.data[0], cmdBuffer.data[1], cmdBuffer.data[2], cmdBuffer.data[3], cmdBuffer.data[4]);
+      } break;
+      
+      case SET_SPR_AUT_R: {
+        pFuncWaitCutBuf(cmdBuffer.data, 1);
+        
+        setSpritesAutoRedraw(cmdBuffer.data[0]);
+      } break;
+      
+      case DRW_SPR: {
+        pFuncWaitCutBuf(cmdBuffer.data, 1);
+        
+        drawSprite(cmdBuffer.data[0]);
+      } break;
+      
+      case GET_SRP_COLISN: {
+        pFuncWaitCutBuf(cmdBuffer.data, 2);
+        
+        uint8_t state = getSpriteCollision(cmdBuffer.data[0], cmdBuffer.data[1]);
+        
+        pFuncSendData8(state);
       } break;
       
       
+      case LDD_USR_PAL: {
+        //pFuncWaitCutBuf(cmdBuffer.data, 4);
+        
+        // get file name
+        //pFuncWaitCutBuf(cmdBufferStr, cmdBuffer.par1);
+        
+        //SDLoadPalette(cmdBufferStr, cmdBuffer.par2);
+      } break;
       
       // -------------  TO DO: ---------- //
       /*

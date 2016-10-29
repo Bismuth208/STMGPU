@@ -1,17 +1,26 @@
 // ------------------------- General Description -------------------- //
 #Tiles:
 -	up to 96 tiles 8x8;
--	up to 16 tiles 8x16;
--	up to 8 tiles 16x16;
--	tiles group (metatile) up to 8 tiles*;
--	any colors per sprite from palette of 80 colors;
+-	up to 16 tiles 16x16;
 -	add tiles;
 -	delete tiles;
 -	draw tiles;
 
+#Sprites
+-	up to 56 sprites ( 63 only on STM32F103VET6 )
+-	tiles grouping to sprite (up to 4 tiles);
+-	any colors per sprite from palette of 80 colors;
+-	check spites collision*;
+-	set coordinates for sprites;
+
+#Background
+-	load and draw background screen (40x30 tiles);
+
 #Draw functions:
 -	almost all from GFX lib;
 -	tiles;
+-	sprites;
+-	background;
 -	GUI*;
 
 #Interface:

@@ -6,8 +6,6 @@
 
 #include "gfx.h"
 
-#if USE_DMA
-
 #include <stm32f10x.h>
 #include <stm32f10x_dma.h>
 
@@ -62,7 +60,7 @@ void init_DMA1_SPI1(void)
   //Enable DMA1 channel IRQ Channel
   NVIC_InitStructure.NVIC_IRQChannel = DMA1_Channel3_IRQn;
   NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
-  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
   NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
   NVIC_Init(&NVIC_InitStructure);
 }
@@ -171,8 +169,6 @@ void DMA1_Channel3_IRQHandler(void)
 }
 
 //----------------------------------------------------------------------------//
-
-#endif // USE_DMA
 
 
 //---------------------------------- Code dump... ---------------------------------------------//

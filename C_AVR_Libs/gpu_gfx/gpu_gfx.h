@@ -3,6 +3,12 @@
 #ifndef _GPU_GFX_H
 #define _GPU_GFX_H
 
+#include "tiles.h"
+#include "sprites.h"
+#include "lowlevel.h"
+#include "text.h"
+#include "primitives.h"
+
 
 // Check busy GPU`s pin before every transfer
 // Protect GPU`s buffer from overflow
@@ -92,13 +98,13 @@
 //#define NOT_USED        0x2F
 
 
-// --------------- Tile/Sprite -------------- //
+// ------------------- Tile ----------------- //
 #define LDD_TLE_8       0x30    // load tile 8x8 size from SD
 #define LDD_TLES_8      0x31    // load tiles 8x8 size from SD
 #define LDD_TLES_RG_8   0x32    // load region of tiles 8x8 size from SD
 #define DRW_TLE_8_POS   0x33    // draw tile 8x8 size on TFT screen
-//#define SET_TLE_POS     0x34    // set tile position in tile screen
-//#define LDD_TLE_SCR     0x35    // load tile screen from SD
+#define LDD_TLE_MAP     0x34    // load background tile map 8x8 from SD
+#define DRW_TLE_MAP     0x35    // draw background tile map 8x8 on TFT screen
 //#define DRW_TLE_SCR     0x36    // draw tile screen on TFT screen
 //#define MAK_METTLE      0x37    // group tiles to metatile
 //#define DRW_METTLE_SCR  0x38    // draw metatile on screen
@@ -111,14 +117,14 @@
 //#define NOT_USED        0x3F
 
 
-// ---------------- NOT_USED ---------------- //
-//#define NOT_USED        0x40
-//#define NOT_USED        0x41
-//#define NOT_USED        0x42
-//#define NOT_USED        0x43
-//#define NOT_USED        0x44
-//#define NOT_USED        0x45
-//#define NOT_USED        0x46
+// ----------------- Sprite ----------------- //
+#define SET_SPR_POS     0x40    // set sprite position
+#define SET_SPR_TYPE    0x41    // set sprite type 1x2:8, 2x2:8; 1x2:16, 2x2:16;
+#define SET_SPR_VISBL   0x42    // enable draw on screen
+#define SET_SPR_TLE     0x43    // set tiles for sprite
+#define SET_SPR_AUT_R   0x44    // enable or disable autoredraw sprite
+#define DRW_SPR         0x45    // draw sprite
+#define GET_SRP_COLISN  0x46    // get sprites collision
 //#define NOT_USED        0x47
 //#define NOT_USED        0x48
 //#define NOT_USED        0x49
@@ -131,7 +137,7 @@
 
 
 // ----------------- SD card ---------------- //
-//#define NOT_USED        0x50
+#define LDD_USR_PAL     0x50    // load user palette from SD card
 //#define NOT_USED        0x51
 //#define NOT_USED        0x52
 //#define NOT_USED        0x53
@@ -175,127 +181,78 @@
 
 // ------------------------------------------------------------------- //
 
-#ifdef __cplusplus
- extern "C" {
-#endif
-   
-//#pragma pack(push, 1)
-typedef union {
-  uint8_t data[15];
-  struct {
-  	uint8_t  cmd;
-    uint16_t par1;
-    uint16_t par2;
-    uint16_t par3;
-    uint16_t par4;
-    uint16_t par5;
-    uint16_t par6;
-    uint16_t par7;
-  };
-} cmdBuffer_t;
-   
-typedef union {
-  uint8_t data[11];
-  struct {
-    uint8_t cmd;
-    uint8_t  par0;
-    uint16_t par1;
-    uint16_t par2;
-    uint16_t par3;
-    uint16_t par4;
-    uint8_t  par5;
-    //uint8_t  align;
-  };
-} cmdBuffer2_t;
-//#pragma pack(pop)
-   
+// Sprites for tiles 8x8
+#define SPR_1X1_8 0
+#define SPR_1X2_8 1
+#define SPR_2X1_8 2
+#define SPR_2X2_8 3
+
+// Sprites for tiles 16x16
+#define SPR_1X1_16 4
+#define SPR_1X2_16 5
+#define SPR_2X1_16 6
+#define SPR_2X2_16 7
+
+// Srites for tiles 32x32 - avaliable only on GPU PRO version!
+#define SPR_1X1_32 8
+#define SPR_1X2_32 9
+#define SPR_2X1_32 10
+#define SPR_2X2_32 11
+
 // ------------------------------------------------------------------- //
 
-void sync_gpu(void);
-void sendCommand(void *buf, uint8_t size);
-
-// ------------------ Base ------------------ //
-void tftDrawPixel(int16_t x, int16_t y, uint16_t color);
-void tftFillScreen(uint16_t color);
-   
-// ------------- Primitives/GFX ------------- //
-void tftFillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
-void tftDrawRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
-void drawRoundRect(int16_t x, int16_t y, int16_t w, int16_t h, int16_t radius, uint16_t color);
-void fillRoundRect(int16_t x, int16_t y, int16_t w, int16_t h, int16_t radius, uint16_t color);
-void tftDrawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint16_t color);
-void tftDrawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color);
-void tftDrawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color);
-
-void drawCircle(int16_t x, int16_t y, int16_t r, uint16_t color);
-void fillCircle(int16_t x, int16_t y0, int16_t r, uint16_t color);
-void drawTriangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t color);
-void fillTriangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t color);
-   
-void tftScroll(uint16_t lines, uint16_t yStart);
-void tftScrollSmooth(uint16_t lines, uint16_t yStart, uint8_t wait);
-
-//void drawBitmap(int16_t x, int16_t y, const uint8_t *bitmap, int16_t w, int16_t h, uint16_t color);
-//void drawBitmapBG(int16_t x, int16_t y, const uint8_t *bitmap, int16_t w, int16_t h, uint16_t color, uint16_t bg);
-void drawXBitmap(int16_t x, int16_t y, const uint8_t *bitmap, int16_t w, int16_t h, uint16_t color);
-
-uint16_t color565(uint8_t r, uint8_t g, uint8_t b);
-uint16_t conv8to16(uint8_t x);
-    
-//uint16_t columns(void);
-//uint16_t rows(void);
-
-//uint8_t getRotation(void);
-   
-void getResolution(void);
-int16_t tftHeight(void);
-int16_t tftWidth(void);
-   
-// --------------- Font/Print --------------- //
-
-// get current cursor position (get rotation safe maximum values, using: width() for x, height() for y)
-//int16_t getCursorX(void);
-//int16_t getCursorY(void);
-
-//void setTextFont(unsigned char* f);
-void drawChar(int16_t x, int16_t y, uint8_t c, uint16_t color, uint16_t bg, uint8_t size);
-void setCursor(int16_t x, int16_t y);
-void setTextColor(uint16_t color);
-void setTextColorBG(uint16_t color, uint16_t bg);
-void setTextSize(uint8_t size);
-void setTextWrap(bool wrap);
-void cp437(bool cp);
-
-void print(const char *str);
-void tftPrintPGR(const char *str);
-void printChar(uint8_t c);
-void printCharPos(int16_t x, int16_t y, uint8_t c);
-   
-// ---------------- Low Level --------------- //
-void tftSetAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
-void tftSetRotation(uint8_t m);
-void tftSetScrollArea(uint16_t TFA, uint16_t BFA);
-void tftScrollAddress(uint16_t VSP);
-void tftSetSleep(bool enable);
-void tftSetIdleMode(bool mode);
-void tftSetDispBrightness(uint8_t brightness);
-void tftSetInvertion(bool i);
-//void setGamma(uint8_t gamma);
-void tftPushColor(uint16_t color);
-   
-void writeCommand(uint8_t c);
-void writeData(uint8_t d);
-void writeWordData(uint16_t c);
-   
-// --------------- Tile/Sprite -------------- //
-void SDLoadTileFromSet8x8(const char *tileSetArrName, uint8_t tileSetW,
-                          uint8_t ramTileNum, uint8_t tileNum);
-void SDLoadTileSet8x8(const char *tileSetArrName, uint8_t tileSetW,
-                      uint8_t ramTileBase, uint8_t tileMax);
-void SDLoadRegionOfTileSet8x8(const char *tileSetArrName, uint8_t tileSetW,
-                              uint8_t ramTileBase, uint8_t tileMin, uint8_t tileMax);
-void drawTile8x8(int16_t posX, int16_t posY, uint8_t tileNum);
-
+#ifdef __cplusplus
+extern "C" {
+#endif
+  
+  //#pragma pack(push, 1)
+  typedef union {
+    uint8_t data[15];
+    struct {
+      uint8_t  cmd;
+      uint16_t par1;
+      uint16_t par2;
+      uint16_t par3;
+      uint16_t par4;
+      uint16_t par5;
+      uint16_t par6;
+      uint16_t par7;
+    };
+  } cmdBuffer_t;
+  //#pragma pack(pop)
+  
+  // ------------------------------------------------------------------- //
+  
+  void sync_gpu(void);
+  void sendCommand(void *buf, uint8_t size);
+  
+  // ------------------ Base ------------------ //
+  void tftDrawPixel(int16_t x, int16_t y, uint16_t color);
+  void tftFillScreen(uint16_t color);
+  
+  
+  // ------------------------------------------------------------------- //
+  
+  void tftScroll(uint16_t lines, uint16_t yStart);
+  void tftScrollSmooth(uint16_t lines, uint16_t yStart, uint8_t wait);
+  
+  //void drawBitmap(int16_t x, int16_t y, const uint8_t *bitmap, int16_t w, int16_t h, uint16_t color);
+  //void drawBitmapBG(int16_t x, int16_t y, const uint8_t *bitmap, int16_t w, int16_t h, uint16_t color, uint16_t bg);
+  void drawXBitmap(int16_t x, int16_t y, const uint8_t *bitmap, int16_t w, int16_t h, uint16_t color);
+  
+  uint16_t color565(uint8_t r, uint8_t g, uint8_t b);
+  uint16_t conv8to16(uint8_t x);
+  
+  //uint16_t columns(void);
+  //uint16_t rows(void);
+  
+  //uint8_t getRotation(void);
+  
+  void getResolution(void);
+  int16_t tftHeight(void);
+  int16_t tftWidth(void);
+  
+  
 #ifdef __cplusplus
 }
 #endif

@@ -9,6 +9,7 @@
  *
  */
 
+#include <stdarg.h>
 #include <string.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -34,8 +35,7 @@
 #define MAX_TEXT_SIZE   30
 
 // ------------------------------------------------------------------------------------ //
-static cmdBuffer_t cmdBuffer;   // \__ more RAM used but little faster and less ROM used
-//static cmdBuffer2_t cmd_T_Buf;  // /   less stack problems
+static cmdBuffer_t cmdBuffer;   // more RAM used but little faster and less ROM used
 //static uint8_t cmdBufferStr[MAX_TEXT_SIZE];
 
 // at sync, GPU return it`s LCD resolution,
@@ -293,19 +293,10 @@ void drawChar(int16_t x, int16_t y, uint8_t c, uint16_t color, uint16_t bg, uint
   cmdBuffer.par2 = y;
   cmdBuffer.par3 = color;
   cmdBuffer.par4 = bg;
-  cmdBuffer.par5 = c;
-  cmdBuffer.par6 = size;
+  cmdBuffer.data[9] = c;
+  cmdBuffer.data[10] = size;
 
-  sendCommand(cmdBuffer.data, 13);
-   
-  /*
-  setTextSize(size);
-  //setCursor(x, y);
-  setTextColorBG(color, bg);
-  //printChar(c);
-   
-  printCharPos(x, y, c);
-   */
+  sendCommand(cmdBuffer.data, 11);
 }
 
 void setCursor(int16_t x, int16_t y)
@@ -337,7 +328,7 @@ void setTextColorBG(uint16_t color, uint16_t bg)
 void setTextSize(uint8_t size)
 {
   cmdBuffer.cmd = SET_TXT_SIZE;
-  cmdBuffer.par1 = size;
+  cmdBuffer.data[1] = size;
 
   sendCommand(cmdBuffer.data, 2);
 }
@@ -345,7 +336,7 @@ void setTextSize(uint8_t size)
 void setTextWrap(bool wrap)
 {
   cmdBuffer.cmd = SET_TXT_WRAP;
-  cmdBuffer.par1 = wrap;
+  cmdBuffer.data[1] = wrap;
 
   sendCommand(cmdBuffer.data, 2);
 }
@@ -353,41 +344,18 @@ void setTextWrap(bool wrap)
 void cp437(bool cp)
 {
   cmdBuffer.cmd = SET_TXT_437;
-  cmdBuffer.par1 = cp;
+  cmdBuffer.data[1] = cp;
 
   sendCommand(cmdBuffer.data, 2);
 }
 
-/*
 void print(const char *str)
 {
-  uint8_t strSize = strlen(str);
+  cmdBuffer.cmd = DRW_PRNT;
+  cmdBuffer.data[1] = strlen(str);
   
-  cmdBufferStr[0] = DRW_PRNT;
-  cmdBufferStr[1] = DRW_PRNT;
-  
-  memcpy(cmdBufferStr[2], str, strSize);
-  
-  sendCommand(cmdBufferStr, strSize + 0x02);
-}
- 
-void tftPrintPGR(const char *str)
-{
- 
-}
-*/
-
-// make a DDoS to GPU's buffer...
-void print(const char *str)
-{
-  uint16_t strSize = strlen(str);
-  
-  for (uint16_t count=0; count < strSize; count++) {
-    cmdBuffer.cmd = DRW_PRNT_C;
-    cmdBuffer.par1 = str[count];
-    
-    sendCommand(cmdBuffer.data, 2);
-  }
+  sendCommand(cmdBuffer.data, 2);
+  sendCommand((void*)str, cmdBuffer.data[1]);
 }
 
 // make a DDoS to GPU's buffer...
@@ -406,7 +374,7 @@ void tftPrintPGR(const char *str)
 void printChar(uint8_t c)
 {
   cmdBuffer.cmd = DRW_PRNT_C;
-  cmdBuffer.par1 = c;
+  cmdBuffer.data[1] = c;
 
   sendCommand(cmdBuffer.data, 2);
 }
@@ -416,7 +384,7 @@ void printCharPos(int16_t x, int16_t y, uint8_t c)
   cmdBuffer.cmd = DRW_PRNT_POS_C;
   cmdBuffer.par1 = x;
   cmdBuffer.par2 = y;
-  cmdBuffer.par3 = c;
+  cmdBuffer.data[5] = c;
 
   sendCommand(cmdBuffer.data, 6);
 }
@@ -437,7 +405,7 @@ void tftSetAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1)
 void tftSetRotation(uint8_t m)
 {
   cmdBuffer.cmd = SET_ROTATION;
-  cmdBuffer.par1 = m;
+  cmdBuffer.data[1] = m;
   
   sendCommand(cmdBuffer.data, 2);
 }
@@ -475,12 +443,12 @@ void tftScrollSmooth(uint16_t lines, uint16_t yStart, uint8_t wait)
 {
   //uint16_t newYstart;
   
-  cmd_T_Buf.cmd = MAK_SCRL_SMTH;
-  cmd_T_Buf.par0 = wait;
-  cmd_T_Buf.par1 = lines;
-  cmd_T_Buf.par2 = yStart;
+  cmdBuffer.cmd = MAK_SCRL_SMTH;
+  cmdBuffer.par1 = lines;
+  cmdBuffer.par2 = yStart;
+  cmdBuffer.data[5] = wait;
   
-  sendCommand(cmd_T_Buf.data, 6);
+  sendCommand(cmdBuffer.data, 6);
   //return newYstart;
 }
 */
@@ -488,7 +456,7 @@ void tftScrollSmooth(uint16_t lines, uint16_t yStart, uint8_t wait)
 void tftSetSleep(bool enable)
 {
   cmdBuffer.cmd = SET_SLEEP;
-  cmdBuffer.par1 = enable;
+  cmdBuffer.data[1] = enable;
   
   sendCommand(cmdBuffer.data, 2);
 }
@@ -496,7 +464,7 @@ void tftSetSleep(bool enable)
 void tftSetIdleMode(bool mode)
 {
   cmdBuffer.cmd = SET_IDLE;
-  cmdBuffer.par1 = mode;
+  cmdBuffer.data[1] = mode;
   
   sendCommand(cmdBuffer.data, 2);
 }
@@ -504,7 +472,7 @@ void tftSetIdleMode(bool mode)
 void tftSetDispBrightness(uint8_t brightness)
 {
   cmdBuffer.cmd = SET_BRIGHTNES;
-  cmdBuffer.par1 = brightness;
+  cmdBuffer.data[1] = brightness;
   
   sendCommand(cmdBuffer.data, 2);
 }
@@ -512,7 +480,7 @@ void tftSetDispBrightness(uint8_t brightness)
 void tftSetInvertion(bool i)
 {
   cmdBuffer.cmd = SET_INVERTION;
-  cmdBuffer.par1 = i;
+  cmdBuffer.data[1] = i;
   
   sendCommand(cmdBuffer.data, 2);
 }
@@ -531,7 +499,7 @@ void tftPushColor(uint16_t color)
 void writeCommand(uint8_t c)
 {
   cmdBuffer.cmd = WRT_CMD;
-  cmdBuffer.par1 = c;
+  cmdBuffer.data[1] = c;
   
   sendCommand(cmdBuffer.data, 2);
 }
@@ -539,7 +507,7 @@ void writeCommand(uint8_t c)
 void writeData(uint8_t d)
 {
   cmdBuffer.cmd = WRT_DATA;
-  cmdBuffer.par1 = d;
+  cmdBuffer.data[1] = d;
   
   sendCommand(cmdBuffer.data, 2);
 }
@@ -552,7 +520,7 @@ void writeWordData(uint16_t c)
   sendCommand(cmdBuffer.data, 3);
 }
 
-// --------------- Tile/Sprite -------------- //
+// ------------------- Tile ----------------- //
 void SDLoadTileFromSet8x8(const char *tileSetArrName, uint8_t tileSetW, uint8_t ramTileNum, uint8_t tileNum)
 {
   cmdBuffer.cmd = LDD_TLE_8;
@@ -565,7 +533,6 @@ void SDLoadTileFromSet8x8(const char *tileSetArrName, uint8_t tileSetW, uint8_t 
   sendCommand((void*)tileSetArrName, cmdBuffer.data[1]); // send name of file
 }
 
-
 void SDLoadTileSet8x8(const char *tileSetArrName, uint8_t tileSetW, uint8_t ramTileBase, uint8_t tileMax)
 {
   cmdBuffer.cmd = LDD_TLES_8;
@@ -577,7 +544,6 @@ void SDLoadTileSet8x8(const char *tileSetArrName, uint8_t tileSetW, uint8_t ramT
   sendCommand(cmdBuffer.data, 5);
   sendCommand((void*)tileSetArrName, cmdBuffer.data[1]); // send name of file
 }
-
 
 void SDLoadRegionOfTileSet8x8(const char *tileSetArrName, uint8_t tileSetW, uint8_t ramTileBase, uint8_t tileMin, uint8_t tileMax)
 {
@@ -597,12 +563,131 @@ void drawTile8x8(int16_t posX, int16_t posY, uint8_t tileNum)
   cmdBuffer.cmd = DRW_TLE_8_POS;
   cmdBuffer.par1 = posX;
   cmdBuffer.par2 = posY;
-  cmdBuffer.par3 = tileNum;
+  cmdBuffer.data[5] = tileNum;
+  
+  sendCommand(cmdBuffer.data, 6);
+}
+
+void SDLoadTileMap(const char *fileName)
+{
+  cmdBuffer.cmd = LDD_TLE_MAP;
+  cmdBuffer.data[1] = strlen(fileName);
+  
+  sendCommand(cmdBuffer.data, 2);
+  sendCommand((void*)fileName, cmdBuffer.data[1]); // send name of file
+}
+
+void drawBackgroundMap(void)
+{
+  cmdBuffer.cmd = DRW_TLE_MAP;
+  
+  sendCommand(cmdBuffer.data, 1);
+}
+
+// ----------------- Sprite ----------------- //
+void setSpritePosition(uint8_t sprNum, uint16_t posX, uint16_t posY)
+{
+  cmdBuffer.cmd = SET_SPR_POS;
+  cmdBuffer.par1 = (uint16_t)sprNum;
+  cmdBuffer.par2 = posX;
+  cmdBuffer.par3 = posY;
   
   sendCommand(cmdBuffer.data, 7);
 }
 
+void setSpriteType(uint8_t sprNum, uint8_t type)
+{
+  cmdBuffer.cmd = SET_SPR_TYPE;
+  cmdBuffer.data[1] = sprNum;
+  cmdBuffer.data[2] = type;
+  
+  sendCommand(cmdBuffer.data, 3);
+}
+
+void setSpriteVisible(uint8_t sprNum, uint8_t state)
+{
+  cmdBuffer.cmd = SET_SPR_VISBL;
+  cmdBuffer.data[1] = sprNum;
+  cmdBuffer.data[2] = state;
+  
+  sendCommand(cmdBuffer.data, 3);
+}
+
+void setSpriteTiles(uint8_t sprNum, uint8_t tle1, uint8_t tle2, uint8_t tle3, uint8_t tle4)
+{
+  cmdBuffer.cmd = SET_SPR_TLE;
+  cmdBuffer.data[1] = sprNum;
+  cmdBuffer.data[2] = tle1;
+  cmdBuffer.data[3] = tle2;
+  cmdBuffer.data[4] = tle3;
+  cmdBuffer.data[5] = tle4;
+  
+  sendCommand(cmdBuffer.data, 6);
+}
+
+void setSpritesAutoRedraw(uint8_t state)
+{
+  cmdBuffer.cmd = SET_SPR_AUT_R;
+  cmdBuffer.data[1] = state;
+  
+  sendCommand(cmdBuffer.data, 2);
+}
+
+void drawSprite(uint8_t sprNum)
+{
+  cmdBuffer.cmd = DRW_SPR;
+  cmdBuffer.data[1] = sprNum;
+  
+  sendCommand(cmdBuffer.data, 2);
+}
+
+bool getSpriteCollision(uint8_t sprNum1, uint8_t sprNum2)
+{
+  cmdBuffer.cmd = GET_SRP_COLISN;
+  cmdBuffer.data[1] = sprNum1;
+  cmdBuffer.data[2] = sprNum2;
+  
+  sendCommand(cmdBuffer.data, 3);
+  
+  while(!serialAvailable() ); // wait for state
+
+  return serialRead();
+}
+
 // -------------------- ___ ---------------------- //
+
+#if 0
+// some type of overdrive in C
+// hi 4 nibles is type of func
+// low 4 nibbles is how much params
+void SDLoadTile(const char *fileName, uint8_t fnNum, ...)
+{
+  va_list argptr;
+  va_start (argptr, fnNum);
+  
+  uint8_t params[4];
+  
+  for(uint8_t count =0; count < (fnNum&0x0F); count++) {
+    params[count] = va_arg (argptr,  uint8_t);
+  }
+  
+  switch (fnNum & 0xF0)
+  {
+    case 1:{
+      SDLoadTileFromSet8x8(fileName, params[0], params[1], params[2]);
+    } break;
+    case 2:{
+      SDLoadTileSet8x8(fileName, params[0], params[1], params[2]);
+    } break;
+    case 3:{
+      SDLoadRegionOfTileSet8x8(fileName, params[0],  params[1], params[2], params[3]);
+    } break;
+    default: break;
+  }
+  
+  va_end(argptr);
+}
+#endif
 
 // Pass 8-bit (each) R,G,B, get back 16-bit packed color
 uint16_t color565(uint8_t r, uint8_t g, uint8_t b)

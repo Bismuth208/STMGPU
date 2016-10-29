@@ -1,4 +1,3 @@
-#pragma once
 #ifndef NESPALETTE_EXT_H
 #define NESPALETTE_EXT_H
 

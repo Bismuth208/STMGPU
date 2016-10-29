@@ -10,9 +10,15 @@
 #define UART_RXREADY RXC0
 
 
-#define SERIAL_BUFFER_SIZE 64
+#define SERIAL_BUFFER_SIZE 16
+
+#ifdef F_CPU
+#undef F_CPU
 //#define F_CPU 16000000L
 #define F_CPU 8000000L
+#warning "F_CPU redifined here"
+#endif
+
 #define UART_CALC_BAUDRATE(baudRate) ((uint32_t)((F_CPU) + ((uint32_t)baudRate * 4UL)) / ((uint32_t)(baudRate) * 8UL) - 1)
 
 typedef struct {

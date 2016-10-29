@@ -4,8 +4,7 @@
 #include <stdbool.h>
 #include <stdint.h>
 
-#include "st7735.h"
-//#include "ili9341.h"
+#include "ili9341.h"
 
 
 // Color definitions
@@ -82,7 +81,6 @@ void setTextWrap(bool w);
 void cp437(bool x);
 
 void print(const char *str);
-void tftPrintPGR(const char *str);
 void printChar(uint8_t c);
 void printCharPos(int16_t x, int16_t y, uint8_t c);
     

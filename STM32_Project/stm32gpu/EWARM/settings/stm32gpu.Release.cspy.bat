@@ -25,7 +25,7 @@ if not "%1" == "" goto debugFile
 
 @echo on 
 
-"C:\Program Files\IAR Systems\ARM 7.4.02\common\bin\cspybat" -f "Z:\stm_arm\IAR_ARM\stm32gpu\EWARM\settings\stm32gpu.Release.general.xcl" --backend -f "Z:\stm_arm\IAR_ARM\stm32gpu\EWARM\settings\stm32gpu.Release.driver.xcl" 
+"C:\Program Files\IAR Systems\ARM 7.4.02\common\bin\cspybat" -f "Z:\stm_arm\IAR_ARM\stm32gpu_ex\stm32gpu\EWARM\settings\stm32gpu.Release.general.xcl" --backend -f "Z:\stm_arm\IAR_ARM\stm32gpu_ex\stm32gpu\EWARM\settings\stm32gpu.Release.driver.xcl" 
 
 @echo off 
 goto end 
@@ -34,7 +34,7 @@ goto end
 
 @echo on 
 
-"C:\Program Files\IAR Systems\ARM 7.4.02\common\bin\cspybat" -f "Z:\stm_arm\IAR_ARM\stm32gpu\EWARM\settings\stm32gpu.Release.general.xcl" "--debug_file=%1" --backend -f "Z:\stm_arm\IAR_ARM\stm32gpu\EWARM\settings\stm32gpu.Release.driver.xcl" 
+"C:\Program Files\IAR Systems\ARM 7.4.02\common\bin\cspybat" -f "Z:\stm_arm\IAR_ARM\stm32gpu_ex\stm32gpu\EWARM\settings\stm32gpu.Release.general.xcl" "--debug_file=%1" --backend -f "Z:\stm_arm\IAR_ARM\stm32gpu_ex\stm32gpu\EWARM\settings\stm32gpu.Release.driver.xcl" 
 
 @echo off 
 :end

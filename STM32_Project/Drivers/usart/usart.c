@@ -16,8 +16,8 @@
 // ------------------------------------------------------------ //
 
 static volatile ring_buffer_t rx_buffer = { 0, 0 };
-//static volatile uint8_t rxBuffer[SERIAL_BUFFER_SIZE] = { 0 };
-static volatile uint8_t *rxBuffer;
+static volatile uint8_t rxBuffer[SERIAL_BUFFER_SIZE] = { 0 };
+//static volatile uint8_t *rxBuffer;
 
 // ------------------------------------------------------------ //
 
@@ -110,6 +110,7 @@ uint8_t init_UART1(uint32_t baud)
   GPIO_InitStruct.GPIO_Mode  = GPIO_Mode_AF_PP;
   GPIO_Init(GPIOA, &GPIO_InitStruct);
   
+  /*
   uint8_t initStatus =0;
   rxBuffer = malloc(SERIAL_BUFFER_SIZE * sizeof(uint8_t));
   
@@ -118,6 +119,7 @@ uint8_t init_UART1(uint32_t baud)
   } else {
     initStatus = 1;
   }
+  */
   
   USART_InitTypeDef USART_InitStruct;
   
@@ -138,11 +140,12 @@ uint8_t init_UART1(uint32_t baud)
   //Enable USART IRQ Channel
   NVIC_InitStructure.NVIC_IRQChannel = USART1_IRQn;
   NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
-  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
   NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
   NVIC_Init(&NVIC_InitStructure);
   
-  return initStatus;
+  //return initStatus;
+  return 1;
 }
 
 void USART1_IRQHandler(void)

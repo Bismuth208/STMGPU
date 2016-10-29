@@ -52,6 +52,7 @@ void init_sdCard(void)
 // ramTileNum           - tile number in ram, where to store loaded tile
 // tileNum              - number of tile in tile set which must me loaded from SD card
 void SDLoadTileFromSet8x8(uint8_t *tileSetArrName, uint8_t tileSetW, uint8_t ramTileNum, uint8_t tileNum)
+//void SDLoadTileFromSet8x8(uint8_t *tileSetArrName, tileParam_t *params)
 {
  /*
   * This function load single Tile from Tileset located in SD card
@@ -102,6 +103,7 @@ void SDLoadTileFromSet8x8(uint8_t *tileSetArrName, uint8_t tileSetW, uint8_t ram
 // ramTileBase          - base tile number in ram, where to start store loaded tiles 
 // tileMax              - number of tiles in tile set which must me loaded from SD card
 void SDLoadTileSet8x8(uint8_t *tileSetArrName, uint8_t tileSetW, uint8_t ramTileBase, uint8_t tileMax)
+//void SDLoadTileSet8x8(uint8_t *tileSetArrName, tileParam_t *params)
 {
  /*
   * This function load tileMax tiles from Tileset at 0 position,
@@ -160,6 +162,7 @@ void SDLoadTileSet8x8(uint8_t *tileSetArrName, uint8_t tileSetW, uint8_t ramTile
 // tileMin              - base tile number in tile set whee loadindg start
 // tileMax              - number of tiles in tile set which must be loaded from SD card
 void SDLoadRegionOfTileSet8x8(uint8_t *tileSetArrName, uint8_t tileSetW, uint8_t ramTileBase, uint8_t tileMin, uint8_t tileMax)
+//void SDLoadRegionOfTileSet8x8(uint8_t *tileSetArrName, tileParam_t *params)
 {
  /*
   * This function load selected region of tiles from Tileset located in SD card.
@@ -204,6 +207,34 @@ void SDLoadRegionOfTileSet8x8(uint8_t *tileSetArrName, uint8_t tileSetW, uint8_t
       }
       tileDataOffset =0;
     }
+  } else {
+    // TODO: add some error code when return
+    return;
+  }
+  
+  f_close(&File);
+}
+
+
+void SDLoadTileMap(uint8_t *tileMapArrName)
+{
+  result = f_open(&File, (char*)tileMapArrName, FA_OPEN_EXISTING | FA_READ);
+  
+  if(result == FR_OK) {
+    
+    UINT cnt;
+    
+    uint8_t *pTileMapArr = getMapArrPointer();
+    uint16_t tileCount=0;
+    
+#if 1
+    for(uint8_t countH=0; countH < BACKGROUND_SIZE_H; countH++) {
+      f_read(&File, &pTileMapArr[tileCount], BACKGROUND_SIZE_W, &cnt);
+      tileCount += BACKGROUND_SIZE_W;
+      
+      f_lseek (&File, tileCount);
+    }
+#endif
   } else {
     // TODO: add some error code when return
     return;

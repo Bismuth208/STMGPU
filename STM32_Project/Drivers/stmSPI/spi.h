@@ -1,22 +1,7 @@
-#pragma once
 #ifndef SPI_H
 #define SPI_H
 
 #include <stdint.h>
-
-#if defined (__AVR__)
-
-#define SET_SCK_LOW     PORTB &= ~ (1 << PB5);
-#define SET_SCK_HI      PORTB |= (1 << PB5);
-
-#define SET_MOSI_HI     PORTB |= (1 << PB3);
-/*
- PB2 - D10; SS
- PB3 - D11; MOSI
- PB4 - D12; MISO
- PB5 - D13; SCK
- */
-#else
 
 // ------------------------- SPI_1 ------------------------- //
 //sck - pa5; miso - pa6; mosi - pa7;
@@ -41,8 +26,6 @@
 // ждем пока данные передадутся до конца
 #define WAIT_FREE_TX    while ((SPI1->SR & SPI_I2S_FLAG_TXE) == (uint16_t)RESET);
 #define WAIT_FOR_BSY    while ((SPI1->SR & SPI_I2S_FLAG_BSY) != (uint16_t)RESET);
-
-#endif // __AVR__
 
 #ifdef __cplusplus
 extern "C"{

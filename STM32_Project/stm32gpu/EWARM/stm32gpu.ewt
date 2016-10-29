@@ -2119,9 +2119,6 @@
         <name>$PROJ_DIR$\..\..\Drivers\FatFS\diskio.h</name>
       </file>
       <file>
-        <name>$PROJ_DIR$\..\..\Drivers\FatFS\fatfs_diskio_sdcard_spi.c</name>
-      </file>
-      <file>
         <name>$PROJ_DIR$\..\..\Drivers\FatFS\ff.c</name>
       </file>
       <file>
@@ -2133,6 +2130,12 @@
       <file>
         <name>$PROJ_DIR$\..\..\Drivers\FatFS\integer.h</name>
       </file>
+      <file>
+        <name>$PROJ_DIR$\..\..\Drivers\FatFS\sdcard_spi.c</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\..\Drivers\FatFS\sdcard_spi.h</name>
+      </file>
     </group>
     <group>
       <name>GFX_TFT</name>
@@ -2143,15 +2146,6 @@
         </file>
         <file>
           <name>$PROJ_DIR$\..\..\Drivers\ILI9341\ili9341.h</name>
-        </file>
-      </group>
-      <group>
-        <name>ST7735</name>
-        <file>
-          <name>$PROJ_DIR$\..\..\Drivers\ST7735\st7735.c</name>
-        </file>
-        <file>
-          <name>$PROJ_DIR$\..\..\Drivers\ST7735\st7735.h</name>
         </file>
       </group>
       <file>
@@ -2203,17 +2197,44 @@
   </group>
   <group>
     <name>GPU</name>
-    <file>
-      <name>$PROJ_DIR$\..\gpuTiles.c</name>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\gpuTiles.h</name>
-    </file>
+    <group>
+      <name>sprites</name>
+      <file>
+        <name>$PROJ_DIR$\..\sprites.c</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\sprites.h</name>
+      </file>
+    </group>
+    <group>
+      <name>tiles</name>
+      <file>
+        <name>$PROJ_DIR$\..\gpuTiles.c</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\gpuTiles.h</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\sdWorker.c</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\sdWorker.h</name>
+      </file>
+    </group>
     <file>
       <name>$PROJ_DIR$\..\gpuWorker.c</name>
     </file>
     <file>
       <name>$PROJ_DIR$\..\gpuWorker.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\gpuWorkerFunc.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\gpuWorkerFunc.h</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\gpuWorkerV2.c</name>
     </file>
     <file>
       <name>$PROJ_DIR$\..\nesPalette_ext.h</name>

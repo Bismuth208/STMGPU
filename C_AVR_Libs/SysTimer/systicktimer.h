@@ -3,7 +3,11 @@
 
 #include <stdint.h>
 
+#ifdef F_CPU
+#undef F_CPU
 #define F_CPU 16000000UL
+#warning "F_CPU redifined here"
+#endif
 
 #ifdef __cplusplus
 extern "C"{

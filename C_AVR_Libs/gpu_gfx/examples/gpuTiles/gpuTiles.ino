@@ -12,7 +12,7 @@
 #define TFT_H tftHeight()
 
 #define TEST_SAMPLE_SIZE    12000
-#define TEST_SAMPLE_SCREENS 20 // this is equal to 24000 tiles
+#define TEST_SAMPLE_SCREENS 20 // this is equal to 24000 tiles  
 
 static uint16_t nextInt = 1;
 
@@ -144,7 +144,7 @@ __attribute__ ((noreturn)) int main(void)
   uint32_t timerCount =0;
 
   uint8_t count =0;
-  uint8_t testsCount = (sizeof(pArrExecGFXFunc)/sizeof(pArrExecGFXFunc[0]));
+  uint8_t testsCount = FUNC_TO_TEST_COUNT;
 
   for(;;) {
 

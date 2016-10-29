@@ -38,11 +38,11 @@ uint8_t serialRead(void)
 
 void serialClear(void)
 {
-  memset(rx_buffer.buffer, 0x00, SERIAL_BUFFER_SIZE);
+  //memset(rx_buffer.buffer, 0x00, SERIAL_BUFFER_SIZE);
   rx_buffer.head = 0;
   rx_buffer.tail = 0;
 }
-
+#if 0
 void byteStore(uint8_t tmpByte, ringBuffer_t *buffer)
 {
   uint8_t i = (buffer->head + 1) % SERIAL_BUFFER_SIZE;
@@ -52,13 +52,21 @@ void byteStore(uint8_t tmpByte, ringBuffer_t *buffer)
     buffer->head = i;
   }
 }
+#endif
 
 ISR(USART_RX_vect)
 {
   uint8_t rxByte;
   if (bit_is_clear(UCSR0A, UPE0)) {
     rxByte = UDR0;
-    byteStore(rxByte, &rx_buffer);
+    
+    uint8_t i = (rx_buffer.head + 1) % SERIAL_BUFFER_SIZE;
+    
+    if (i != rx_buffer.tail) {
+      rx_buffer.buffer[rx_buffer.head] = rxByte;
+      rx_buffer.head = i;
+    }
+    
   } else rxByte = UDR0;
 }
 
@@ -79,8 +87,7 @@ void uartSendArrayP(uint8_t *txArray)
 
 void uartSendArray(uint8_t *txArray, uint8_t txArraySize)
 {
-  uint8_t count;
-  for(count = 0; count < txArraySize; ++count){
+  for(uint8_t count = 0; count < txArraySize; ++count){
     while (!(UCSR0A & (1<<UART_TXREADY)));
     UDR0 = txArray[count];
   }

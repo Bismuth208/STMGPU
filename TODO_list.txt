@@ -1,18 +1,18 @@
 /* current must be */
 
+fix 1x2, 2x2 sprites;
+
 draw *.bmp files;
 
-draw, load, tiles 8x16;
 draw, load, tiles 16x16;
-add BSY answer throw communication interface; +
+draw, load, tiles 32x32;
+
+add collision detection for sprites;
+load, draw sprites for tiles 16px and 32px;
+
 
 /* add this soon */
 
-add at least one tilecreen;
-load tilemap;
-draw tilecreen;
-
-tile grouping to metatile;
 rotate tiles (matrix transformation?);
 
 /* in nearly future */

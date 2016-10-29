@@ -15,41 +15,6 @@
 #ifndef _GPUWORKER_H
 #define _GPUWORKER_H
 
-// -------------------------------- //
-
-typedef union {
-  uint8_t data[14];
-  struct {
-    uint16_t par1;
-    uint16_t par2;
-    uint16_t par3;
-    uint16_t par4;
-    uint16_t par5;
-    uint16_t par6;
-    uint16_t par7;
-  };
-} cmdBuffer_t;
-
-
-typedef union {
-  uint8_t data[12];
-  struct {
-    uint8_t  par0;
-    uint16_t par1;
-    uint16_t par2;
-    uint16_t par3;
-    uint16_t par4;
-    uint8_t par5;
-  };
-} cmdBuffer2_t;
-
-// -------------------------------- //
-
-void init_GPU(void);
-void sync_CPU(void);
-__noreturn __task void run_GPU(void);
-
-
 //===========================================================================//
 
 #define MAX_TEXT_SIZE   256
@@ -100,6 +65,28 @@ __noreturn __task void run_GPU(void);
 //===========================================================================//
 
 
+//===========================================================================//
+
+typedef union {
+  uint8_t data[14];
+  struct {
+    uint16_t par1;
+    uint16_t par2;
+    uint16_t par3;
+    uint16_t par4;
+    uint16_t par5;
+    uint16_t par6;
+    uint16_t par7;
+  };
+} cmdBuffer_t;
+
+typedef struct {
+  uint8_t cmdBufferStr[MAX_TEXT_SIZE];
+  cmdBuffer_t cmdBuffer;
+} cmdStructBuf_t;
+
+//===========================================================================//
+
 // -------------------------- Command list --------------------------- //
 // CLR  - CLEAR
 // FLL  - FILL
@@ -123,7 +110,7 @@ __noreturn __task void run_GPU(void);
 //#define NOT_USED          0x02
 #define DRW_PIXEL       0x03
 
-// ------------- Primitives/GFX ------------- /// 
+// ------------- Primitives/GFX ------------- // 
 #define FLL_RECT        0x04
 #define DRW_RECT        0x05
 #define DRW_ROUND_RECT  0x06
@@ -175,13 +162,13 @@ __noreturn __task void run_GPU(void);
 //#define NOT_USED        0x2F
 
 
-// --------------- Tile/Sprite -------------- //
+// ------------------- Tile ----------------- //
 #define LDD_TLE_8       0x30    // load tile 8x8 size from SD
 #define LDD_TLES_8      0x31    // load tiles 8x8 size from SD
 #define LDD_TLES_RG_8   0x32    // load region of tiles 8x8 size from SD
 #define DRW_TLE_8_POS   0x33    // draw tile 8x8 size on TFT screen
-//#define SET_TLE_POS     0x34    // set tile position in tile screen
-//#define LDD_TLE_SCR     0x35    // load tile screen from SD
+#define LDD_TLE_MAP     0x34    // load background tile map 8x8 from SD
+#define DRW_TLE_MAP     0x35    // draw background tile map 8x8 on TFT screen
 //#define DRW_TLE_SCR     0x36    // draw tile screen on TFT screen
 //#define MAK_METTLE      0x37    // group tiles to metatile
 //#define DRW_METTLE_SCR  0x38    // draw metatile on screen
@@ -194,14 +181,14 @@ __noreturn __task void run_GPU(void);
 //#define NOT_USED        0x3F
 
 
-// ---------------- NOT_USED ---------------- //
-//#define NOT_USED        0x40
-//#define NOT_USED        0x41
-//#define NOT_USED        0x42
-//#define NOT_USED        0x43
-//#define NOT_USED        0x44
-//#define NOT_USED        0x45
-//#define NOT_USED        0x46
+// ----------------- Sprite ----------------- //
+#define SET_SPR_POS     0x40    // set sprite position
+#define SET_SPR_TYPE    0x41    // set sprite type 1x2:8, 2x2:8; 1x2:16, 2x2:16;
+#define SET_SPR_VISBL   0x42    // enable draw on screen
+#define SET_SPR_TLE     0x43    // set tiles for sprite
+#define SET_SPR_AUT_R   0x44    // enable or disable autoredraw sprite
+#define DRW_SPR         0x45    // draw sprite
+#define GET_SRP_COLISN  0x46    // get sprites collision
 //#define NOT_USED        0x47
 //#define NOT_USED        0x48
 //#define NOT_USED        0x49
@@ -214,7 +201,7 @@ __noreturn __task void run_GPU(void);
 
 
 // ----------------- SD card ---------------- //
-//#define NOT_USED        0x50
+#define LDD_USR_PAL     0x50    // load user palette from SD card
 //#define NOT_USED        0x51
 //#define NOT_USED        0x52
 //#define NOT_USED        0x53
@@ -252,6 +239,14 @@ __noreturn __task void run_GPU(void);
 
 // ---------------- NOT_USED ---------------- //
 // -------------- 0x70 - 0xFF --------------- //
+
+//===========================================================================//
+
+
+
+void init_GPU(void);
+void sync_CPU(void);
+__noreturn __task void run_GPU(void);
 
 
 
