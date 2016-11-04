@@ -4,10 +4,10 @@
  * - make a cleanup! this is terrible! so much garabage in code!
  */
 
-#include "gfx.h"
-
 #include <stm32f10x.h>
 #include <stm32f10x_dma.h>
+
+#include "gfx.h"
 
 // DMA can`t send more than 65535 bytes
 #define MAX_DMA_REQUEST 0xFFFF

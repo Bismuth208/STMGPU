@@ -74,7 +74,7 @@
         <item>100</item><item>150</item><item>100</item><item>154</item></col-widths>
         <QWatchHistory>
           
-        <item>rearBackGround[BACKGROUND_SIZE_W * BACKGROUND_SIZE_H]</item><item>pTileMapArr</item><item>count_tic</item><item>DWT-&gt;CYCCNT</item><item>tilesDrawed[108]</item><item>rndTileY</item><item>rndTileX</item><item>lastSprite8x8[64]</item><item>pLastSpriteArr</item><item>currentPalette</item><item>tileArr8x8[80][64]</item><item>rx_buffer</item><item>rx_buffer.buffer[rx_buffer.tail]</item><item>cmd</item><item>cmdBuffer</item></QWatchHistory>
+        <item>result8[0]</item><item>rearBackGround[BACKGROUND_SIZE_W * BACKGROUND_SIZE_H]</item><item>pTileMapArr</item><item>count_tic</item><item>DWT-&gt;CYCCNT</item><item>tilesDrawed[108]</item><item>rndTileY</item><item>rndTileX</item><item>lastSprite8x8[64]</item><item>pLastSpriteArr</item><item>currentPalette</item><item>tileArr8x8[80][64]</item><item>rx_buffer</item><item>rx_buffer.buffer[rx_buffer.tail]</item><item>cmd</item><item>cmdBuffer</item></QWatchHistory>
       <PreferedWindows><Position>2</Position><ScreenPosX>0</ScreenPosX><ScreenPosY>0</ScreenPosY><Windows><Window><Factory>WATCH_1</Factory></Window></Windows></PreferedWindows></QuickWatch>
     </Static>
     <Windows>
@@ -82,7 +82,7 @@
       
       
       
-    <Wnd4>
+    <Wnd0>
         <Tabs>
           <Tab>
             <Identity>TabID-27357-16161</Identity>
@@ -98,7 +98,7 @@
           </Tab>
         </Tabs>
         
-      <SelectedTab>0</SelectedTab></Wnd4><Wnd5>
+      <SelectedTab>0</SelectedTab></Wnd0><Wnd1>
         <Tabs>
           <Tab>
             <Identity>TabID-5337-16165</Identity>
@@ -110,7 +110,7 @@
           </Tab>
         </Tabs>
         
-      <SelectedTab>0</SelectedTab></Wnd5><Wnd6>
+      <SelectedTab>0</SelectedTab></Wnd1><Wnd2>
         <Tabs>
           <Tab>
             <Identity>TabID-16086-16168</Identity>
@@ -120,20 +120,20 @@
           </Tab>
         </Tabs>
         
-      <SelectedTab>0</SelectedTab></Wnd6><Wnd7><Tabs><Tab><Identity>TabID-2504-22792</Identity><TabName>Quick Watch</TabName><Factory>QuickWatch</Factory></Tab><Tab><Identity>TabID-15658-15014</Identity><TabName>Watch 1</TabName><Factory>WATCH_1</Factory></Tab></Tabs><SelectedTab>0</SelectedTab></Wnd7></Windows>
+      <SelectedTab>0</SelectedTab></Wnd2><Wnd3><Tabs><Tab><Identity>TabID-2504-22792</Identity><TabName>Quick Watch</TabName><Factory>QuickWatch</Factory></Tab><Tab><Identity>TabID-15658-15014</Identity><TabName>Watch 1</TabName><Factory>WATCH_1</Factory></Tab></Tabs><SelectedTab>0</SelectedTab></Wnd3></Windows>
     <Editor>
       
       
       
       
-    <Pane><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\..\..\Drivers\gfx_tft\gfxDMA.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>79</YPos2><SelStart2>4732</SelStart2><SelEnd2>4732</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\..\sprites.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>36</YPos2><SelStart2>2782</SelStart2><SelEnd2>2782</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\..\sprites.h</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>0</YPos2><SelStart2>228</SelStart2><SelEnd2>228</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\..\gpuTiles.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>141</YPos2><SelStart2>5190</SelStart2><SelEnd2>5190</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\..\gpuTiles.h</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>0</YPos2><SelStart2>628</SelStart2><SelEnd2>643</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\..\main.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>108</YPos2><SelStart2>3616</SelStart2><SelEnd2>3616</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\..\..\Drivers\ILI9341\ili9341.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>46</YPos2><SelStart2>12785</SelStart2><SelEnd2>12785</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\..\..\Drivers\FatFS\ff.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>2555</YPos2><SelStart2>95360</SelStart2><SelEnd2>95360</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\..\gpuWorker.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>460</YPos2><SelStart2>14590</SelStart2><SelEnd2>14590</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\..\gpuWorker.h</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>0</YPos2><SelStart2>1051</SelStart2><SelEnd2>1051</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\..\sdWorker.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>200</YPos2><SelStart2>6460</SelStart2><SelEnd2>6460</SelEnd2></Tab><ActiveTab>10</ActiveTab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\..\sdWorker.h</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>0</YPos2><SelStart2>381</SelStart2><SelEnd2>381</SelEnd2></Tab></Pane><ActivePane>0</ActivePane><Sizes><Pane><X>1000000</X><Y>1000000</Y></Pane></Sizes><SplitMode>1</SplitMode></Editor>
+    <Pane><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\..\sprites.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>23</YPos2><SelStart2>1499</SelStart2><SelEnd2>1499</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\..\sprites.h</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>0</YPos2><SelStart2>228</SelStart2><SelEnd2>228</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\..\sdWorker.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>395</YPos2><SelStart2>9453</SelStart2><SelEnd2>9453</SelEnd2></Tab><ActiveTab>2</ActiveTab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\..\sdWorker.h</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>0</YPos2><SelStart2>1163</SelStart2><SelEnd2>1163</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\..\gpuTiles.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>61</YPos2><SelStart2>1456</SelStart2><SelEnd2>1456</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\..\gpuTiles.h</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>12</YPos2><SelStart2>1922</SelStart2><SelEnd2>1922</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\..\gpuWorker.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>0</YPos2><SelStart2>227</SelStart2><SelEnd2>243</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\..\gpuWorker.h</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>24</YPos2><SelStart2>1606</SelStart2><SelEnd2>1606</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\..\..\Drivers\usart\usart.h</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>0</YPos2><SelStart2>1103</SelStart2><SelEnd2>1123</SelEnd2></Tab><Tab><Factory>TextEditor</Factory><Filename>$WS_DIR$\..\main.c</Filename><XPos>0</XPos><YPos>0</YPos><SelStart>0</SelStart><SelEnd>0</SelEnd><XPos2>0</XPos2><YPos2>116</YPos2><SelStart2>3591</SelStart2><SelEnd2>3591</SelEnd2></Tab></Pane><ActivePane>0</ActivePane><Sizes><Pane><X>1000000</X><Y>1000000</Y></Pane></Sizes><SplitMode>1</SplitMode></Editor>
     <Positions>
       
       
       
       
       
-    <Top><Row0><Sizes><Toolbar-011C8600><key>iaridepm.enu1</key></Toolbar-011C8600></Sizes></Row0><Row1><Sizes><Toolbar-17118528><key>debuggergui.enu1</key></Toolbar-17118528></Sizes></Row1><Row2><Sizes><Toolbar-17117A38><key>armstlink.enu1</key></Toolbar-17117A38></Sizes></Row2></Top><Left><Row0><Sizes><Wnd5><Rect><Top>-2</Top><Left>-2</Left><Bottom>596</Bottom><Right>199</Right><x>-2</x><y>-2</y><xscreen>150</xscreen><yscreen>164</yscreen><sizeHorzCX>104167</sizeHorzCX><sizeHorzCY>198307</sizeHorzCY><sizeVertCX>139583</sizeVertCX><sizeVertCY>723096</sizeVertCY></Rect></Wnd5></Sizes></Row0></Left><Right><Row0><Sizes><Wnd7><Rect><Top>-2</Top><Left>-2</Left><Bottom>298</Bottom><Right>359</Right><x>-2</x><y>-2</y><xscreen>150</xscreen><yscreen>164</yscreen><sizeHorzCX>104167</sizeHorzCX><sizeHorzCY>198307</sizeHorzCY><sizeVertCX>250694</sizeVertCX><sizeVertCY>362757</sizeVertCY></Rect></Wnd7><Wnd6><Rect><Top>0</Top><Left>0</Left><Bottom>0</Bottom><Right>447694788</Right><x>-2</x><y>296</y><xscreen>150</xscreen><yscreen>164</yscreen><sizeHorzCX>104167</sizeHorzCX><sizeHorzCY>198307</sizeHorzCY><sizeVertCX>250694</sizeVertCX><sizeVertCY>362757</sizeVertCY></Rect></Wnd6></Sizes></Row0></Right><Bottom><Row0><Sizes><Wnd4><Rect><Top>-2</Top><Left>-2</Left><Bottom>138</Bottom><Right>1442</Right><x>-2</x><y>-2</y><xscreen>1444</xscreen><yscreen>140</yscreen><sizeHorzCX>1002778</sizeHorzCX><sizeHorzCY>169287</sizeHorzCY><sizeVertCX>104167</sizeVertCX><sizeVertCY>198307</sizeVertCY></Rect></Wnd4></Sizes></Row0></Bottom><Float><Sizes/></Float></Positions>
+    <Top><Row0><Sizes><Toolbar-04E28600><key>iaridepm.enu1</key></Toolbar-04E28600></Sizes></Row0><Row1><Sizes><Toolbar-17BD9600><key>debuggergui.enu1</key></Toolbar-17BD9600></Sizes></Row1><Row2><Sizes><Toolbar-17BD9B78><key>armstlink.enu1</key></Toolbar-17BD9B78></Sizes></Row2></Top><Left><Row0><Sizes><Wnd1><Rect><Top>-2</Top><Left>-2</Left><Bottom>596</Bottom><Right>199</Right><x>-2</x><y>-2</y><xscreen>150</xscreen><yscreen>164</yscreen><sizeHorzCX>104167</sizeHorzCX><sizeHorzCY>198307</sizeHorzCY><sizeVertCX>139583</sizeVertCX><sizeVertCY>723096</sizeVertCY></Rect></Wnd1></Sizes></Row0></Left><Right><Row0><Sizes><Wnd3><Rect><Top>-2</Top><Left>-2</Left><Bottom>298</Bottom><Right>359</Right><x>-2</x><y>-2</y><xscreen>150</xscreen><yscreen>164</yscreen><sizeHorzCX>104167</sizeHorzCX><sizeHorzCY>198307</sizeHorzCY><sizeVertCX>250694</sizeVertCX><sizeVertCY>362757</sizeVertCY></Rect></Wnd3><Wnd2><Rect><Top>0</Top><Left>0</Left><Bottom>0</Bottom><Right>15</Right><x>-2</x><y>296</y><xscreen>150</xscreen><yscreen>164</yscreen><sizeHorzCX>104167</sizeHorzCX><sizeHorzCY>198307</sizeHorzCY><sizeVertCX>250694</sizeVertCX><sizeVertCY>362757</sizeVertCY></Rect></Wnd2></Sizes></Row0></Right><Bottom><Row0><Sizes><Wnd0><Rect><Top>-2</Top><Left>-2</Left><Bottom>138</Bottom><Right>1442</Right><x>-2</x><y>-2</y><xscreen>1444</xscreen><yscreen>140</yscreen><sizeHorzCX>1002778</sizeHorzCX><sizeHorzCY>169287</sizeHorzCY><sizeVertCX>104167</sizeVertCX><sizeVertCY>198307</sizeVertCY></Rect></Wnd0></Sizes></Row0></Bottom><Float><Sizes/></Float></Positions>
   </Desktop>
 </Project>
 

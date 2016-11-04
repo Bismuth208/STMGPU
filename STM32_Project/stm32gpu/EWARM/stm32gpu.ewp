@@ -1242,12 +1242,11 @@
           <name>CCIncludePath2</name>
           <state>$PROJ_DIR$\..\..\Drivers\STM32F10x_StdPeriph_Driver\inc\</state>
           <state>$PROJ_DIR$\..\..\Drivers\STM32F10x_StdPeriph_Driver\src\</state>
-          <state>$PROJ_DIR$\..\..\Drivers\CMSIS\CM3\DeviceSupport\ST\STM32F10x\</state>
+          <state>$PROJ_DIR$\..\..\Drivers\CMSIS\</state>
           <state>$PROJ_DIR$\..\..\Drivers\systicktimer\</state>
           <state>$PROJ_DIR$\..\..\Drivers\stmSPI\</state>
           <state>$PROJ_DIR$\..\..\Drivers\usart\</state>
           <state>$PROJ_DIR$\..\..\Drivers\gfx_tft\</state>
-          <state>$PROJ_DIR$\..\..\Drivers\ST7735\</state>
           <state>$PROJ_DIR$\..\..\Drivers\ILI9341\</state>
           <state>$PROJ_DIR$\..\..\Drivers\FatFS\</state>
         </option>
@@ -2016,24 +2015,6 @@
       <name>$PROJ_DIR$\..\gpuWorker.h</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\gpuWorkerFunc.c</name>
-      <excluded>
-        <configuration>Release</configuration>
-      </excluded>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\gpuWorkerFunc.h</name>
-      <excluded>
-        <configuration>Release</configuration>
-      </excluded>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\gpuWorkerV2.c</name>
-      <excluded>
-        <configuration>Release</configuration>
-      </excluded>
-    </file>
-    <file>
       <name>$PROJ_DIR$\..\nesPalette_ext.h</name>
     </file>
     <file>
@@ -2114,28 +2095,28 @@
     <group>
       <name>Startup</name>
       <file>
-        <name>$PROJ_DIR$\..\..\Drivers\CMSIS\CM3\DeviceSupport\ST\STM32F10x\startup\iar\startup_stm32f10x_hd.s</name>
+        <name>$PROJ_DIR$\..\..\Drivers\CMSIS\startup_stm32f10x_hd.s</name>
         <excluded>
           <configuration>Release</configuration>
         </excluded>
       </file>
       <file>
-        <name>$PROJ_DIR$\..\..\Drivers\CMSIS\CM3\DeviceSupport\ST\STM32F10x\startup\iar\startup_stm32f10x_md.s</name>
+        <name>$PROJ_DIR$\..\..\Drivers\CMSIS\startup_stm32f10x_md.s</name>
       </file>
     </group>
     <group>
       <name>STM32F10x</name>
       <file>
-        <name>$PROJ_DIR$\..\..\Drivers\CMSIS\CM3\DeviceSupport\ST\STM32F10x\stm32f10x.h</name>
+        <name>$PROJ_DIR$\..\..\Drivers\CMSIS\stm32f10x.h</name>
       </file>
       <file>
-        <name>$PROJ_DIR$\..\..\Drivers\CMSIS\CM3\DeviceSupport\ST\STM32F10x\stm32f10x_conf.h</name>
+        <name>$PROJ_DIR$\..\..\Drivers\CMSIS\stm32f10x_conf.h</name>
       </file>
       <file>
-        <name>$PROJ_DIR$\..\..\Drivers\CMSIS\CM3\DeviceSupport\ST\STM32F10x\system_stm32f10x.c</name>
+        <name>$PROJ_DIR$\..\..\Drivers\CMSIS\system_stm32f10x.c</name>
       </file>
       <file>
-        <name>$PROJ_DIR$\..\..\Drivers\CMSIS\CM3\DeviceSupport\ST\STM32F10x\system_stm32f10x.h</name>
+        <name>$PROJ_DIR$\..\..\Drivers\CMSIS\system_stm32f10x.h</name>
       </file>
     </group>
   </group>

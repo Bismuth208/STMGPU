@@ -2228,15 +2228,6 @@
       <name>$PROJ_DIR$\..\gpuWorker.h</name>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\gpuWorkerFunc.c</name>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\gpuWorkerFunc.h</name>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\gpuWorkerV2.c</name>
-    </file>
-    <file>
       <name>$PROJ_DIR$\..\nesPalette_ext.h</name>
     </file>
     <file>
@@ -2305,25 +2296,25 @@
     <group>
       <name>Startup</name>
       <file>
-        <name>$PROJ_DIR$\..\..\Drivers\CMSIS\CM3\DeviceSupport\ST\STM32F10x\startup\iar\startup_stm32f10x_hd.s</name>
+        <name>$PROJ_DIR$\..\..\Drivers\CMSIS\startup_stm32f10x_hd.s</name>
       </file>
       <file>
-        <name>$PROJ_DIR$\..\..\Drivers\CMSIS\CM3\DeviceSupport\ST\STM32F10x\startup\iar\startup_stm32f10x_md.s</name>
+        <name>$PROJ_DIR$\..\..\Drivers\CMSIS\startup_stm32f10x_md.s</name>
       </file>
     </group>
     <group>
       <name>STM32F10x</name>
       <file>
-        <name>$PROJ_DIR$\..\..\Drivers\CMSIS\CM3\DeviceSupport\ST\STM32F10x\stm32f10x.h</name>
+        <name>$PROJ_DIR$\..\..\Drivers\CMSIS\stm32f10x.h</name>
       </file>
       <file>
-        <name>$PROJ_DIR$\..\..\Drivers\CMSIS\CM3\DeviceSupport\ST\STM32F10x\stm32f10x_conf.h</name>
+        <name>$PROJ_DIR$\..\..\Drivers\CMSIS\stm32f10x_conf.h</name>
       </file>
       <file>
-        <name>$PROJ_DIR$\..\..\Drivers\CMSIS\CM3\DeviceSupport\ST\STM32F10x\system_stm32f10x.c</name>
+        <name>$PROJ_DIR$\..\..\Drivers\CMSIS\system_stm32f10x.c</name>
       </file>
       <file>
-        <name>$PROJ_DIR$\..\..\Drivers\CMSIS\CM3\DeviceSupport\ST\STM32F10x\system_stm32f10x.h</name>
+        <name>$PROJ_DIR$\..\..\Drivers\CMSIS\system_stm32f10x.h</name>
       </file>
     </group>
   </group>

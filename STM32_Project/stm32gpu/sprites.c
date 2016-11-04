@@ -52,7 +52,7 @@ void convertSprite(uint8_t sprNum, uint8_t size)
     for(uint16_t count =0; count < TILE_ARR_8X8_SIZE; count++) {
       // convert colors from current palette to RGB565 color space
       colorTileIdx = pTileArr[count];
-      lastSprite[count + tleOffset] = pCurrentPalette[colorTileIdx];
+      lastSprite[count + tleOffset] = currentPaletteArr[colorTileIdx];
     }
     
     tleOffset += TILE_ARR_8X8_SIZE;

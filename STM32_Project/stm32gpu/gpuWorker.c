@@ -9,6 +9,10 @@
 *
 */
 
+#include <string.h> // for memset
+
+#include <stm32f10x.h>
+
 #include <gfx.h>
 #include <gfxDMA.h>
 #include <spi.h>
@@ -93,8 +97,6 @@ void init_GPU_GPIO(void)
 
 void init_GPU(void)
 {
-  uint8_t initBufStatus =0;
-  
   init_GPU_GPIO();
   
   // setup access to low level interface
@@ -110,7 +112,7 @@ void init_GPU(void)
     pFuncWaitCutBuf = waitCutBuf_USART1;
     pFuncFlushBuf = fflush_USART1;
     
-    initBufStatus = init_UART1(USART_BAUD_1M);
+    init_UART1(USART_BAUD_1M);
   } /* else {
     print(T_USER_WAY);
     
@@ -124,12 +126,14 @@ void init_GPU(void)
     initBufStatus = init_USER();
   } */
   
+  /*
   if(initBufStatus) {
     print(T_INIT_BUF T_OK); // RAM for command buffer allocated
   } else {
     print(T_INIT_BUF T_FAIL);  // RAM for command buffer not allocated
     while(1);
   }
+  */
 }
 
 __noreturn __task void run_GPU(void)
@@ -137,6 +141,8 @@ __noreturn __task void run_GPU(void)
   uint8_t cmd = 0;
   uint8_t bsy = 0;
   uint16_t avaliableData =0;
+  
+  tftFillScreen(COLOR_BLACK);
   
   for(;;) {
     
@@ -280,6 +286,7 @@ __noreturn __task void run_GPU(void)
         pFuncWaitCutBuf(cmdBufferStr, cmdBuffer.data[0]);
         
         print((const char*)cmdBufferStr);
+        memset(cmdBufferStr, 0x00, MAX_TEXT_SIZE);
       } break;
       
       case DRW_PRNT_C: {
@@ -442,7 +449,7 @@ __noreturn __task void run_GPU(void)
         
         SDLoadTileFromSet8x8(cmdBufferStr, cmdBuffer.data[1], cmdBuffer.data[2], cmdBuffer.data[3]);
         //SDLoadTileFromSet8x8(cmdBufferStr, (tileParam_t*)&cmdBuffer);
-        // memset(cmdBufferStr, 0x00, cmdBuffer.data[0]); // remove name
+        memset(cmdBufferStr, 0x00, MAX_TEXT_SIZE);
       } break;
       
       case LDD_TLES_8: {
@@ -453,7 +460,7 @@ __noreturn __task void run_GPU(void)
         
         SDLoadTileSet8x8(cmdBufferStr, cmdBuffer.data[1], cmdBuffer.data[2], cmdBuffer.data[3]);
         //SDLoadTileSet8x8(cmdBufferStr, (tileParam_t*)&cmdBuffer);
-        // memset(cmdBufferStr, 0x00, cmdBuffer.data[0]); // remove name
+        memset(cmdBufferStr, 0x00, MAX_TEXT_SIZE);
       } break;    
       
       case LDD_TLES_RG_8: {
@@ -465,7 +472,7 @@ __noreturn __task void run_GPU(void)
         
         SDLoadRegionOfTileSet8x8(cmdBufferStr, cmdBuffer.data[1], cmdBuffer.data[2], cmdBuffer.data[3], cmdBuffer.data[4]);
         //SDLoadRegionOfTileSet8x8(cmdBufferStr, (tileParam_t*)&cmdBuffer);
-        // memset(cmdBufferStr, 0x00, cmdBuffer.data[0]); // remove name
+        memset(cmdBufferStr, 0x00, MAX_TEXT_SIZE);
       } break;
       
       case DRW_TLE_8_POS: {
@@ -482,6 +489,7 @@ __noreturn __task void run_GPU(void)
         pFuncWaitCutBuf(cmdBufferStr, cmdBuffer.data[0]);
         
         SDLoadTileMap(cmdBufferStr);
+        memset(cmdBufferStr, 0x00, MAX_TEXT_SIZE);
       } break;
       
       case DRW_TLE_MAP: {
@@ -536,12 +544,29 @@ __noreturn __task void run_GPU(void)
       
       
       case LDD_USR_PAL: {
-        //pFuncWaitCutBuf(cmdBuffer.data, 4);
+        //pFuncWaitCutBuf(cmdBuffer.data, 1);
         
         // get file name
-        //pFuncWaitCutBuf(cmdBufferStr, cmdBuffer.par1);
+        //pFuncWaitCutBuf(cmdBufferStr, cmdBuffer.data[0]);
         
-        //SDLoadPalette(cmdBufferStr, cmdBuffer.par2);
+        //SDLoadPalette(cmdBufferStr);
+      } break;
+      
+      
+      case DRW_MBP_FIL: {
+        pFuncWaitCutBuf(cmdBuffer.data, 5);
+        
+        pFuncWaitCutBuf(cmdBufferStr, cmdBuffer.data[4]);
+        
+        bsy = 1;
+        // say to CPU: "I`m bsy, do not send the data!"
+#if USE_HARD_BSY
+      GPIO_SET_PIN(GPU_BSY_PORT, GPU_BSY_PIN);
+#else
+      pFuncSendData8(BSY_MSG_CODE_WAIT);
+#endif
+        SDPrintBMP( cmdBuffer.par1, cmdBuffer.par2, (const char*)cmdBufferStr);
+        memset(cmdBufferStr, 0x00, MAX_TEXT_SIZE);
       } break;
       
       // -------------  TO DO: ---------- //

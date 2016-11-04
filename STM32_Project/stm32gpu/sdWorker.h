@@ -29,4 +29,7 @@ void SDLoadRegionOfTileSet8x8(uint8_t *tileSetArrName, uint8_t tileSetW, uint8_t
 
 void SDLoadTileMap(uint8_t *tileMapArrName);
 
+
+void SDPrintBMP(uint16_t x, uint16_t y, const char* name);
+
 #endif /* _SDWORKER_H */

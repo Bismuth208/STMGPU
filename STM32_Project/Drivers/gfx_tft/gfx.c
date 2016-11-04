@@ -88,6 +88,13 @@ uint16_t charBuffer[192]; // size == 5
 
 void drawCircle(int16_t x0, int16_t y0, int16_t r, uint16_t color)
 {
+  if(r == 0)
+    return;
+  if (r == 1) {
+    tftDrawPixel(x0, y0, color);
+    return;
+  }
+  
   int16_t x = -r, y = 0, err = 2-2*r, e2;
   
   do {
@@ -213,7 +220,7 @@ void fillCircleHelper(int16_t x0, int16_t y0, int16_t r, uint8_t cornername, int
     tftDrawPixel(x0, y0, color);
     return;
   }
-    
+  
   int16_t f     = 1 - r;
   int16_t ddF_x = 1;
   int16_t ddF_y = -2 * r;
@@ -289,7 +296,7 @@ void tftDrawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint16_t color)
   } else {
     ystep = -1;
   }
-    
+  
   if (steep) {
     for (; x0<=x1; x0++) {
       err -= dy;
@@ -349,9 +356,8 @@ void tftFillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color)
   
   tftSetAddrWindow(x, y, x+w-1, y+h-1);
   
-  fillColor_DMA1_SPI1(color, w*h);
   //SET_TFT_CS_HI;
-
+  
   //SET_TFT_DC_HI;
   //SET_TFT_CS_LOW;
 #if USE_FSMC
@@ -361,10 +367,9 @@ void tftFillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color)
     }
   }
 #else
-  repeatData16_SPI1(color, w*h);
+  fillColor_DMA1_SPI1(color, w*h);
 #endif // USE_FSMC
   RELEASE_TFT();
-  
 }
 
 // Draw a rounded rectangle
@@ -577,6 +582,13 @@ void printChar(uint8_t c)
 // Draw a character
 void drawChar(int16_t x, int16_t y, uint8_t c, uint16_t fgcolor, uint16_t bgcolor, uint8_t size)
 {
+  // Rudimentary clipping
+  if((x >= _width)            || // Clip right
+     (y >= _height)           || // Clip bottom
+       ((x + 6 * size - 1) < 0) || // Clip left  TODO: this is not correct
+         ((y + 8 * size - 1) < 0))   // Clip top   TODO: this is not correct
+    return;
+  
   if(!_cp437 && (c >= 176)) c++; // Handle 'classic' charset behavior
   
   if (fgcolor == bgcolor) {
@@ -662,14 +674,8 @@ void drawChar(int16_t x, int16_t y, uint8_t c, uint16_t fgcolor, uint16_t bgcolo
       }
     }
   } else {
-    // Rudimentary clipping
-    if((x >= _width)            || // Clip right
-       (y >= _height)           || // Clip bottom
-         ((x + 6 * size - 1) < 0) || // Clip left  TODO: this is not correct
-           ((y + 8 * size - 1) < 0))   // Clip top   TODO: this is not correct
-      return;
-    
     // This solid background approach is about 5 time faster
+    
     tftSetAddrWindow(x, y, x + 6 * size - 1, y + 8 * size - 1);
     
     uint8_t xr, yr;
@@ -687,20 +693,10 @@ void drawChar(int16_t x, int16_t y, uint8_t c, uint16_t fgcolor, uint16_t bgcolo
           }
           for (xr=0; xr < size; xr++) {
             charBuffer[bufCount++] = color;
-#if USE_FSMC
-            FSMC_SEND_DATA(color);
-#else
-            sendData16_SPI1(color);
-#endif // USE_FSMC
           }
         }
         for (xr=0; xr < size; xr++) {
           charBuffer[bufCount++] = bgcolor;
-#if USE_FSMC
-          FSMC_SEND_DATA(bgcolor);
-#else
-          sendData16_SPI1(bgcolor);
-#endif // USE_FSMC
         }
       }
       mask = mask << 1;
@@ -708,7 +704,13 @@ void drawChar(int16_t x, int16_t y, uint8_t c, uint16_t fgcolor, uint16_t bgcolo
     
     bufCount++;
     
+#if USE_FSMC
+    while(bufCount--) {
+      FSMC_SEND_DATA(charBuffer[bufCount]);
+    }
+#else
     sendData16_DMA1_SPI1(charBuffer, bufCount);
+#endif /* USE_FSMC */
   }
 }
 
@@ -800,27 +802,22 @@ void tftPushColor(uint16_t color)
   //SET_TFT_CS_LOW;
   
   sendData16_SPI1(color);
-  
-  //SET_TFT_CS_HI;
-#endif // USE_FSMC  
+#endif /* USE_FSMC */
 }
 
 void tftDrawPixel(int16_t x, int16_t y, uint16_t color)
 {
   if((x < 0) || (x >= _width) || (y < 0) || (y >= _height)) return;
   
-  //tftSetAddrWindow(x,y,x,y);
   tftSetAddrPixel(x, y);
-
+  
 #if USE_FSMC
-  *FSMC_SEND_DATA(color);
+  FSMC_SEND_DATA(color);
 #else
-  //SET_TFT_DC_HI;
-  //SET_TFT_CS_LOW;
   
   sendData16_SPI1(color);
   RELEASE_TFT();
-#endif // USE_FSMC
+#endif /* USE_FSMC */
 }
 
 void tftDrawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color)
@@ -829,22 +826,15 @@ void tftDrawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color)
   if((x >= _width) || (y >= _height)) return;
   if((y+h-1) >= _height) h = _height-y;
   
-  //tftSetAddrWindow(x, y, x, y+h-1);
   tftSetVAddrWindow(x, y, y+h-1);
   
-  //SET_TFT_DC_HI;
-  //SET_TFT_CS_LOW;
-  
-  fillColor_DMA1_SPI1(color, h);
-  //SET_TFT_CS_HI;
-
 #if USE_FSMC
   while (h--) {
     FSMC_SEND_DATA(color);
   }
 #else
-  repeatData16_SPI1(color, h);
-#endif // USE_FSMC
+  fillColor_DMA1_SPI1(color, h);
+#endif /* USE_FSMC */
   RELEASE_TFT();
 }
 
@@ -854,21 +844,15 @@ void tftDrawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color)
   if((x >= _width) || (y >= _height)) return;
   if((x+w-1) >= _width)  w = _width-x;
   
-  //tftSetAddrWindow(x, y, x+w-1, y);
   tftSetHAddrWindow(x, y, x+w-1);
   
-  //SET_TFT_DC_HI;
-  //SET_TFT_CS_LOW;
-  
-  fillColor_DMA1_SPI1(color, w);
-  //SET_TFT_CS_HI;
 #if USE_FSMC
   while (w--) {
     FSMC_SEND_DATA(color);
   }
 #else
-  repeatData16_SPI1(color, w);
-#endif // USE_FSMC
+  fillColor_DMA1_SPI1(color, w);
+#endif /* USE_FSMC */
   RELEASE_TFT();
 }
 

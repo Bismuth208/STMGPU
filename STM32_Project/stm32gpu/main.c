@@ -24,8 +24,6 @@
 #include "gpuWorker.h"
 #include "gpuTiles.h"
 
-#include "nesPalette_ext.h"
-
 #include "stm_gpu_nes_tiles2.h"
 #include "stm_gpu_nes_tilesMap.h"
 
@@ -87,14 +85,14 @@ void drawSturtupScreen(void)
       
       // draw tile
       drawTile8x8(rndTileX, rndTileY, tileIndex);
-    
+      
       // make a little delay, overvise we don`t see mosaic effect (too fast)
       _delayMS(10);
     }
   }
   
   setCursor(_width/5, _height-15);
-  setTextColorBG(pCurrentPalette[0x0A], COLOR_BLACK); // 0x0A - dark green
+  setTextColorBG(currentPaletteArr[0x0A], COLOR_BLACK); // 0x0A - dark green
   print("Powered by Bismuth208");
   setCursor(0, 0);
   _delayMS(500); // he he he :[)
@@ -114,7 +112,7 @@ void init_GPIO_RCC(void)
   //SET_BIT(RCC->APB2ENR, RCC_APB2ENR_IOPCEN); // GPIOC
   SET_BIT(RCC->APB2ENR, RCC_APB2ENR_IOPDEN); // GPIOD
   SET_BIT(RCC->APB2ENR, RCC_APB2ENR_IOPEEN); // GPIOE
-
+  
 #endif  
 }
 
@@ -135,12 +133,11 @@ void startupInit(void)
   //initRand();
   
   tftBegin();         /* initialize a ILI9341 chip */
-  //initR(INITR_BLACKTAB);          /* initialize a ST7735 chip */
   tftSetRotation(1); // Horizontal
-
+  
   // 67 tiles, 17 wide, tiles array, tile size 8x8
-  loadTileSet(67, 17, stm_gpu_nes_tiles2_data, 1);      // startup logo
-  setCurrentPalette(nesPalette_ext);                    // extended NES palette
+  loadLogoTileSet(67, 17, stm_gpu_nes_tiles2_data);      // startup logo
+  loadDefaultPalette();
   
   drawSturtupScreen();
   
@@ -161,17 +158,17 @@ __noreturn __task void main(void)
 
 #ifdef  USE_FULL_ASSERT
 /**
-  * @brief  Reports the name of the source file and the source line number
-  *         where the assert_param error has occurred.
-  * @param  file: pointer to the source file name
-  * @param  line: assert_param error line source number
-  * @retval None
-  */
+* @brief  Reports the name of the source file and the source line number
+*         where the assert_param error has occurred.
+* @param  file: pointer to the source file name
+* @param  line: assert_param error line source number
+* @retval None
+*/
 void assert_failed(uint8_t* file, uint32_t line)
 { 
   /* User can add his own implementation to report the file name and line number,
-     ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
- 
+  ex: printf("Wrong parameters value: file %s on line %d\r\n", file, line) */
+  
   /* Infinite loop */
   while (1)
   {

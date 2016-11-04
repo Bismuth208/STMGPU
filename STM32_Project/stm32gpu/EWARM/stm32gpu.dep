@@ -2,7 +2,7 @@
 
 <project>
   <fileVersion>2</fileVersion>
-  <fileChecksum>3267038533</fileChecksum>
+  <fileChecksum>2183841611</fileChecksum>
   <configuration>
     <name>Debug</name>
     <outputs/>
@@ -14,579 +14,269 @@
   <configuration>
     <name>Release</name>
     <outputs>
-      <file>$PROJ_DIR$\..\stm_gpu_nes_tilesMap.h</file>
-      <file>$PROJ_DIR$\..\..\Drivers\STM32F10x_StdPeriph_Driver\inc\stm32f10x_dma.h</file>
-      <file>$PROJ_DIR$\Release\Obj\stm32f10x_spi.pbi</file>
-      <file>$PROJ_DIR$\Release\Obj\ili9341.pbi</file>
-      <file>$PROJ_DIR$\Release\Obj\gfx.pbi</file>
-      <file>$PROJ_DIR$\Release\Obj\gfxDMA.__cstat.et</file>
-      <file>$PROJ_DIR$\Release\Obj\stm32f10x_spi.__cstat.et</file>
-      <file>$PROJ_DIR$\Release\List\misc.lst</file>
-      <file>$PROJ_DIR$\Release\List\gpuTiles.lst</file>
-      <file>$PROJ_DIR$\Release\List\stm32f10x_dma.lst</file>
-      <file>$PROJ_DIR$\Release\Obj\ili9341.__cstat.et</file>
-      <file>$PROJ_DIR$\Release\List\gfxDMA.lst</file>
-      <file>$TOOLKIT_DIR$\CMSIS\Include\core_cmFunc.h</file>
-      <file>$TOOLKIT_DIR$\inc\c\DLib_Product_string.h</file>
-      <file>$TOOLKIT_DIR$\lib\m7M_tl.a</file>
-      <file>$PROJ_DIR$\Release\List\ili9341.lst</file>
-      <file>$PROJ_DIR$\Release\List\spi.lst</file>
-      <file>$PROJ_DIR$\Release\List\stm32f10x_usart.lst</file>
-      <file>$PROJ_DIR$\Release\Obj\sprites.pbi</file>
-      <file>$PROJ_DIR$\Release\Exe\stm32gpu.out</file>
-      <file>$PROJ_DIR$\Release\List\gfx.lst</file>
-      <file>$PROJ_DIR$\Release\Obj\usart.__cstat.et</file>
-      <file>$TOOLKIT_DIR$\inc\c\ycheck.h</file>
-      <file>$TOOLKIT_DIR$\inc\c\ysizet.h</file>
-      <file>$PROJ_DIR$\Release\Obj\gpuTiles.o</file>
-      <file>$TOOLKIT_DIR$\lib\dl7M_tln.a</file>
-      <file>$PROJ_DIR$\Release\Obj\misc.o</file>
-      <file>$PROJ_DIR$\Release\Obj\ili9341.o</file>
-      <file>$PROJ_DIR$\Release\Obj\stm32f10x_rcc.pbi</file>
-      <file>$TOOLKIT_DIR$\inc\c\cmsis_iar.h</file>
-      <file>$PROJ_DIR$\Release\Obj\stm32f10x_gpio.__cstat.et</file>
-      <file>$PROJ_DIR$\Release\Obj\stm32gpu.pbd</file>
-      <file>$TOOLKIT_DIR$\inc\c\ystdio.h</file>
-      <file>$PROJ_DIR$\Release\List\sdcard_spi.lst</file>
-      <file>$TOOLKIT_DIR$\inc\c\intrinsics.h</file>
-      <file>$TOOLKIT_DIR$\inc\c\stdio.h</file>
-      <file>$PROJ_DIR$\Release\Obj\main.o</file>
-      <file>$PROJ_DIR$\Release\Obj\sdWorker.o</file>
-      <file>$PROJ_DIR$\Release\List\stm32f10x_gpio.lst</file>
-      <file>$TOOLKIT_DIR$\inc\c\xencoding_limits.h</file>
-      <file>$PROJ_DIR$\Release\Obj\systicktimer.__cstat.et</file>
-      <file>$PROJ_DIR$\Release\List\stm32f10x_rcc.lst</file>
-      <file>$PROJ_DIR$\Release\Obj\diskio.o</file>
-      <file>$PROJ_DIR$\Release\Obj\system_stm32f10x.o</file>
-      <file>$PROJ_DIR$\Release\List\stm32gpu.map</file>
-      <file>$PROJ_DIR$\Release\Obj\stm32f10x_rcc.__cstat.et</file>
-      <file>$PROJ_DIR$\Release\Obj\stm32f10x_rcc.o</file>
-      <file>$PROJ_DIR$\Release\List\sdWorker.lst</file>
-      <file>$TOOLKIT_DIR$\inc\c\stdint.h</file>
-      <file>$PROJ_DIR$\Release\List\usart.lst</file>
-      <file>$TOOLKIT_DIR$\inc\c\DLib_Config_Normal.h</file>
-      <file>$PROJ_DIR$\Release\Obj\gpuWorker.__cstat.et</file>
-      <file>$PROJ_DIR$\Release\Obj\gfx.__cstat.et</file>
-      <file>$PROJ_DIR$\Release\Obj\diskio.__cstat.et</file>
-      <file>$TOOLKIT_DIR$\inc\c\DLib_Threads.h</file>
-      <file>$PROJ_DIR$\Release\Obj\stm32f10x_gpio.o</file>
-      <file>$TOOLKIT_DIR$\CMSIS\Include\core_cmInstr.h</file>
-      <file>$PROJ_DIR$\Release\Obj\stm32f10x_gpio.pbi</file>
-      <file>$PROJ_DIR$\Release\Exe\stm32gpu.bin</file>
-      <file>$PROJ_DIR$\Release\Obj\systicktimer.o</file>
-      <file>$TOOLKIT_DIR$\inc\c\DLib_Product.h</file>
-      <file>$PROJ_DIR$\Release\Obj\usart.pbi</file>
-      <file>$PROJ_DIR$\Release\Obj\diskio.pbi</file>
-      <file>$PROJ_DIR$\Release\Obj\sdcard_spi.__cstat.et</file>
-      <file>$PROJ_DIR$\Release\Obj\stm32f10x_spi.o</file>
-      <file>$PROJ_DIR$\Release\Obj\stm32f10x_dma.__cstat.et</file>
-      <file>$PROJ_DIR$\Release\Obj\spi.o</file>
-      <file>$PROJ_DIR$\Release\List\diskio.lst</file>
-      <file>$TOOLKIT_DIR$\inc\c\DLib_Defaults.h</file>
-      <file>$PROJ_DIR$\Release\Obj\stm32f10x_usart.o</file>
-      <file>$PROJ_DIR$\Release\Obj\misc.__cstat.et</file>
-      <file>$PROJ_DIR$\Release\Obj\sdcard_spi.pbi</file>
-      <file>$PROJ_DIR$\Release\Obj\spi.__cstat.et</file>
-      <file>$PROJ_DIR$\Release\Obj\gpuWorker.o</file>
-      <file>$PROJ_DIR$\Release\Obj\system_stm32f10x.pbi</file>
-      <file>$PROJ_DIR$\Release\Obj\ff.__cstat.et</file>
-      <file>$TOOLKIT_DIR$\inc\c\yvals.h</file>
-      <file>$PROJ_DIR$\Release\List\sprites.lst</file>
-      <file>$PROJ_DIR$\Release\List\gpuWorker.lst</file>
-      <file>$PROJ_DIR$\Release\Obj\sdWorker.pbi</file>
-      <file>$PROJ_DIR$\Release\Obj\misc.pbi</file>
-      <file>$PROJ_DIR$\Release\Obj\gpuTiles.__cstat.et</file>
-      <file>$TOOLKIT_DIR$\CMSIS\Include\core_cm3.h</file>
-      <file>$PROJ_DIR$\Release\Obj\ff.o</file>
-      <file>$PROJ_DIR$\Release\List\ff.lst</file>
-      <file>$PROJ_DIR$\Release\Obj\gfx.o</file>
-      <file>$TOOLKIT_DIR$\inc\c\stdbool.h</file>
-      <file>$PROJ_DIR$\Release\Obj\systicktimer.pbi</file>
-      <file>$PROJ_DIR$\Release\Obj\stm32f10x_usart.__cstat.et</file>
-      <file>$PROJ_DIR$\Release\List\systicktimer.lst</file>
-      <file>$PROJ_DIR$\..\..\Drivers\ILI9341\ili9341.h</file>
-      <file>$PROJ_DIR$\..\..\Drivers\gfx_tft\gfx.h</file>
-      <file>$PROJ_DIR$\..\..\Drivers\gfx_tft\glcdfont_cyrillic.h</file>
-      <file>$PROJ_DIR$\..\..\Drivers\gfx_tft\glcdfont.h</file>
-      <file>$PROJ_DIR$\..\..\Drivers\FatFS\sdcard_spi.c</file>
-      <file>$PROJ_DIR$\..\..\Drivers\FatFS\ff.h</file>
-      <file>$PROJ_DIR$\..\..\Drivers\gfx_tft\gfx.c</file>
-      <file>$PROJ_DIR$\..\..\Drivers\FatFS\ffconf.h</file>
-      <file>$PROJ_DIR$\..\..\Drivers\gfx_tft\gfxDMA.c</file>
-      <file>$PROJ_DIR$\..\..\Drivers\FatFS\sdcard_spi.h</file>
-      <file>$PROJ_DIR$\..\..\Drivers\FatFS\diskio.c</file>
-      <file>$PROJ_DIR$\..\..\Drivers\FatFS\diskio.h</file>
-      <file>$PROJ_DIR$\..\..\Drivers\FatFS\integer.h</file>
-      <file>$PROJ_DIR$\..\..\Drivers\FatFS\ff.c</file>
-      <file>$PROJ_DIR$\..\..\Drivers\gfx_tft\gfxDMA.h</file>
-      <file>$PROJ_DIR$\..\..\Drivers\ILI9341\ili9341.c</file>
-      <file>$PROJ_DIR$\..\gpuTiles.c</file>
-      <file>$PROJ_DIR$\..\gpuWorker.h</file>
-      <file>$PROJ_DIR$\..\nesPalette_ext.h</file>
-      <file>$PROJ_DIR$\..\..\Drivers\systicktimer\systicktimer.c</file>
-      <file>$PROJ_DIR$\..\gpuWorker.c</file>
-      <file>$PROJ_DIR$\..\..\Drivers\stmSPI\spi.h</file>
-      <file>$PROJ_DIR$\..\sdWorker.h</file>
-      <file>$PROJ_DIR$\..\..\Drivers\STM32F10x_StdPeriph_Driver\inc\misc.h</file>
-      <file>$PROJ_DIR$\..\..\Drivers\systicktimer\systicktimer.h</file>
-      <file>$PROJ_DIR$\..\..\Drivers\usart\usart.h</file>
-      <file>$PROJ_DIR$\..\sprites.h</file>
-      <file>$PROJ_DIR$\..\gpuTiles.h</file>
-      <file>$PROJ_DIR$\..\sprites.c</file>
-      <file>$PROJ_DIR$\..\gpuWorkerFunc.c</file>
-      <file>$PROJ_DIR$\..\gpuWorkerV2.c</file>
-      <file>$PROJ_DIR$\..\stm_gpu_nes_tiles2.h</file>
-      <file>$PROJ_DIR$\..\..\Drivers\usart\usart.c</file>
-      <file>$PROJ_DIR$\..\sdWorker.c</file>
-      <file>$PROJ_DIR$\..\..\Drivers\stmSPI\spi.c</file>
-      <file>$PROJ_DIR$\..\gpuWorkerFunc.h</file>
-      <file>$PROJ_DIR$\Release\Obj\sprites.o</file>
-      <file>$PROJ_DIR$\Release\Obj\stm32f10x_usart.pbi</file>
-      <file>$PROJ_DIR$\Release\Obj\main.pbi</file>
-      <file>$PROJ_DIR$\Release\Obj\system_stm32f10x.__cstat.et</file>
-      <file>$PROJ_DIR$\Release\Obj\gpuTiles.pbi</file>
+      <file>$PROJ_DIR$\..\..\Drivers\STM32F10x_StdPeriph_Driver\inc\stm32f10x_usart.h</file>
+      <file>$PROJ_DIR$\..\..\Drivers\STM32F10x_StdPeriph_Driver\src\stm32f10x_gpio.c</file>
+      <file>$PROJ_DIR$\..\..\Drivers\STM32F10x_StdPeriph_Driver\inc\stm32f10x_spi.h</file>
+      <file>$PROJ_DIR$\..\..\Drivers\STM32F10x_StdPeriph_Driver\src\misc.c</file>
+      <file>$PROJ_DIR$\..\..\Drivers\STM32F10x_StdPeriph_Driver\src\stm32f10x_dma.c</file>
+      <file>$PROJ_DIR$\..\..\Drivers\CMSIS\CM3\DeviceSupport\ST\STM32F10x\system_stm32f10x.h</file>
       <file>$PROJ_DIR$\Release\List\main.lst</file>
-      <file>$PROJ_DIR$\Release\Obj\sdWorker.__cstat.et</file>
-      <file>$TOOLKIT_DIR$\inc\c\string.h</file>
-      <file>$PROJ_DIR$\Release\List\stm32f10x_spi.lst</file>
-      <file>$PROJ_DIR$\Release\Obj\spi.pbi</file>
-      <file>$PROJ_DIR$\Release\Obj\gfxDMA.pbi</file>
-      <file>$PROJ_DIR$\Release\Obj\stm32f10x_dma.pbi</file>
-      <file>$PROJ_DIR$\Release\Obj\gfxDMA.o</file>
-      <file>$PROJ_DIR$\Release\Obj\stm32f10x_dma.o</file>
-      <file>$PROJ_DIR$\Release\Obj\startup_stm32f10x_md.o</file>
-      <file>$PROJ_DIR$\stack.suc</file>
-      <file>$TOOLKIT_DIR$\inc\c\stdlib.h</file>
+      <file>$PROJ_DIR$\Release\List\ili9341.lst</file>
       <file>$PROJ_DIR$\Release\Obj\usart.o</file>
       <file>$PROJ_DIR$\Release\Obj\sdcard_spi.o</file>
-      <file>$TOOLKIT_DIR$\lib\rt7M_tl.a</file>
-      <file>$PROJ_DIR$\Release\Obj\ff.pbi</file>
-      <file>$PROJ_DIR$\Release\Obj\main.__cstat.et</file>
-      <file>$PROJ_DIR$\f103c8t6.icf</file>
-      <file>$PROJ_DIR$\Release\Obj\sprites.__cstat.et</file>
-      <file>$PROJ_DIR$\..\..\Drivers\STM32F10x_StdPeriph_Driver\src\stm32f10x_rcc.c</file>
+      <file>$PROJ_DIR$\Release\List\stm32f10x_gpio.lst</file>
+      <file>$PROJ_DIR$\Release\Obj\ili9341.__cstat.et</file>
+      <file>$PROJ_DIR$\Release\Obj\stm32f10x_gpio.pbi</file>
+      <file>$PROJ_DIR$\Release\Obj\gpuTiles.o</file>
+      <file>$PROJ_DIR$\Release\Obj\systicktimer.pbi</file>
+      <file>$PROJ_DIR$\Release\Obj\stm32f10x_rcc.o</file>
       <file>$PROJ_DIR$\..\..\Drivers\CMSIS\CM3\DeviceSupport\ST\STM32F10x\startup\iar\startup_stm32f10x_md.s</file>
-      <file>$PROJ_DIR$\Release\List\system_stm32f10x.lst</file>
-      <file>$PROJ_DIR$\..\..\Drivers\STM32F10x_StdPeriph_Driver\inc\stm32f10x_gpio.h</file>
-      <file>$PROJ_DIR$\..\..\Drivers\STM32F10x_StdPeriph_Driver\src\stm32f10x_spi.c</file>
-      <file>$PROJ_DIR$\..\main.c</file>
-      <file>$PROJ_DIR$\..\..\Drivers\STM32F10x_StdPeriph_Driver\src\stm32f10x_usart.c</file>
-      <file>$PROJ_DIR$\..\..\Drivers\STM32F10x_StdPeriph_Driver\inc\stm32f10x_rcc.h</file>
-      <file>$PROJ_DIR$\..\..\Drivers\STM32F10x_StdPeriph_Driver\src\misc.c</file>
-      <file>$PROJ_DIR$\..\..\Drivers\STM32F10x_StdPeriph_Driver\inc\stm32f10x_spi.h</file>
-      <file>$PROJ_DIR$\..\..\Drivers\CMSIS\CM3\DeviceSupport\ST\STM32F10x\startup\iar\startup_stm32f10x_hd.s</file>
-      <file>$PROJ_DIR$\..\..\Drivers\STM32F10x_StdPeriph_Driver\inc\stm32f10x_usart.h</file>
-      <file>$PROJ_DIR$\..\..\Drivers\STM32F10x_StdPeriph_Driver\src\stm32f10x_dma.c</file>
-      <file>$PROJ_DIR$\..\..\Drivers\STM32F10x_StdPeriph_Driver\src\stm32f10x_gpio.c</file>
-      <file>$PROJ_DIR$\..\..\Drivers\CMSIS\CM3\DeviceSupport\ST\STM32F10x\stm32f10x.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\DLib_Product.h</file>
+      <file>$PROJ_DIR$\Release\Exe\stm32gpu.out</file>
+      <file>$TOOLKIT_DIR$\inc\c\DLib_Threads.h</file>
+      <file>$PROJ_DIR$\Release\Obj\gpuWorker.o</file>
+      <file>$PROJ_DIR$\Release\Obj\ili9341.pbi</file>
+      <file>$PROJ_DIR$\Release\Obj\sdWorker.__cstat.et</file>
+      <file>$TOOLKIT_DIR$\inc\c\ystdio.h</file>
+      <file>$TOOLKIT_DIR$\CMSIS\Include\core_cmInstr.h</file>
       <file>$PROJ_DIR$\..\..\Drivers\CMSIS\CM3\DeviceSupport\ST\STM32F10x\stm32f10x_conf.h</file>
-      <file>$PROJ_DIR$\..\..\Drivers\CMSIS\CM3\DeviceSupport\ST\STM32F10x\system_stm32f10x.c</file>
-      <file>$PROJ_DIR$\..\..\Drivers\CMSIS\CM3\DeviceSupport\ST\STM32F10x\system_stm32f10x.h</file>
+      <file>$TOOLKIT_DIR$\inc\c\ysizet.h</file>
+      <file>$PROJ_DIR$\Release\Obj\gfxDMA.o</file>
+      <file>$PROJ_DIR$\Release\Obj\stm32gpu.pbd</file>
       <file>$PROJ_DIR$\Release\Obj\gpuWorker.pbi</file>
+      <file>$PROJ_DIR$\..\..\Drivers\CMSIS\CM3\DeviceSupport\ST\STM32F10x\stm32f10x.h</file>
+      <file>$PROJ_DIR$\Release\Obj\system_stm32f10x.__cstat.et</file>
+      <file>$PROJ_DIR$\stack.suc</file>
+      <file>$TOOLKIT_DIR$\inc\c\stdio.h</file>
+      <file>$PROJ_DIR$\Release\Obj\sdWorker.o</file>
+      <file>$PROJ_DIR$\Release\Obj\stm32f10x_dma.__cstat.et</file>
+      <file>$PROJ_DIR$\Release\List\stm32f10x_dma.lst</file>
+      <file>$PROJ_DIR$\..\..\Drivers\CMSIS\CM3\startup_stm32f10x_hd.s</file>
+      <file>$PROJ_DIR$\Release\Obj\stm32f10x_rcc.pbi</file>
+      <file>$PROJ_DIR$\..\..\Drivers\CMSIS\CM3\DeviceSupport\ST\STM32F10x\system_stm32f10x.c</file>
+      <file>$PROJ_DIR$\Release\Obj\sdcard_spi.__cstat.et</file>
+      <file>$PROJ_DIR$\..\..\Drivers\CMSIS\CM3\startup_stm32f10x_md.s</file>
+      <file>$PROJ_DIR$\Release\Obj\diskio.o</file>
+      <file>$TOOLKIT_DIR$\inc\c\DLib_Defaults.h</file>
+      <file>$PROJ_DIR$\Release\List\gpuTiles.lst</file>
+      <file>$PROJ_DIR$\Release\List\gfx.lst</file>
+      <file>$TOOLKIT_DIR$\CMSIS\Include\core_cmFunc.h</file>
+      <file>$TOOLKIT_DIR$\lib\rt7M_tl.a</file>
+      <file>$TOOLKIT_DIR$\inc\c\ycheck.h</file>
+      <file>$PROJ_DIR$\Release\Obj\gfx.pbi</file>
+      <file>$PROJ_DIR$\Release\List\misc.lst</file>
+      <file>$PROJ_DIR$\Release\Obj\sprites.__cstat.et</file>
+      <file>$PROJ_DIR$\Release\List\spi.lst</file>
+      <file>$PROJ_DIR$\Release\Obj\gfx.o</file>
+      <file>$PROJ_DIR$\Release\List\stm32f10x_rcc.lst</file>
+      <file>$PROJ_DIR$\Release\Obj\gfx.__cstat.et</file>
+      <file>$PROJ_DIR$\Release\Obj\main.pbi</file>
+      <file>$PROJ_DIR$\Release\Obj\usart.__cstat.et</file>
+      <file>$PROJ_DIR$\Release\Obj\stm32f10x_gpio.__cstat.et</file>
+      <file>$TOOLKIT_DIR$\inc\c\stdint.h</file>
+      <file>$PROJ_DIR$\Release\Obj\system_stm32f10x.o</file>
+      <file>$PROJ_DIR$\Release\Obj\misc.__cstat.et</file>
+      <file>$TOOLKIT_DIR$\lib\m7M_tl.a</file>
+      <file>$PROJ_DIR$\Release\List\systicktimer.lst</file>
+      <file>$PROJ_DIR$\f103c8t6.icf</file>
+      <file>$PROJ_DIR$\Release\Obj\ff.o</file>
+      <file>$TOOLKIT_DIR$\inc\c\xencoding_limits.h</file>
+      <file>$PROJ_DIR$\Release\List\sdcard_spi.lst</file>
+      <file>$PROJ_DIR$\Release\Obj\gpuTiles.__cstat.et</file>
+      <file>$PROJ_DIR$\Release\List\stm32f10x_spi.lst</file>
+      <file>$PROJ_DIR$\Release\Obj\startup_stm32f10x_md.o</file>
+      <file>$PROJ_DIR$\Release\Obj\gpuTiles.pbi</file>
+      <file>$PROJ_DIR$\Release\Obj\stm32f10x_dma.o</file>
+      <file>$PROJ_DIR$\Release\Exe\stm32gpu.bin</file>
+      <file>$PROJ_DIR$\Release\List\system_stm32f10x.lst</file>
+      <file>$TOOLKIT_DIR$\inc\c\stdlib.h</file>
+      <file>$PROJ_DIR$\Release\Obj\stm32f10x_spi.o</file>
+      <file>$PROJ_DIR$\Release\Obj\sdWorker.pbi</file>
+      <file>$TOOLKIT_DIR$\inc\c\stdbool.h</file>
+      <file>$PROJ_DIR$\Release\Obj\misc.o</file>
+      <file>$TOOLKIT_DIR$\inc\c\yvals.h</file>
+      <file>$PROJ_DIR$\Release\List\gfxDMA.lst</file>
+      <file>$PROJ_DIR$\Release\Obj\sprites.pbi</file>
+      <file>$TOOLKIT_DIR$\inc\c\cmsis_iar.h</file>
+      <file>$TOOLKIT_DIR$\CMSIS\Include\core_cm3.h</file>
+      <file>$PROJ_DIR$\Release\List\gpuWorker.lst</file>
+      <file>$PROJ_DIR$\Release\Obj\stm32f10x_spi.pbi</file>
+      <file>$TOOLKIT_DIR$\inc\c\string.h</file>
+      <file>$PROJ_DIR$\Release\Obj\usart.pbi</file>
+      <file>$PROJ_DIR$\Release\Obj\spi.pbi</file>
+      <file>$PROJ_DIR$\Release\Obj\main.o</file>
+      <file>$PROJ_DIR$\Release\Obj\startup_stm32f10x_hd.o</file>
+      <file>$PROJ_DIR$\Release\Obj\spi.o</file>
+      <file>$PROJ_DIR$\Release\Obj\gfxDMA.pbi</file>
+      <file>$PROJ_DIR$\..\..\Drivers\CMSIS\CM3\system_stm32f10x.c</file>
+      <file>$PROJ_DIR$\Release\List\sdWorker.lst</file>
+      <file>$PROJ_DIR$\Release\Obj\systicktimer.o</file>
+      <file>$PROJ_DIR$\..\..\Drivers\gfx_tft\glcdfont_cyrillic.h</file>
+      <file>$PROJ_DIR$\..\..\Drivers\stmSPI\spi.c</file>
+      <file>$PROJ_DIR$\..\..\Drivers\FatFS\sdcard_spi.c</file>
+      <file>$PROJ_DIR$\..\..\Drivers\FatFS\diskio.c</file>
+      <file>$PROJ_DIR$\..\..\Drivers\FatFS\ff.c</file>
+      <file>$PROJ_DIR$\..\..\Drivers\ILI9341\ili9341.h</file>
+      <file>$PROJ_DIR$\..\..\Drivers\FatFS\ff.h</file>
+      <file>$PROJ_DIR$\..\..\Drivers\FatFS\diskio.h</file>
+      <file>$PROJ_DIR$\..\..\Drivers\gfx_tft\gfx.h</file>
+      <file>$PROJ_DIR$\..\..\Drivers\FatFS\sdcard_spi.h</file>
+      <file>$PROJ_DIR$\..\..\Drivers\gfx_tft\gfx.c</file>
+      <file>$PROJ_DIR$\..\..\Drivers\stmSPI\spi.h</file>
+      <file>$PROJ_DIR$\..\..\Drivers\ILI9341\ili9341.c</file>
+      <file>$PROJ_DIR$\..\..\Drivers\gfx_tft\gfxDMA.h</file>
+      <file>$PROJ_DIR$\..\..\Drivers\gfx_tft\glcdfont.h</file>
+      <file>$PROJ_DIR$\..\..\Drivers\gfx_tft\gfxDMA.c</file>
+      <file>$PROJ_DIR$\..\..\Drivers\FatFS\ffconf.h</file>
+      <file>$PROJ_DIR$\..\..\Drivers\FatFS\integer.h</file>
+      <file>$PROJ_DIR$\..\gpuWorker.c</file>
+      <file>$PROJ_DIR$\..\sprites.h</file>
+      <file>$PROJ_DIR$\..\gpuTiles.h</file>
+      <file>$PROJ_DIR$\..\stm_gpu_nes_tiles2.h</file>
+      <file>$PROJ_DIR$\..\gpuWorker.h</file>
+      <file>$PROJ_DIR$\..\..\Drivers\usart\usart.c</file>
+      <file>$PROJ_DIR$\..\..\Drivers\STM32F10x_StdPeriph_Driver\inc\stm32f10x_dma.h</file>
+      <file>$PROJ_DIR$\..\..\Drivers\STM32F10x_StdPeriph_Driver\inc\stm32f10x_gpio.h</file>
+      <file>$PROJ_DIR$\..\..\Drivers\usart\usart.h</file>
+      <file>$PROJ_DIR$\..\..\Drivers\systicktimer\systicktimer.c</file>
+      <file>$PROJ_DIR$\..\stm_gpu_nes_tilesMap.h</file>
+      <file>$PROJ_DIR$\..\..\Drivers\STM32F10x_StdPeriph_Driver\inc\stm32f10x_rcc.h</file>
+      <file>$PROJ_DIR$\..\sdWorker.c</file>
+      <file>$PROJ_DIR$\..\..\Drivers\STM32F10x_StdPeriph_Driver\inc\misc.h</file>
+      <file>$PROJ_DIR$\..\..\Drivers\systicktimer\systicktimer.h</file>
+      <file>$PROJ_DIR$\..\sprites.c</file>
+      <file>$PROJ_DIR$\..\gpuTiles.c</file>
+      <file>$PROJ_DIR$\..\sdWorker.h</file>
+      <file>$PROJ_DIR$\..\nesPalette_ext.h</file>
+      <file>$PROJ_DIR$\..\..\Drivers\CMSIS\stm32f10x_conf.h</file>
+      <file>$PROJ_DIR$\..\..\Drivers\STM32F10x_StdPeriph_Driver\src\stm32f10x_rcc.c</file>
+      <file>$PROJ_DIR$\..\..\Drivers\CMSIS\startup_stm32f10x_hd.s</file>
+      <file>$PROJ_DIR$\Release\Obj\stm32f10x_gpio.o</file>
+      <file>$PROJ_DIR$\..\..\Drivers\STM32F10x_StdPeriph_Driver\src\stm32f10x_usart.c</file>
+      <file>$PROJ_DIR$\..\..\Drivers\CMSIS\stm32f10x.h</file>
+      <file>$PROJ_DIR$\..\main.c</file>
+      <file>$PROJ_DIR$\Release\List\stm32gpu.map</file>
+      <file>$PROJ_DIR$\Release\Obj\spi.__cstat.et</file>
+      <file>$PROJ_DIR$\Release\List\sprites.lst</file>
+      <file>$PROJ_DIR$\..\..\Drivers\STM32F10x_StdPeriph_Driver\src\stm32f10x_spi.c</file>
+      <file>$PROJ_DIR$\..\..\Drivers\CMSIS\startup_stm32f10x_md.s</file>
+      <file>$PROJ_DIR$\..\..\Drivers\CMSIS\system_stm32f10x.c</file>
+      <file>$PROJ_DIR$\Release\Obj\gpuWorker.__cstat.et</file>
+      <file>$PROJ_DIR$\..\..\Drivers\CMSIS\system_stm32f10x.h</file>
+      <file>$PROJ_DIR$\Release\Obj\ff.pbi</file>
+      <file>$PROJ_DIR$\Release\Obj\diskio.__cstat.et</file>
+      <file>$PROJ_DIR$\Release\Obj\misc.pbi</file>
+      <file>$PROJ_DIR$\Release\List\ff.lst</file>
+      <file>$TOOLKIT_DIR$\inc\c\DLib_Config_Normal.h</file>
+      <file>$PROJ_DIR$\Release\Obj\stm32f10x_dma.pbi</file>
+      <file>$PROJ_DIR$\Release\List\diskio.lst</file>
+      <file>$TOOLKIT_DIR$\inc\c\intrinsics.h</file>
+      <file>$PROJ_DIR$\Release\Obj\ff.__cstat.et</file>
+      <file>$PROJ_DIR$\Release\Obj\stm32f10x_usart.pbi</file>
+      <file>$PROJ_DIR$\Release\Obj\diskio.pbi</file>
+      <file>$PROJ_DIR$\Release\Obj\stm32f10x_usart.o</file>
+      <file>$PROJ_DIR$\Release\Obj\gfxDMA.__cstat.et</file>
+      <file>$TOOLKIT_DIR$\lib\dl7M_tln.a</file>
+      <file>$PROJ_DIR$\Release\Obj\sdcard_spi.pbi</file>
+      <file>$PROJ_DIR$\Release\Obj\system_stm32f10x.pbi</file>
+      <file>$PROJ_DIR$\Release\List\usart.lst</file>
+      <file>$PROJ_DIR$\Release\Obj\ili9341.o</file>
+      <file>$TOOLKIT_DIR$\inc\c\DLib_Product_string.h</file>
+      <file>$PROJ_DIR$\Release\Obj\stm32f10x_rcc.__cstat.et</file>
+      <file>$PROJ_DIR$\Release\Obj\sprites.o</file>
+      <file>$PROJ_DIR$\Release\Obj\stm32f10x_spi.__cstat.et</file>
+      <file>$PROJ_DIR$\Release\List\stm32f10x_usart.lst</file>
+      <file>$PROJ_DIR$\Release\Obj\main.__cstat.et</file>
+      <file>$PROJ_DIR$\Release\Obj\systicktimer.__cstat.et</file>
+      <file>$PROJ_DIR$\Release\Obj\stm32f10x_usart.__cstat.et</file>
     </outputs>
     <file>
       <name>[ROOT_NODE]</name>
       <outputs>
         <tool>
           <name>ILINK</name>
-          <file> 19 44</file>
+          <file> 18 141</file>
         </tool>
       </outputs>
     </file>
     <file>
-      <name>$PROJ_DIR$\Release\Exe\stm32gpu.out</name>
+      <name>$PROJ_DIR$\..\..\Drivers\STM32F10x_StdPeriph_Driver\src\stm32f10x_gpio.c</name>
       <outputs>
         <tool>
-          <name>ILINK</name>
-          <file> 44</file>
+          <name>BICOMP</name>
+          <file> 12</file>
         </tool>
         <tool>
-          <name>OBJCOPY</name>
+          <name>ICCARM</name>
+          <file> 10 137</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
           <file> 58</file>
         </tool>
       </outputs>
       <inputs>
         <tool>
-          <name>ILINK</name>
-          <file> 148 42 83 85 138 24 73 27 36 26 144 37 66 126 140 139 55 46 64 69 43 59 143 145 14 25 141</file>
+          <name>BICOMP</name>
+          <file> 0 139 59 80 17 84 134 48 121 126 148 46 153 83 122 24 43 66 19 156 2 128</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 122 139 84 59 48 80 43 153 17 66 19 24 83 156 46 148 134 121 126 2 0 128</file>
         </tool>
       </inputs>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\..\Drivers\FatFS\sdcard_spi.c</name>
+      <name>$PROJ_DIR$\..\..\Drivers\STM32F10x_StdPeriph_Driver\src\misc.c</name>
       <outputs>
         <tool>
-          <name>ICCARM</name>
-          <file> 33 144</file>
+          <name>BICOMP</name>
+          <file> 151</file>
         </tool>
         <tool>
-          <name>BICOMP</name>
-          <file> 71</file>
+          <name>ICCARM</name>
+          <file> 50 79</file>
         </tool>
         <tool>
           <name>__cstat</name>
-          <file> 63</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>ICCARM</name>
-          <file> 35 22 76 68 50 60 39 54 23 32 101 102 99 165 1 164 82 48 56 29 34 12 167 153 157 159 161 113</file>
-        </tool>
-        <tool>
-          <name>BICOMP</name>
-          <file> 22 82 68 161 164 1 34 99 23 39 54 76 102 157 48 12 29 101 32 50 60 165 153 159 113 167 35 56</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\Drivers\gfx_tft\gfx.c</name>
-      <outputs>
-        <tool>
-          <name>ICCARM</name>
-          <file> 20 85</file>
-        </tool>
-        <tool>
-          <name>BICOMP</name>
-          <file> 4</file>
-        </tool>
-        <tool>
-          <name>__cstat</name>
-          <file> 52</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>ICCARM</name>
-          <file> 164 82 48 22 76 68 50 60 39 54 56 29 34 12 167 165 1 153 157 159 161 113 133 23 13 86 142 114 111 91 90 93 104</file>
-        </tool>
-        <tool>
-          <name>BICOMP</name>
-          <file> 22 157 111 82 90 133 50 29 164 142 93 48 13 1 86 114 91 104 167 56 76 60 161 23 165 12 68 39 54 34 153 159 113</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\Drivers\gfx_tft\gfxDMA.c</name>
-      <outputs>
-        <tool>
-          <name>ICCARM</name>
-          <file> 11 138</file>
-        </tool>
-        <tool>
-          <name>BICOMP</name>
-          <file> 136</file>
-        </tool>
-        <tool>
-          <name>__cstat</name>
-          <file> 5</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>ICCARM</name>
-          <file> 91 86 48 22 76 68 50 60 39 54 90 164 82 56 29 34 12 167 165 1 153 157 159 161 113</file>
-        </tool>
-        <tool>
-          <name>BICOMP</name>
-          <file> 167 48 113 68 12 34 1 22 39 54 76 86 29 153 164 90 50 60 82 165 159 91 56 157 161</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\Drivers\FatFS\diskio.c</name>
-      <outputs>
-        <tool>
-          <name>ICCARM</name>
-          <file> 67 42</file>
-        </tool>
-        <tool>
-          <name>BICOMP</name>
-          <file> 62</file>
-        </tool>
-        <tool>
-          <name>__cstat</name>
-          <file> 53</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>ICCARM</name>
-          <file> 35 22 76 68 50 60 39 54 23 32 101 102 99 165 1 164 82 48 56 29 34 12 167 153 157 159 161 113</file>
-        </tool>
-        <tool>
-          <name>BICOMP</name>
-          <file> 164 22 50 76 102 159 34 99 23 60 165 153 113 167 12 29 101 32 68 39 54 1 157 161 82 48 35 56</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\Drivers\FatFS\ff.c</name>
-      <outputs>
-        <tool>
-          <name>ICCARM</name>
-          <file> 84 83</file>
-        </tool>
-        <tool>
-          <name>BICOMP</name>
-          <file> 146</file>
-        </tool>
-        <tool>
-          <name>__cstat</name>
-          <file> 75</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>ICCARM</name>
-          <file> 95 102 97 101</file>
-        </tool>
-        <tool>
-          <name>BICOMP</name>
-          <file> 102 101 95 97</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\Drivers\ILI9341\ili9341.c</name>
-      <outputs>
-        <tool>
-          <name>ICCARM</name>
-          <file> 15 27</file>
-        </tool>
-        <tool>
-          <name>BICOMP</name>
-          <file> 3</file>
-        </tool>
-        <tool>
-          <name>__cstat</name>
-          <file> 10</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>ICCARM</name>
-          <file> 164 82 48 22 76 68 50 60 39 54 56 29 34 12 167 165 1 153 157 159 161 113 133 23 13 86 142 114 111 90 104</file>
-        </tool>
-        <tool>
-          <name>BICOMP</name>
-          <file> 153 90 48 76 86 39 54 29 164 1 114 82 12 34 113 133 142 111 104 167 165 22 68 159 56 50 60 157 161 23 13</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\gpuTiles.c</name>
-      <outputs>
-        <tool>
-          <name>ICCARM</name>
-          <file> 8 24</file>
-        </tool>
-        <tool>
-          <name>BICOMP</name>
-          <file> 130</file>
-        </tool>
-        <tool>
-          <name>__cstat</name>
-          <file> 81</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>ICCARM</name>
-          <file> 164 82 48 22 76 68 50 60 39 54 56 29 34 12 167 165 1 153 157 159 161 113 133 23 13 91 86 90 104 111 117 108</file>
-        </tool>
-        <tool>
-          <name>BICOMP</name>
-          <file> 29 48 50 22 111 157 90 91 108 82 13 133 104 117 167 56 76 60 1 161 164 23 86 165 12 68 39 54 34 153 159 113</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\Drivers\systicktimer\systicktimer.c</name>
-      <outputs>
-        <tool>
-          <name>ICCARM</name>
-          <file> 89 59</file>
-        </tool>
-        <tool>
-          <name>BICOMP</name>
-          <file> 87</file>
-        </tool>
-        <tool>
-          <name>__cstat</name>
-          <file> 40</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>ICCARM</name>
-          <file> 142 22 76 68 50 60 39 54 23 114 164 82 48 56 29 34 12 167 165 1 153 157 159 161 113</file>
-        </tool>
-        <tool>
-          <name>BICOMP</name>
-          <file> 39 54 76 22 113 167 34 68 12 29 153 164 114 23 50 60 82 48 165 159 142 56 1 157 161</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\gpuWorker.c</name>
-      <outputs>
-        <tool>
-          <name>ICCARM</name>
-          <file> 78 73</file>
-        </tool>
-        <tool>
-          <name>BICOMP</name>
-          <file> 168</file>
-        </tool>
-        <tool>
-          <name>__cstat</name>
-          <file> 51</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>ICCARM</name>
-          <file> 91 86 48 22 76 68 50 60 39 54 90 104 111 115 114 164 82 56 29 34 12 167 165 1 153 157 159 161 113 107 112 117 116</file>
-        </tool>
-        <tool>
-          <name>BICOMP</name>
-          <file> 12 48 50 116 22 34 114 86 113 111 112 90 60 82 29 153 164 104 115 107 117 76 68 39 54 167 165 159 91 56 1 157 161</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\sprites.c</name>
-      <outputs>
-        <tool>
-          <name>ICCARM</name>
-          <file> 77 126</file>
-        </tool>
-        <tool>
-          <name>BICOMP</name>
-          <file> 18</file>
-        </tool>
-        <tool>
-          <name>__cstat</name>
-          <file> 149</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>ICCARM</name>
-          <file> 164 82 48 22 76 68 50 60 39 54 56 29 34 12 167 165 1 153 157 159 161 113 91 86 90 104 111 117 116</file>
-        </tool>
-        <tool>
-          <name>BICOMP</name>
-          <file> 22 82 48 117 159 104 68 164 91 111 116 167 56 76 39 54 34 29 153 113 165 12 50 60 1 157 161 86 90</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\Drivers\usart\usart.c</name>
-      <outputs>
-        <tool>
-          <name>ICCARM</name>
-          <file> 49 143</file>
-        </tool>
-        <tool>
-          <name>BICOMP</name>
           <file> 61</file>
         </tool>
-        <tool>
-          <name>__cstat</name>
-          <file> 21</file>
-        </tool>
       </outputs>
       <inputs>
         <tool>
-          <name>ICCARM</name>
-          <file> 164 82 48 22 76 68 50 60 39 54 56 29 34 12 167 165 1 153 157 159 161 113 133 23 13 142 115</file>
+          <name>BICOMP</name>
+          <file> 121 139 148 48 17 0 84 59 24 153 83 126 128 134 46 80 43 66 19 156 122 2</file>
         </tool>
         <tool>
-          <name>BICOMP</name>
-          <file> 34 167 113 76 142 22 39 54 29 153 164 133 115 82 48 56 68 159 23 165 12 50 60 1 157 161 13</file>
+          <name>ICCARM</name>
+          <file> 128 139 84 59 48 80 43 153 17 66 19 24 83 156 46 148 134 121 122 126 2 0</file>
         </tool>
       </inputs>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\sdWorker.c</name>
+      <name>$PROJ_DIR$\..\..\Drivers\STM32F10x_StdPeriph_Driver\src\stm32f10x_dma.c</name>
       <outputs>
         <tool>
-          <name>ICCARM</name>
-          <file> 47 37</file>
+          <name>BICOMP</name>
+          <file> 154</file>
         </tool>
         <tool>
-          <name>BICOMP</name>
-          <file> 79</file>
+          <name>ICCARM</name>
+          <file> 36 72</file>
         </tool>
         <tool>
           <name>__cstat</name>
-          <file> 132</file>
+          <file> 35</file>
         </tool>
       </outputs>
       <inputs>
         <tool>
-          <name>ICCARM</name>
-          <file> 133 22 76 68 50 60 39 54 23 13 91 86 48 90 95 102 97 101 99 165 1 164 82 56 29 34 12 167 153 157 159 161 113 112 117</file>
-        </tool>
-        <tool>
           <name>BICOMP</name>
-          <file> 22 68 153 99 13 48 102 113 167 95 117 23 39 54 76 97 159 164 29 91 101 112 50 60 86 90 165 1 157 161 82 56 133 12 34</file>
+          <file> 121 84 134 48 139 59 80 17 0 126 148 46 153 83 24 43 66 19 156 122 2 128</file>
         </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\Drivers\stmSPI\spi.c</name>
-      <outputs>
         <tool>
           <name>ICCARM</name>
-          <file> 16 66</file>
-        </tool>
-        <tool>
-          <name>BICOMP</name>
-          <file> 135</file>
-        </tool>
-        <tool>
-          <name>__cstat</name>
-          <file> 72</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>ICCARM</name>
-          <file> 133 22 76 68 50 60 39 54 23 13 142 48 114 164 82 56 29 34 12 167 165 1 153 157 159 161 113 111</file>
-        </tool>
-        <tool>
-          <name>BICOMP</name>
-          <file> 1 13 68 164 22 76 48 23 39 54 167 56 161 142 114 111 50 60 82 29 157 133 165 12 34 153 159 113</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\Drivers\STM32F10x_StdPeriph_Driver\src\stm32f10x_rcc.c</name>
-      <outputs>
-        <tool>
-          <name>ICCARM</name>
-          <file> 41 46</file>
-        </tool>
-        <tool>
-          <name>BICOMP</name>
-          <file> 28</file>
-        </tool>
-        <tool>
-          <name>__cstat</name>
-          <file> 45</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>ICCARM</name>
-          <file> 157 164 82 48 22 76 68 50 60 39 54 56 29 34 12 167 165 1 153 159 161 113</file>
-        </tool>
-        <tool>
-          <name>BICOMP</name>
-          <file> 167 12 164 22 50 29 157 82 48 165 76 60 1 161 56 68 39 54 34 153 159 113</file>
+          <file> 121 139 84 59 48 80 43 153 17 66 19 24 83 156 46 148 134 122 126 2 0 128</file>
         </tool>
       </inputs>
     </file>
@@ -595,47 +285,286 @@
       <outputs>
         <tool>
           <name>AARM</name>
-          <file> 140</file>
+          <file> 70</file>
         </tool>
       </outputs>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\..\Drivers\STM32F10x_StdPeriph_Driver\src\stm32f10x_spi.c</name>
+      <name>$PROJ_DIR$\Release\Exe\stm32gpu.out</name>
       <outputs>
         <tool>
-          <name>ICCARM</name>
-          <file> 134 64</file>
+          <name>OBJCOPY</name>
+          <file> 73</file>
         </tool>
         <tool>
-          <name>BICOMP</name>
-          <file> 2</file>
-        </tool>
-        <tool>
-          <name>__cstat</name>
-          <file> 6</file>
+          <name>ILINK</name>
+          <file> 141</file>
         </tool>
       </outputs>
       <inputs>
         <tool>
-          <name>ICCARM</name>
-          <file> 159 164 82 48 22 76 68 50 60 39 54 56 29 34 12 167 165 1 153 157 161 113</file>
-        </tool>
-        <tool>
-          <name>BICOMP</name>
-          <file> 153 82 39 54 76 29 164 48 12 34 113 157 167 165 68 22 159 56 50 60 1 161</file>
+          <name>ILINK</name>
+          <file> 64 42 65 53 27 13 20 166 90 79 9 34 92 169 70 72 137 15 76 160 60 96 8 47 62 162 32</file>
         </tool>
       </inputs>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\main.c</name>
+      <name>$PROJ_DIR$\..\..\Drivers\CMSIS\CM3\startup_stm32f10x_hd.s</name>
       <outputs>
         <tool>
-          <name>ICCARM</name>
-          <file> 131 36</file>
+          <name>AARM</name>
+          <file> 91</file>
         </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\Drivers\CMSIS\CM3\DeviceSupport\ST\STM32F10x\system_stm32f10x.c</name>
+      <outputs>
         <tool>
           <name>BICOMP</name>
-          <file> 128</file>
+          <file> 164</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 74 60</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 31</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 128 59 24 156 84 66 19 80 83 122 30 5 48 43 2 25 46 153 17 121 126 0</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 30 84 59 48 80 43 153 17 66 19 24 83 156 46 5 25 121 122 126 2 0 128</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\Drivers\CMSIS\CM3\startup_stm32f10x_md.s</name>
+      <outputs>
+        <tool>
+          <name>AARM</name>
+          <file> 70</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\Drivers\CMSIS\CM3\system_stm32f10x.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 164</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 60</file>
+        </tool>
+      </outputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\Drivers\stmSPI\spi.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 89</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 52 92</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 142</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 48 84 121 153 139 167 66 59 26 17 80 24 0 75 129 108 43 19 148 83 126 87 134 46 156 122 2 128</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 87 48 80 43 153 17 66 19 26 167 75 59 129 139 84 24 83 156 46 148 134 121 122 126 2 0 128 108</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\Drivers\FatFS\sdcard_spi.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 163</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 67 9</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 40</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 48 84 43 0 139 121 156 106 26 66 19 80 114 126 59 46 83 104 23 153 17 134 122 2 128 148 33 24</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 33 48 80 43 153 17 66 19 26 23 104 114 106 134 121 139 84 59 24 83 156 46 148 122 126 2 0 128</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\Drivers\FatFS\diskio.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 159</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 155 42</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 150</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 59 48 66 19 80 139 114 126 156 106 26 43 121 0 84 46 83 104 23 153 17 134 122 2 128 148 33 24</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 33 48 80 43 153 17 66 19 26 23 104 114 106 134 121 139 84 59 24 83 156 46 148 122 126 2 0 128</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\Drivers\FatFS\ff.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 149</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 152 65</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 157</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 114 104 103 113</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 103 114 113 104</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\Drivers\gfx_tft\gfx.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 49</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 45 53</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 55</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 0 139 108 102 87 84 17 26 75 111 59 48 121 78 129 105 110 148 24 80 153 83 126 167 134 46 43 66 19 156 122 2 128</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 139 84 59 48 80 43 153 17 66 19 24 83 156 46 148 134 121 122 126 2 0 128 87 26 167 78 75 129 108 105 102 111 110</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\Drivers\ILI9341\ili9341.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 21</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 7 166</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 11</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 2 110 59 75 148 48 80 87 108 43 139 121 78 129 102 84 24 66 19 156 83 122 128 134 46 153 17 126 0 26 167</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 139 84 59 48 80 43 153 17 66 19 24 83 156 46 148 134 121 122 126 2 0 128 87 26 167 78 75 129 108 102 110</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\Drivers\gfx_tft\gfxDMA.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 93</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 81 27</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 161</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 83 19 80 139 66 59 122 105 84 156 128 121 148 24 43 48 2 134 46 153 17 126 0 78 102</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 139 84 59 48 80 43 153 17 66 19 24 83 156 46 148 134 121 122 126 2 0 128 105 78 102</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\gpuWorker.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 29</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 85 20</file>
         </tool>
         <tool>
           <name>__cstat</name>
@@ -645,149 +574,322 @@
       <inputs>
         <tool>
           <name>ICCARM</name>
-          <file> 133 22 76 68 50 60 39 54 23 13 48 164 82 56 29 34 12 167 165 1 153 157 159 161 113 91 86 90 104 111 115 114 112 107 117 108 121 0</file>
-        </tool>
-        <tool>
-          <name>BICOMP</name>
-          <file> 22 164 112 76 48 104 121 13 50 165 115 117 23 60 167 159 91 111 114 107 108 0 68 39 54 82 12 34 29 153 113 133 56 1 157 161 86 90</file>
+          <file> 87 48 80 43 153 17 66 19 26 167 139 84 59 24 83 156 46 148 134 121 122 126 2 0 128 105 78 102 110 108 123 129 119 132 117 116</file>
         </tool>
       </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\Drivers\usart\usart.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 88</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 165 8</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 57</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 46 156 148 128 80 75 66 19 83 122 139 48 87 123 84 59 134 43 2 26 24 153 17 121 126 0 167</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 139 84 59 48 80 43 153 17 66 19 24 83 156 46 148 134 121 122 126 2 0 128 87 26 167 75 123</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\Drivers\systicktimer\systicktimer.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 14</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 63 96</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 173</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 24 148 48 129 153 83 126 139 80 75 84 59 17 121 0 26 134 46 43 66 19 156 122 2 128</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 139 84 59 48 80 43 153 17 66 19 24 83 156 46 148 134 121 122 126 2 0 128 75 26 129</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\sdWorker.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 77</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 95 34</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 22</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 48 139 117 153 80 78 121 103 59 114 0 84 110 106 17 102 113 126 24 105 108 104 132 26 167 43 66 19 134 122 2 128 83 87 148 46 156</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 87 48 80 43 153 17 66 19 26 167 105 78 59 102 110 108 103 114 113 104 106 134 121 139 84 24 83 156 46 148 122 126 2 0 128 132 117</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\sprites.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 82</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 143 169</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 51</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 84 121 59 117 48 110 24 80 17 0 139 102 105 108 116 148 153 83 126 78 134 46 43 66 19 156 122 2 128</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 139 84 59 48 80 43 153 17 66 19 24 83 156 46 148 134 121 122 126 2 0 128 105 78 102 110 108 117 116</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\gpuTiles.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 71</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 44 13</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 68</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 48 80 108 2 105 133 148 24 43 139 87 110 117 84 59 66 19 156 83 122 128 134 46 153 17 121 126 0 26 167 78 102</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 139 84 59 48 80 43 153 17 66 19 24 83 156 46 148 134 121 122 126 2 0 128 87 26 167 105 78 102 110 108 117 133</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\Drivers\STM32F10x_StdPeriph_Driver\src\stm32f10x_rcc.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 38</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 54 15</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 168</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 84 139 59 48 153 83 126 148 24 17 121 0 134 46 80 43 66 19 156 122 2 128</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 126 139 84 59 48 80 43 153 17 66 19 24 83 156 46 148 134 121 122 2 0 128</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\Drivers\CMSIS\startup_stm32f10x_hd.s</name>
+      <outputs>
+        <tool>
+          <name>AARM</name>
+          <file> 91</file>
+        </tool>
+      </outputs>
     </file>
     <file>
       <name>$PROJ_DIR$\..\..\Drivers\STM32F10x_StdPeriph_Driver\src\stm32f10x_usart.c</name>
       <outputs>
         <tool>
-          <name>ICCARM</name>
-          <file> 17 69</file>
+          <name>BICOMP</name>
+          <file> 158</file>
         </tool>
         <tool>
-          <name>BICOMP</name>
-          <file> 127</file>
+          <name>ICCARM</name>
+          <file> 171 160</file>
         </tool>
         <tool>
           <name>__cstat</name>
-          <file> 88</file>
+          <file> 174</file>
         </tool>
       </outputs>
       <inputs>
         <tool>
-          <name>ICCARM</name>
-          <file> 161 164 82 48 22 76 68 50 60 39 54 56 29 34 12 167 165 1 153 157 159 113</file>
+          <name>BICOMP</name>
+          <file> 139 59 134 84 80 48 153 83 126 148 46 17 121 0 24 43 66 19 156 122 2 128</file>
         </tool>
         <tool>
-          <name>BICOMP</name>
-          <file> 12 164 48 82 22 50 29 157 167 165 76 60 1 161 56 68 39 54 34 153 159 113</file>
+          <name>ICCARM</name>
+          <file> 0 139 84 59 48 80 43 153 17 66 19 24 83 156 46 148 134 121 122 126 2 128</file>
         </tool>
       </inputs>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\..\Drivers\STM32F10x_StdPeriph_Driver\src\misc.c</name>
+      <name>$PROJ_DIR$\..\main.c</name>
       <outputs>
         <tool>
-          <name>ICCARM</name>
-          <file> 7 26</file>
+          <name>BICOMP</name>
+          <file> 56</file>
         </tool>
         <tool>
-          <name>BICOMP</name>
-          <file> 80</file>
+          <name>ICCARM</name>
+          <file> 6 90</file>
         </tool>
         <tool>
           <name>__cstat</name>
+          <file> 172</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 139 80 43 132 0 110 125 84 24 102 59 123 117 66 19 48 121 105 108 129 119 118 26 167 153 17 148 83 126 78 87 134 46 156 122 2 128</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 87 48 80 43 153 17 66 19 26 167 59 139 84 24 83 156 46 148 134 121 122 126 2 0 128 105 78 102 110 108 123 129 132 119 117 118 125</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\Drivers\STM32F10x_StdPeriph_Driver\src\stm32f10x_spi.c</name>
+      <outputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 86</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 69 76</file>
+        </tool>
+        <tool>
+          <name>__cstat</name>
+          <file> 170</file>
+        </tool>
+      </outputs>
+      <inputs>
+        <tool>
+          <name>BICOMP</name>
+          <file> 122 84 66 19 80 83 139 59 46 156 128 126 148 134 43 48 2 24 153 17 121 0</file>
+        </tool>
+        <tool>
+          <name>ICCARM</name>
+          <file> 2 139 84 59 48 80 43 153 17 66 19 24 83 156 46 148 134 121 122 126 0 128</file>
+        </tool>
+      </inputs>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\Drivers\CMSIS\startup_stm32f10x_md.s</name>
+      <outputs>
+        <tool>
+          <name>AARM</name>
           <file> 70</file>
         </tool>
       </outputs>
-      <inputs>
-        <tool>
-          <name>ICCARM</name>
-          <file> 113 164 82 48 22 76 68 50 60 39 54 56 29 34 12 167 165 1 153 157 159 161</file>
-        </tool>
-        <tool>
-          <name>BICOMP</name>
-          <file> 1 164 167 22 60 161 82 48 56 50 29 157 113 165 12 76 68 39 54 34 153 159</file>
-        </tool>
-      </inputs>
     </file>
     <file>
-      <name>$PROJ_DIR$\..\..\Drivers\STM32F10x_StdPeriph_Driver\src\stm32f10x_dma.c</name>
+      <name>$PROJ_DIR$\..\..\Drivers\CMSIS\system_stm32f10x.c</name>
       <outputs>
         <tool>
-          <name>ICCARM</name>
-          <file> 9 139</file>
+          <name>BICOMP</name>
+          <file> 164</file>
         </tool>
         <tool>
-          <name>BICOMP</name>
-          <file> 137</file>
+          <name>ICCARM</name>
+          <file> 74 60</file>
         </tool>
         <tool>
           <name>__cstat</name>
-          <file> 65</file>
+          <file> 31</file>
         </tool>
       </outputs>
       <inputs>
         <tool>
-          <name>ICCARM</name>
-          <file> 1 164 82 48 22 76 68 50 60 39 54 56 29 34 12 167 165 153 157 159 161 113</file>
+          <name>BICOMP</name>
+          <file> 128 59 46 156 84 66 19 80 83 122 139 148 134 43 48 2 24 153 17 121 126 0</file>
         </tool>
         <tool>
-          <name>BICOMP</name>
-          <file> 1 82 22 164 48 12 60 161 157 167 165 76 50 29 56 68 39 54 34 153 159 113</file>
+          <name>ICCARM</name>
+          <file> 139 84 59 48 80 43 153 17 66 19 24 83 156 46 148 134 121 122 126 2 0 128</file>
         </tool>
       </inputs>
     </file>
-    <file>
-      <name>$PROJ_DIR$\..\..\Drivers\STM32F10x_StdPeriph_Driver\src\stm32f10x_gpio.c</name>
-      <outputs>
-        <tool>
-          <name>ICCARM</name>
-          <file> 38 55</file>
-        </tool>
-        <tool>
-          <name>BICOMP</name>
-          <file> 57</file>
-        </tool>
-        <tool>
-          <name>__cstat</name>
-          <file> 30</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>ICCARM</name>
-          <file> 153 164 82 48 22 76 68 50 60 39 54 56 29 34 12 167 165 1 157 159 161 113</file>
-        </tool>
-        <tool>
-          <name>BICOMP</name>
-          <file> 161 164 48 56 60 82 22 1 157 167 50 29 153 165 12 76 68 39 54 34 159 113</file>
-        </tool>
-      </inputs>
-    </file>
-    <file>
+    <forcedrebuild>
+      <name>$PROJ_DIR$\..\..\Drivers\STM32F10x_StdPeriph_Driver\src\stm32f10x_fsmc.c</name>
+      <tool>ICCARM</tool>
+    </forcedrebuild>
+    <forcedrebuild>
       <name>$PROJ_DIR$\..\..\Drivers\CMSIS\CM3\DeviceSupport\ST\STM32F10x\system_stm32f10x.c</name>
-      <outputs>
-        <tool>
-          <name>ICCARM</name>
-          <file> 152 43</file>
-        </tool>
-        <tool>
-          <name>BICOMP</name>
-          <file> 74</file>
-        </tool>
-        <tool>
-          <name>__cstat</name>
-          <file> 129</file>
-        </tool>
-      </outputs>
-      <inputs>
-        <tool>
-          <name>ICCARM</name>
-          <file> 164 82 48 22 76 68 50 60 39 54 56 29 34 12 167 165 1 153 157 159 161 113</file>
-        </tool>
-        <tool>
-          <name>BICOMP</name>
-          <file> 113 48 12 34 82 39 54 76 29 153 164 167 165 68 22 159 56 50 60 1 157 161</file>
-        </tool>
-      </inputs>
-    </file>
+      <tool>ICCARM</tool>
+    </forcedrebuild>
+    <forcedrebuild>
+      <name>$PROJ_DIR$\..\gpuWorkerFunc.c</name>
+      <tool>ICCARM</tool>
+    </forcedrebuild>
+    <forcedrebuild>
+      <name>$PROJ_DIR$\..\..\Drivers\CMSIS\CM3\system_stm32f10x.c</name>
+      <tool>ICCARM</tool>
+    </forcedrebuild>
+    <forcedrebuild>
+      <name>$PROJ_DIR$\..\gpuWorkerV2.c</name>
+      <tool>ICCARM</tool>
+    </forcedrebuild>
+    <forcedrebuild>
+      <name>$PROJ_DIR$\..\..\Drivers\STM32F10x_StdPeriph_Driver\src\stm32f10x_sdio.c</name>
+      <tool>ICCARM</tool>
+    </forcedrebuild>
   </configuration>
 </project>
 

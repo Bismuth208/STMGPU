@@ -38,6 +38,7 @@ extern "C"{
 void init_SPI1(void);
 //void beginTrSPI(uint8_t spcr, uint8_t spsr);
 void sendData8_SPI1(uint8_t data);
+void sendArr8_SPI1(void *data, uint32_t size);
 void sendData16_SPI1(uint16_t data);
 void sendData32_SPI1(uint16_t data0, uint16_t data1);
 void sendArr16_SPI1(void *data, uint32_t size);

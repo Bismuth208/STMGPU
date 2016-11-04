@@ -17,20 +17,20 @@ If You using gpu_gfx API, it will made transformation automatically.
 
  DRW_PIXEL - code: 0x03
  func: tftDrawPixel(int16_t x, int16_t y, uint16_t color);
- Draw pixel with color on x and y positions;
+ Draw pixel with color at x and y positions;
  Example: "DRW_PIXEL, byte1 x, byte2 x, byte3 y, byte4 y, byte5 color, byte6 color".
 
 // ------------- Primitives/GFX ------------- //
  FLL_RECT - code: 0x04
  func: tftFillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
- Draw filled rectangle on x and y positions, with width and height;
+ Draw filled rectangle at x and y positions, with width and height;
  Example: "FLL_RECT, byte1 x, byte2 x, byte3 y, byte4 y, 
  byte5 w, byte6 w, byte7 h, byte8 h,
  byte9 color, byte10 color".
 
  DRW_RECT - code: 0x05
  func: tftDrawRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
- Draw rectangle on x and y positions;
+ Draw rectangle at x and y positions;
  Example: "DRW_RECT, byte1 x, byte2 x, byte3 y, byte4 y, 
  byte5 w, byte6 w, byte7 h, byte8 h,
  byte9 color, byte10 color".
@@ -105,121 +105,144 @@ If You using gpu_gfx API, it will made transformation automatically.
 
 // --------------- Font/Print --------------- //
  DRW_CHAR - code: 0x10
- func: drawChar();
- Example: "".
+ func: drawChar(int16_t x, int16_t y, uint8_t c, uint16_t fgcolor, uint16_t bgcolor, uint8_t size);
+ draw single char gliph at x and y position, with given colors and size;
+ Example: "DRW_CHAR, byte1 x0, byte2 x0, byte3 y0, byte4 y0,
+ byte5 fgcolor1, byte6 fgcolor2, byte7 bgcolor1, byte7 bgcolor2, 
+ byte8 char, byte9 size".
  
  DRW_PRNT - code: 0x11
  func: print();
- Example: "".
+ Example: "DRW_PRNT, ".
  
  DRW_PRNT_C - code: 0x12
  func: printChar();
- Example: "".
+ Example: "DRW_PRNT_C, ".
  
  DRW_PRNT_POS_C - code: 0x13
  func: printCharPos();
- Example: "".
+ Example: "DRW_PRNT_POS_C, ".
  
  SET_CURSOR - code: 0x14
  func: setCursor();
- Example: "".
+ Example: "SET_CURSOR, ".
  
  SET_TXT_CR - code: 0x15
  func: setTextColor();
- Example: "".
+ Example: "SET_TXT_CR, ".
  
  SET_TXT_CR_BG - code: 0x16
  func: setTextColorBG();
- Example: "".
+ Example: "SET_TXT_CR_BG, ".
  
  SET_TXT_SIZE - code: 0x17
  func: setTextSize();
- Example: "".
+ Example: "SET_TXT_SIZE, ".
  
  SET_TXT_WRAP - code: 0x18
  func: setTextWrap();
- Example: "".
+ Example: "SET_TXT_WRAP, ".
  
  SET_TXT_437 - code: 0x19
  func: cp437();
- Example: "".
+ Example: "SET_TXT_437, ".
 
 // ---------------- Low Level --------------- //
- SET_ADR_WIN- code: 0x20
- func: tftSetAddrWindow();
- Example: "".
+ SET_ADR_WIN - code: 0x20
+ set addr windows where TFT will draw pixels;
+ func: tftSetAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
+ Example: "SET_ADR_WIN, byte1 x0, byte2 x0, byte3 y0, byte4 y0,
+ byte5 x1, byte6 x1, byte7 y1, byte8 y1,".
  
- SET_ROTATION- code: 0x21
+ SET_ROTATION - code: 0x21
  func: tftSetRotation();
- Example: "".
+ Example: "SET_ROTATION, ".
  
- SET_SCRL_AREA- code: 0x22
+ SET_SCRL_AREA - code: 0x22
  func: tftSetScrollArea();
- Example: "".
+ Example: "SET_SCRL_AREA, ".
  
- WRT_CMD- code: 0x23
- func: writeCommand();
- Example: "".
+ WRT_CMD - code: 0x23
+ send byte cmd direct to TFT display;
+ func: writeCommand(uint8_t cmd);
+ Example: "WRT_CMD, byte1 cmd".
  
- WRT_DATA- code: 0x24
- func: writeData();
- Example: "".
+ WRT_DATA - code: 0x24
+ send byte data direct to TFT display;
+ func: writeData(uint8_t data);
+ Example: "WRT_DATA, byte1 data".
  
  WRT_DATA_U16 - code: 0x25
- func: writeWordData();
- Example: "".
+ send word data direct to TFT display;
+ func: writeWordData(uint16_t data);
+ Example: "WRT_DATA_U16, byte1 data, byte2 data".
  
  SET_V_SCRL_ADR - code: 0x26
  func: tftScrollAddress();
- Example: "".
+ Example: "SET_V_SCRL_ADR, ".
  
  SET_SLEEP - code: 0x27
  func: tftSetSleep();
- Example: "".
+ Example: "SET_SLEEP, ".
  
  SET_IDLE - code: 0x28
  func: tftSetIdleMode();
- Example: "".
+ Example: "SET_IDLE, ".
  
  SET_BRIGHTNES - code: 0x29
- func: tftSetDispBrightness();
- Example: "".
+ set brightness level from 0 to 255;
+ func: tftSetDispBrightness(uint8_t level);
+ Example: "SET_BRIGHTNES, byte1 level".
  
  SET_INVERTION - code: 0x2A
- func: tftSetInvertion();
- Example: "".
+ enable or disable inversion mode;
+ func: tftSetInvertion(uint8_t state);
+ Example: "SET_INVERTION, byte1 state".
  
  MAK_SCRL - code: 0x2C
  func: tftScroll();
- Example: "".
+ Example: "MAK_SCRL, ".
  
  MAK_SCRL_SMTH - code: 0x2D
  func: tftScrollSmooth();
- Example: "".
+ Example: "MAK_SCRL_SMTH, ".
  
  PSH_CR - code: 0x2E
- func: tftPushColor();
- Example: "".
+ push color directly to TFT display;
+ func: tftPushColor(uint16_t color);
+ Example: "PSH_CR, byte1 color, byte2 color".
  
 
-// --------------- Tile/Sprite -------------- //
+// ------------------- Tile ----------------- //
  LDD_TLE_8 - code: 0x30
- Load tile 8x8 size from SD
- func: SDLoadTileFromSet8x8();
- Example: "".
+ Load tile with 8x8 size from SD card
+ func: SDLoadTileFromSet8x8(uint8_t *tileSetArrName, uint8_t tileSetW, uint8_t ramTileNum, uint8_t tileNum);
+ First sequence:
+ Example: "LDD_TLE_8, byte1 arrNameSize, byte2 tileSetW, byte3 ramTileBase, byte4 tileNum";
+ Second sequence:
+ Example: "file name byte array";
  
  LDD_TLES_8 - code: 0x31
- Load tiles 8x8 size from SD
- func: SDLoadTileSet8x8();
- Example: "".
+ Load tiles with 8x8 size from SD card
+ func: SDLoadTileSet8x8(uint8_t *tileSetArrName, uint8_t tileSetW, uint8_t ramTileBase, uint8_t tileMax);
+ First sequence:
+ Example: "LDD_TLES_8, byte1 arrNameSize, byte2 tileSetW, byte3 ramTileBase, byte4 tileMax";
+ Second sequence:
+ Example: "file name byte array";
  
  LDD_TLES_RG_8 - code: 0x32
- Load region of tiles 8x8 size from SD
- func: SDLoadRegionOfTileSet8x8();
- Example: "".
+ Load region of tiles with 8x8 size from SD card
+ func: SDLoadRegionOfTileSet8x8(uint8_t *tileSetArrName, uint8_t tileSetW, uint8_t ramTileBase, uint8_t tileMin, uint8_t tileMax);
+ First sequence:
+ Example: "LDD_TLES_RG_8, byte1 arrNameSize, byte2 tileSetW, byte3 ramTileBase, byte4 tileMin, byte5 tileMax";
+ Second sequence:
+ Example: "file name byte array";
  
  DRW_TLE_8_POS - code: 0x33
- Draw tile 8x8 size on TFT screen
- func: drawTile8x8();
- Example: "".
+ Draw tile with 8x8 size on TFT screen
+ func: drawTile8x8(int16_t posX, int16_t posY, uint8_t tileNum);
+ Example: "DRW_TLE_8_POS, byte1 x0, byte2 x0, byte3 y0, byte4 y0, byte5 tileNum".
+ 
+ // ----------------- Sprite ----------------- //
+ 
  

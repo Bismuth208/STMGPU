@@ -1,3 +1,16 @@
+v.0.1.4 - Finally add bmp 24 bit/px draw support;
+		- remove a tons of waste in CMSIS folder;
+		- fixed stupid critical mistakes for stm32 in:
+ 			- tftFillRect();
+ 			- drawChar();
+ 			- tftDrawFastVLine();
+ 			- tftDrawFastHLine();
+		- add a lot of stuff for pure Arduino lib;
+		- describe commands a little more;
+		- add test bmp pics for SD card;
+		- update only stm32gpu_USART_1MBaud.bin in Software_BSY;
+		- little cleanup in libs;
+
 v.0.1.3 - remove rudiment avr legacy in Drivers for stm32;
 		- add loading, drawing tilemap;
 		- add sprites (1x1, 1x2, 2x1, 2x2 for 8px tiles);

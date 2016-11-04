@@ -7,13 +7,18 @@
 * Author: Alexandr Antonov (Bismuth208)
 * Created:  11.9.2015
 */
+
+#include <stm32f10x.h>
+
 #include <stdlib.h>
 #include "systicktimer.h"
 
 static __IO uint32_t systemCurrentMilis = 0;
 
+#if USE_USER_FUNCTION
 void (*pUserRunTimeFunc)(void) = NULL;
 static __IO uint8_t usrTimeOutCheck =0;
+#endif
 
 //==========================================//
 void _delayMS(__IO uint32_t delayTime)
@@ -27,16 +32,18 @@ uint32_t _uptime(void)
   return systemCurrentMilis;
 }
 
+#if USE_USER_FUNCTION
 void SysTimerSetRuntine(void (*pFunc)(void))
 {
   pUserRunTimeFunc = pFunc;
 }
+#endif
  
 void SysTick_Handler(void)
 {
   ++systemCurrentMilis;
 
-#if 0
+#if USE_USER_FUNCTION
   if(pUserRunTimeFunc != NULL) {
     if((++usrTimeOutCheck) >= PERIOD_CHECK_USER_FUNC) {
       usrTimeOutCheck=0;

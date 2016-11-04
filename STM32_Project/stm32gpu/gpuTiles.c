@@ -37,30 +37,58 @@ uint8_t rearBackGround[BACKGROUND_SIZE] = {0};
 //uint8_t frontBackGround[BACKGROUND_SIZE_W][BACKGROUND_SIZE_H] = {0, 0};
 
 // total: 512
-uint16_t userPaletteArr[USER_PALETTE_SIZE]; // user can specify max 256 colors
-
-const uint16_t *pCurrentPalette;
+uint16_t currentPaletteArr[USER_PALETTE_SIZE]; // user can specify max 256 colors
 
 // -------------------------------------------------------- //
 
-void setCurrentPalette(const uint16_t *pNewPalette)
+void loadDefaultPalette(void)
 {
-  pCurrentPalette = pNewPalette;
+  for(uint8_t count=0; count <80; count++) {
+    currentPaletteArr[count] = nesPalette_ext[count]; // extended NES palette
+  }   
 }
 
-// -------------------------------------------------------- //
-
-// return the pointer to given tile array number
-uint8_t *getArrTilePointer8x8(uint8_t tileNum)
+#if 0
+void loadLogoTileSet(uint8_t tileSetSize, uint8_t tileSetW, const uint8_t *pTileSet)
 {
-  return tileArr8x8[tileNum];
+  uint8_t count =0;
+  uint8_t tileNum=0;
+  uint8_t tileYcnt, tileXcnt;
+  
+  uint16_t tileNumOffsetX = (tileNum % tileSetW)*TILE_BASE_SIZE;     // start position
+  uint16_t tileNewLineOffsetY = tileSetW*TILE_BASE_SIZE;       // offset for new scanline
+  
+  uint16_t offset = ((tileNum)  / (tileSetW)) * (tileSetW * TILE_ARR_8X8_SIZE);
+  
+  for(; tileNum <= tileSetSize; tileNum++) {
+    
+    for(tileYcnt = 0; tileYcnt < TILE_BASE_SIZE; tileYcnt++) { // Y
+      for(tileXcnt =0; tileXcnt < TILE_BASE_SIZE; tileXcnt++) { // X
+        tileArr8x8[tileNum][count] = pTileSet[tileNumOffsetX + tileXcnt + offset]; // read single line in X pos
+        ++count;
+      }
+      offset += tileNewLineOffsetY;
+    }
+    
+    count =0;
+    offset = ((tileNum)  / (tileSetW)) * (tileSetW * TILE_ARR_8X8_SIZE);
+    tileNumOffsetX = (tileNum % tileSetW)*TILE_BASE_SIZE;     // start position
+    
+  }
 }
+#else
 
-uint8_t *getMapArrPointer(void)
+void loadLogoTileSet(uint8_t tileSetSize, uint8_t tileSetW, const uint8_t *pTileSet)
 {
-  return rearBackGround;
+  
+  for(uint8_t tileNum=0; tileNum <= tileSetSize; tileNum++) {
+    loadTile8x8(tileNum, tileSetW, tileArr8x8[tileNum], pTileSet);
+  }
+  
 }
+#endif
 
+#if 1
 void loadTile8x8(uint8_t tileNum, uint8_t tileSetW, uint8_t *pTile, const uint8_t *pTileSet)
 {
   uint8_t count =0;
@@ -79,34 +107,22 @@ void loadTile8x8(uint8_t tileNum, uint8_t tileSetW, uint8_t *pTile, const uint8_
     offset += tileNewLineOffsetY;
   }
 }
+#endif
+// -------------------------------------------------------- //
+
+// return the pointer to given tile array number
+uint8_t *getArrTilePointer8x8(uint8_t tileNum)
+{
+  return tileArr8x8[tileNum];
+}
+
+uint8_t *getMapArrPointer(void)
+{
+  return rearBackGround;
+}
 
 void drawTile8x8(int16_t posX, int16_t posY, uint8_t tileNum)
 {
-#if 0
-    // first set addr window (this is protection for DMA buffer data)
-  tftSetAddrWindow(posX, posY, posX+7, posY+7);
-  
-  // little trick, if tile same, just redraw it
-  if((lastTileStruct8x8.drawed) && (lastTileStruct8x8.lasttileNum == tileNum)) {
-
-    sendData16_DMA1_SPI1(lastTileStruct8x8.pLastTileArr, TILE_ARR_8X8_SIZE);
-    
-  } else {
-    uint8_t colorTileIdx;
-    
-    lastTileStruct8x8.drawed = 1;
-    lastTileStruct8x8.lasttileNum = tileNum;
-    
-    for(uint16_t count =0; count < TILE_ARR_8X8_SIZE; count++) {
-      // convert colors from current palette to RGB565 color space
-      colorTileIdx = tileArr8x8[tileNum][count];
-      lastTileStruct8x8.pLastTileArr[count] = pCurrentPalette[colorTileIdx];
-    }
- 
-    sendData16_DMA1_SPI1(lastTileStruct8x8.pLastTileArr, TILE_ARR_8X8_SIZE);
-  }
-  
-#else
   // little trick, if tile same, just redraw it
   if((lastTileStruct8x8.drawed == 0) || (lastTileStruct8x8.lasttileNum != tileNum)) {
     
@@ -118,40 +134,15 @@ void drawTile8x8(int16_t posX, int16_t posY, uint8_t tileNum)
     for(uint16_t count =0; count < TILE_ARR_8X8_SIZE; count++) {
       // convert colors from current palette to RGB565 color space
       colorTileIdx = tileArr8x8[tileNum][count];
-      lastTileStruct8x8.pLastTileArr[count] = pCurrentPalette[colorTileIdx];
+      lastTileStruct8x8.pLastTileArr[count] = currentPaletteArr[colorTileIdx];
     }
   }
   
   tftSetAddrWindow(posX, posY, posX+7, posY+7);
   sendData16_DMA1_SPI1(lastTileStruct8x8.pLastTileArr, TILE_ARR_8X8_SIZE);
-#endif
-}
-
-void repeatTile8x8(int16_t posX, int16_t posY)
-{
-  // first set addr window (this is protection for DMA buffer data)
-  tftSetAddrWindow(posX, posY, posX+7, posY+7);
-  sendData16_DMA1_SPI1(lastTileStruct8x8.pLastTileArr, TILE_ARR_8X8_SIZE);
 }
 
 // -------------------------------------------------------- //
-
-void loadTileSet(uint8_t tileSetSize, uint8_t tileSetW, const uint8_t *pTileSet, uint8_t tileSize)
-{
-  void (*pLoadTileFunc)(uint8_t, uint8_t, uint8_t *, const uint8_t *);
-  
-  if(tileSize == 1) {
-    pLoadTileFunc = loadTile8x8;
-  }/* else if(tileSize == 2) {
-    pLoadTileFunc = ;
-  } else if(tileSize == 3) {
-    pLoadTileFunc = loadTile16x16;
-  } */
-  
-  for(uint8_t count =0; count <= tileSetSize; count++) {
-    pLoadTileFunc(count, tileSetW, tileArr8x8[count], pTileSet);
-  }
-}
 
 void drawBackgroundMap(void)
 {

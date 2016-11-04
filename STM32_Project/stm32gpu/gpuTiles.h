@@ -44,23 +44,22 @@ extern "C"{
     uint16_t *pLastTileArr;       // pointer to last tile array
   } lastTile_t;
   
-  extern const uint16_t *pCurrentPalette;
+  extern uint16_t currentPaletteArr[USER_PALETTE_SIZE];
   
   //extern uint8_t tileArr8x8[TILES_NUM_8x8][TILE_ARR_8X8_SIZE];
   //extern uint8_t tileArr16x16[TILES_NUM_16x16][TILE_ARR_16X16_SIZE];
   
   // -------------------------------------------------------- //
   
-  void setCurrentPalette(const uint16_t *newPalette);
+  void loadDefaultPalette(void);
+  void loadTile8x8(uint8_t tileNum, uint8_t tileSetW, uint8_t *pTile, const uint8_t *pTileSet);
+  void loadLogoTileSet(uint8_t tileSetSize, uint8_t tileSetW, const uint8_t *pTileSet);
   
   uint8_t *getArrTilePointer8x8(uint8_t tileNum);
   
   void loadTile8x8(uint8_t tileNum, uint8_t tileSetW, uint8_t *pTile, const uint8_t *pTileSet);
-  void loadTileSet(uint8_t tileSetSize, uint8_t tileSetW, const uint8_t *pTileSet, uint8_t tileSize);
   
   void drawTile8x8(int16_t posX, int16_t posY, uint8_t tileNum);
-  
-  void repeatTile8x8(int16_t posX, int16_t posY);
   
   void drawBackgroundMap(void);
   

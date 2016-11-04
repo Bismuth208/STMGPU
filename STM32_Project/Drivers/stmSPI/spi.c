@@ -137,6 +137,17 @@ void sendData32_SPI1(uint16_t data0, uint16_t data1)
 #endif
 }
 
+void sendArr8_SPI1(void *data, uint32_t size)
+{
+  for(uint32_t count =0; count < size; count++) {
+    WAIT_FREE_TX;
+    SPI1->DR = ((uint8_t*)data)[count];
+  }
+  
+  WAIT_FREE_TX;
+  WAIT_FOR_BSY;
+}
+
 void sendArr16_SPI1(void *data, uint32_t size)
 {
   SET_BIT(SPI1->CR1, SPI_DataSize_16b);

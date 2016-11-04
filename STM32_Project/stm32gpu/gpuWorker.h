@@ -169,11 +169,11 @@ typedef struct {
 #define DRW_TLE_8_POS   0x33    // draw tile 8x8 size on TFT screen
 #define LDD_TLE_MAP     0x34    // load background tile map 8x8 from SD
 #define DRW_TLE_MAP     0x35    // draw background tile map 8x8 on TFT screen
-//#define DRW_TLE_SCR     0x36    // draw tile screen on TFT screen
-//#define MAK_METTLE      0x37    // group tiles to metatile
-//#define DRW_METTLE_SCR  0x38    // draw metatile on screen
-//#define DRW_METTLE_POS  0x39    // draw metatile in tile screen
-//#define DRW_METSCR_POS  0x3A    // draw all tile screens on screen
+//#define NOT_USED        0x36
+//#define NOT_USED        0x37
+//#define NOT_USED        0x38
+//#define NOT_USED        0x39
+//#define NOT_USED        0x3A
 //#define NOT_USED        0x3B
 //#define NOT_USED        0x3C
 //#define NOT_USED        0x3D
@@ -202,7 +202,7 @@ typedef struct {
 
 // ----------------- SD card ---------------- //
 #define LDD_USR_PAL     0x50    // load user palette from SD card
-//#define NOT_USED        0x51
+#define DRW_MBP_FIL     0x51    // draw bmp file located on SD card
 //#define NOT_USED        0x52
 //#define NOT_USED        0x53
 //#define NOT_USED        0x54
@@ -220,10 +220,10 @@ typedef struct {
 
 
 // --------------- GUI commands -------------- //
-//#define SET_WND_CR        0x60          // Set window colors
-//#define DRW_WND        0x61           // draw window
-//#define DRW_WND_TXT        0x62       // draw window whith text
-//#define NOT_USED        0x63
+#define SET_WND_CR      0x60    // Set window colors
+#define DRW_WND         0x61    // draw window
+#define DRW_WND_TXT     0x62    // draw window whith text
+#define DRW_BTN_NUM     0x63    // draw numerated buttons
 //#define NOT_USED        0x64
 //#define NOT_USED        0x65
 //#define NOT_USED        0x66
