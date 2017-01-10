@@ -22,10 +22,17 @@
 
 #define BUFFPIXELCOUNT 160
 
+//===========================================================================//
+
 //uint8_t buffer[2 * BUFFPIXELCOUNT]; // pixel buffer (contains already formatted data for ILI9341 display)
 uint8_t  sdbuffer[3 * BUFFPIXELCOUNT]; // pixel in buffer (R+G+B per pixel)
 uint16_t lcdbuffer[BUFFPIXELCOUNT];  // pixel out buffer (16-bit per pixel)
 
+
+const char bmpExtension[] = ".bmp";
+const char palExtension[] = ".pal";
+const char tleExtension[] = ".tle";
+const char mapExtension[] = ".map";
 
 //===========================================================================//
 
@@ -55,16 +62,16 @@ void init_sdCard(void)
   }
 }
 
-// tileSetArrName       - name of tile set array on SD card
-// tileSetW             - width in NUMBER of tiles in tile set
-// ramTileNum           - tile number in ram, where to store loaded tile
-// tileNum              - number of tile in tile set which must me loaded from SD card
-void SDLoadTileFromSet8x8(uint8_t *tileSetArrName, uint8_t tileSetW, uint8_t ramTileNum, uint8_t tileNum)
-//void SDLoadTileFromSet8x8(uint8_t *tileSetArrName, tileParam_t *params)
+void SDLoadTileFromSet8x8(void *tileSetArrName, uint8_t *pData)
 {
   /*
   * This function load single Tile from Tileset located in SD card
   * and store loaded data to RAM
+  *
+  * tileSetArrName  - name of tile set array on SD card
+  * tileSetW        - width in NUMBER of tiles in tile set
+  * ramTileNum      - tile number in ram, where to store loaded tile
+  * tileNum         - number of tile in tile set which must me loaded from SD card
   */
   
   UINT cnt;
@@ -76,9 +83,14 @@ void SDLoadTileFromSet8x8(uint8_t *tileSetArrName, uint8_t tileSetW, uint8_t ram
   uint16_t tileNewLineOffsetY = 0;
   uint16_t offset = 0;
   
+  strcat( (char*)tileSetArrName, tleExtension );
   result = f_open(&File, (char*)tileSetArrName, FA_OPEN_EXISTING | FA_READ);
   
   if(result == FR_OK) {
+    
+    uint8_t tileSetW = *pData++;
+    uint8_t ramTileNum = *pData++;
+    uint8_t tileNum = *pData++;
     
     uint8_t *pTileArr = getArrTilePointer8x8(ramTileNum);
     
@@ -106,17 +118,17 @@ void SDLoadTileFromSet8x8(uint8_t *tileSetArrName, uint8_t tileSetW, uint8_t ram
   f_close(&File);
 }
 
-// tileSetArrName       - name of tile set array on SD card
-// tileSetW             - width in NUMBER of tiles in tile set
-// ramTileBase          - base tile number in ram, where to start store loaded tiles 
-// tileMax              - number of tiles in tile set which must me loaded from SD card
-void SDLoadTileSet8x8(uint8_t *tileSetArrName, uint8_t tileSetW, uint8_t ramTileBase, uint8_t tileMax)
-//void SDLoadTileSet8x8(uint8_t *tileSetArrName, tileParam_t *params)
+void SDLoadTileSet8x8(void *tileSetArrName, uint8_t *pData)
 {
   /*
   * This function load tileMax tiles from Tileset at 0 position,
   * and located in SD card;
   * Store loaded data to RAM from ramTileBase to (ramTileBase + tileMax);
+  *
+  * tileSetArrName  - name of tile set array on SD card
+  * tileSetW        - width in NUMBER of tiles in tile set
+  * ramTileBase     - base tile number in ram, where to start store loaded tiles
+  * tileMax         - number of tiles in tile set which must me loaded from SD card
   */
   
   UINT cnt;
@@ -128,11 +140,15 @@ void SDLoadTileSet8x8(uint8_t *tileSetArrName, uint8_t tileSetW, uint8_t ramTile
   uint16_t tileNewLineOffsetY = 0;
   uint16_t offset = 0;
   
+  strcat( (char*)tileSetArrName, tleExtension );
   result = f_open(&File, (char*)tileSetArrName, FA_OPEN_EXISTING | FA_READ);
   
   if(result == FR_OK) {
     
-    uint8_t *pTileArr =0;
+    uint8_t *pTileArr = NULL;
+    uint8_t tileSetW = *pData++;
+    uint8_t ramTileBase = *pData++;
+    uint8_t tileMax = *pData++;
     
     tileNewLineOffsetY = tileSetW*TILE_BASE_SIZE;       // offset for new scanline
     
@@ -164,18 +180,18 @@ void SDLoadTileSet8x8(uint8_t *tileSetArrName, uint8_t tileSetW, uint8_t ramTile
   f_close(&File);
 }
 
-// tileSetArrName       - name of tile set array on SD card
-// tileSetW             - width in NUMBER of tiles in tile set
-// ramTileBase          - base tile number in ram, where to start store loaded tiles
-// tileMin              - base tile number in tile set whee loadindg start
-// tileMax              - number of tiles in tile set which must be loaded from SD card
-void SDLoadRegionOfTileSet8x8(uint8_t *tileSetArrName, uint8_t tileSetW, uint8_t ramTileBase, uint8_t tileMin, uint8_t tileMax)
-//void SDLoadRegionOfTileSet8x8(uint8_t *tileSetArrName, tileParam_t *params)
+void SDLoadRegionOfTileSet8x8(void *tileSetArrName, uint8_t *pData)
 {
   /*
   * This function load selected region of tiles from Tileset located in SD card.
   * Tiles load from tileMin position, to tileMax position;
   * Store loaded data to RAM from ramTileBase to (ramTileBase + tileMax);
+  *
+  * tileSetArrName  - name of tile set array on SD card
+  * tileSetW        - width in NUMBER of tiles in tile set
+  * ramTileBase     - base tile number in ram, where to start store loaded tiles
+  * tileMin         - base tile number in tile set where loading start
+  * tileMax         - number of tiles in tile set which must be loaded from SD card
   */
   
   UINT cnt;
@@ -187,11 +203,16 @@ void SDLoadRegionOfTileSet8x8(uint8_t *tileSetArrName, uint8_t tileSetW, uint8_t
   uint16_t tileNewLineOffsetY = 0;
   uint16_t offset = 0;
   
+  strcat( (char*)tileSetArrName, tleExtension );
   result = f_open(&File, (char*)tileSetArrName, FA_OPEN_EXISTING | FA_READ);
   
   if(result == FR_OK) {
     
     uint8_t *pTileArr =0;
+    uint8_t tileSetW = *pData++;
+    uint8_t ramTileBase = *pData++;
+    uint8_t tileMin = *pData++;
+    uint8_t tileMax = *pData++;
     
     tileNewLineOffsetY = tileSetW*TILE_BASE_SIZE;       // offset for new scanline
     
@@ -224,8 +245,9 @@ void SDLoadRegionOfTileSet8x8(uint8_t *tileSetArrName, uint8_t tileSetW, uint8_t
 }
 
 
-void SDLoadTileMap(uint8_t *tileMapArrName)
+void SDLoadTileMap(void *tileMapArrName)
 {
+  strcat( (char*)tileMapArrName, mapExtension );
   result = f_open(&File, (char*)tileMapArrName, FA_OPEN_EXISTING | FA_READ);
   
   if(result == FR_OK) {
@@ -241,6 +263,38 @@ void SDLoadTileMap(uint8_t *tileMapArrName)
       
       f_lseek (&File, tileCount);
     }
+  } else {
+    // TODO: add some error code when return
+    return;
+  }
+  
+  f_close(&File);
+}
+
+
+void SDLoadPalette(void *palleteArrName)
+{
+  UINT cnt;
+  
+  strcat( (char*)palleteArrName, palExtension );
+  result = f_open(&File, (char*)palleteArrName, FA_OPEN_EXISTING | FA_READ);
+  
+  if(result == FR_OK) {
+    uint8_t  r, g, b;
+    uint16_t colors = File.fsize /3;
+    
+    if(colors <= 255) {
+      
+      f_read(&File, sdbuffer, File.fsize, &cnt);
+      
+      for(uint16_t count =0; count<colors; count++) {
+        r = sdbuffer[3 * count];
+        g = sdbuffer[3 * count + 1];
+        b = sdbuffer[3 * count + 2];
+        currentPaletteArr[count] = color565(r, g, b);
+      } 
+    }
+    
   } else {
     // TODO: add some error code when return
     return;
@@ -266,33 +320,106 @@ uint16_t read16(FIL *f)
 uint32_t read32(FIL *f)
 {
   UINT cnt;
-  uint32_t result32 =0;
-  uint8_t result8[4];
+  union uResult_t {
+    uint8_t resultArr[4];
+    uint32_t result32;
+  } uResult;
   
-  f_read (f, (char*)result8, 4, &cnt);
+  f_read (f, (char*)uResult.resultArr, 4, &cnt);
   
-  result32 = (uint32_t)((result8[3] <<24) | (result8[2] <<16)
-                        |(result8[1] <<8) | result8[0]);
-  
-  return result32;
+  return uResult.result32;
 }
 
-void SDPrintBMP(uint16_t x, uint16_t y, const char* name)
+void drawBMP24(uint16_t w, uint16_t h, int32_t bmpWidth, int32_t bmpHeight, bool flip, uint32_t bmpImageoffset)
 {
   UINT cnt;
+  uint8_t  r, g, b;
   
+  // BMP rows are padded (if needed) to 4-byte boundary
+  // Not always = bmpWidth; may have padding
+  uint32_t rowSize = (bmpWidth * 3 + 3) & ~3;
+  uint32_t pos = 0;
+  
+  for (uint16_t row = 0; row < h; row++) { // For each scanline...
+    // Seek to start of scan line.  It might seem labor-
+    // intensive to be doing this on every line, but this
+    // method covers a lot of gritty details like cropping
+    // and scanline padding.  Also, the seek only takes
+    // place if the file position actually needs to change
+
+    if (flip) // Bitmap is stored bottom-to-top order (normal BMP)
+      pos = bmpImageoffset + (bmpHeight - 1 - row) * rowSize;
+    else     // Bitmap is stored top-to-bottom
+      pos = bmpImageoffset + row * rowSize;
+    
+    if (File.fptr != pos) { // Need seek?
+      f_lseek (&File, pos);
+    }
+    
+    for (uint16_t col = 0; col < w; col += BUFFPIXELCOUNT) {
+      // read pixels into the buffer
+      f_read(&File, sdbuffer, 3 * BUFFPIXELCOUNT, &cnt);
+      
+      // convert color
+      for (int p = 0; p < BUFFPIXELCOUNT; p++) {
+        b = sdbuffer[3 * p];
+        g = sdbuffer[3 * p + 1];
+        r = sdbuffer[3 * p + 2];
+        lcdbuffer[p] = color565(r, g, b);
+      }
+      // push buffer to TFT
+      sendData16_Fast_DMA1_SPI1(lcdbuffer, BUFFPIXELCOUNT);
+    }
+  }
+}
+
+#if 0
+void drawBMP16()
+{
+  
+  f_lseek (&File, headerSize+1); // skip header
+  
+  uint32_t totalPixels = bmpWidth*bmpHeight;
+  uint16_t numFullBufferRuns = totalPixels / BUFFPIXELCOUNT;
+  for (uint32_t p = 0; p < numFullBufferRuns; p++) {
+    // read pixels into the buffer
+    f_read(&File, buffer, 2*BUFFPIXELCOUNT, &cnt);
+    
+    //for(uint16_t pxCount=0; pxCount <BUFFPIXELCOUNT-1; pxCount++) {
+    //lcdbuffer[pxCount] = ( buffer[pxCount]<<8 | (buffer[pxCount+1]));
+    //}
+    
+    // push them to the diplay
+    sendArr8_SPI1(buffer, BUFFPIXELCOUNT);
+  }
+  
+  // render any remaining pixels that did not fully fit the buffer
+  uint32_t remainingPixels = totalPixels % BUFFPIXELCOUNT;
+  if (remainingPixels > 0)
+  {
+    f_read(&File, buffer, 2*remainingPixels, &cnt);
+    
+    //for(uint16_t pxCount=0; pxCount <BUFFPIXELCOUNT-1; pxCount++) {
+    // lcdbuffer[pxCount] = ( buffer[pxCount]<<8 | (buffer[pxCount+1]));
+    //}
+    
+    sendArr8_SPI1(buffer, remainingPixels);
+  }
+}
+#endif
+
+void SDPrintBMP(uint16_t x, uint16_t y, void *name)
+{
   int32_t bmpWidth, bmpHeight;   // W+H in pixels
   uint8_t  bmpDepth;              // Bit depth (currently must be 24)
   uint8_t  headerSize;
   uint32_t bmpImageoffset;        // Start of image data in file
-  uint32_t rowSize;     // Not always = bmpWidth; may have padding
   bool  flip = true;        // BMP is stored bottom-to-top
-  uint16_t w, h, row, col;
-  uint8_t  r, g, b;
-  uint32_t pos = 0;
+  uint16_t w, h;
   
   if ((x >= width()) || (y >= height())) return;
   
+  strcat( (char*)name, bmpExtension );
   result = f_open(&File, (char*)name, FA_OPEN_EXISTING | FA_READ);
   
   if(result == FR_OK) {
@@ -315,7 +442,6 @@ void SDPrintBMP(uint16_t x, uint16_t y, const char* name)
         bmpHeight = read16(&File);  // 0x14
       }
       
-      
       if (read16(&File) == 1) { // must be '1'; 0x16 or 0x1A
         bmpDepth = read16(&File); // bits per pixel; 0x18 or 0x1C
         
@@ -333,103 +459,23 @@ void SDPrintBMP(uint16_t x, uint16_t y, const char* name)
         if ((y + h - 1) >= width()) h = width() - y;
         
         // Set TFT address window to clipped image bounds
-        tftSetAddrWindow(x, y, x + w - 1, y + h - 1);
+        setAddrWindow(x, y, x + w - 1, y + h - 1);
         
         if (read32(&File) == 0) { // 0 = uncompressed
-          
           if (bmpDepth == 24) {	// standard 24bit bmp
-            
-            // BMP rows are padded (if needed) to 4-byte boundary
-            rowSize = (bmpWidth * 3 + 3) & ~3;
-            
-            for (row = 0; row < h; row++) { // For each scanline...
-              // Seek to start of scan line.  It might seem labor-
-              // intensive to be doing this on every line, but this
-              // method covers a lot of gritty details like cropping
-              // and scanline padding.  Also, the seek only takes
-              // place if the file position actually needs to change
-              
-              if (flip) // Bitmap is stored bottom-to-top order (normal BMP)
-                pos = bmpImageoffset + (bmpHeight - 1 - row) * rowSize;
-              else     // Bitmap is stored top-to-bottom
-                pos = bmpImageoffset + row * rowSize;
-              if (File.fptr != pos) { // Need seek?
-                f_lseek (&File, pos);
-              }
-              
-              for (col = 0; col < w; col += BUFFPIXELCOUNT) {
-                // read pixels into the buffer
-                f_read(&File, sdbuffer, 3 * BUFFPIXELCOUNT, &cnt);
-                
-                // convert color
-                for (int p = 0; p < BUFFPIXELCOUNT; p++) {
-                  b = sdbuffer[3 * p];
-                  g = sdbuffer[3 * p + 1];
-                  r = sdbuffer[3 * p + 2];
-                  lcdbuffer[p] = color565(r, g, b);
-                }
-                // push buffer to TFT
-                sendData16_DMA1_SPI1(lcdbuffer, BUFFPIXELCOUNT);
-              }
-              
-              // render any remaining pixels that did not fully fit the buffer
-              uint16_t remainingPixels = w % BUFFPIXELCOUNT;
-              if (remainingPixels > 0) {
-                f_read(&File, sdbuffer, 3 * remainingPixels, &cnt);
-                
-                for (int p = 0; p < remainingPixels; p++) {
-                  b = sdbuffer[3 * p];
-                  g = sdbuffer[3 * p + 1];
-                  r = sdbuffer[3 * p + 2];
-                  lcdbuffer[p] = color565(r, g, b);
-                }
-                
-                sendData16_DMA1_SPI1(lcdbuffer, remainingPixels);
-              }
-            }
+            drawBMP24(w, h, bmpWidth, bmpHeight, flip, bmpImageoffset);
           } else {
-            //progmemPrint(PSTR("Unsupported Bit Depth."));
+            //print("Unsupported Bit Depth.");
           }
-          
-        } else {
+        } else { // 1 = comressed
 #if 0
           if (bmpDepth == 16) {	// 565 format
-            
-            f_lseek (&File, headerSize+1); // skip header
-            
-            uint32_t totalPixels = bmpWidth*bmpHeight;
-            uint16_t numFullBufferRuns = totalPixels / BUFFPIXELCOUNT;
-            for (uint32_t p = 0; p < numFullBufferRuns; p++) {
-              // read pixels into the buffer
-              f_read(&File, buffer, 2*BUFFPIXELCOUNT, &cnt);
-              
-              //for(uint16_t pxCount=0; pxCount <BUFFPIXELCOUNT-1; pxCount++) {
-              //lcdbuffer[pxCount] = ( buffer[pxCount]<<8 | (buffer[pxCount+1]));
-              //}
-              
-              // push them to the diplay
-              sendArr8_SPI1(buffer, BUFFPIXELCOUNT);
-            }
-            
-            // render any remaining pixels that did not fully fit the buffer
-            uint32_t remainingPixels = totalPixels % BUFFPIXELCOUNT;
-            if (remainingPixels > 0)
-            {
-              f_read(&File, buffer, 2*remainingPixels, &cnt);
-              
-              //for(uint16_t pxCount=0; pxCount <BUFFPIXELCOUNT-1; pxCount++) {
-              // lcdbuffer[pxCount] = ( buffer[pxCount]<<8 | (buffer[pxCount+1]));
-              //}
-              
-              sendArr8_SPI1(buffer, remainingPixels);
-            }
-            
+            drawBMP16();
           }
-#endif
+#endif 
         }
       }
     }
-    
   } 
   
   f_close(&File);

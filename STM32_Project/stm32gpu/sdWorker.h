@@ -20,16 +20,12 @@ typedef union {
 
 void init_sdCard(void);
 
-void SDLoadTileFromSet8x8(uint8_t *tileSetArrName, uint8_t tileSetW, uint8_t ramTileNum, uint8_t tileNum);
-//void SDLoadTileFromSet8x8(uint8_t *tileSetArrName, tileParam_t *params);
-void SDLoadTileSet8x8(uint8_t *tileSetArrName, uint8_t tileSetW, uint8_t ramTileBase, uint8_t tileMax);
-//void SDLoadTileSet8x8(uint8_t *tileSetArrName, tileParam_t *params);
-void SDLoadRegionOfTileSet8x8(uint8_t *tileSetArrName, uint8_t tileSetW, uint8_t ramTileBase, uint8_t tileMin, uint8_t tileMax);
-//void SDLoadRegionOfTileSet8x8(uint8_t *tileSetArrName, tileParam_t *params);
+void SDLoadTileFromSet8x8(void *tileSetArrName, uint8_t *pData);
+void SDLoadTileSet8x8(void *tileSetArrName, uint8_t *pData);
+void SDLoadRegionOfTileSet8x8(void *tileSetArrName, uint8_t *pData);
 
-void SDLoadTileMap(uint8_t *tileMapArrName);
-
-
-void SDPrintBMP(uint16_t x, uint16_t y, const char* name);
+void SDLoadTileMap(void *tileMapArrName);
+void SDLoadPalette(void *palleteArrName);
+void SDPrintBMP(uint16_t x, uint16_t y, void *name);
 
 #endif /* _SDWORKER_H */
