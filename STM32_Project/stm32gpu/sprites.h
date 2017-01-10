@@ -34,14 +34,14 @@
 #define SPR_2X1_16 6
 #define SPR_2X2_16 7
 
-// Srites for tiles 32x32 - avaliable only on GPU PRO version!
+// Srites for tiles 32x32 - avaliable only on sGPU PRO version!
 #define SPR_1X1_32 8
 #define SPR_1X2_32 9
 #define SPR_2X1_32 10
 #define SPR_2X2_32 11
 
 // -------------------------------------------------------- //
-
+#pragma pack(push, 1)
 typedef struct {
  uint16_t posX;
  uint16_t posY;
@@ -50,12 +50,29 @@ typedef struct {
  uint8_t tle[4];
 } sprite_t;
 
+typedef struct {
+  uint16_t posX;
+  uint16_t posY;
+  uint16_t width;
+  uint16_t height;
+} object_t;
+
+
+typedef struct {
+  object_t sprBase;
+  uint16_t posOffsetX;
+  uint16_t posOffsetY;
+  uint32_t spriteSize;
+  uint8_t tleNum;
+} spriteData_t;
+#pragma pack(pop)
+
 // -------------------------------------------------------- //
 
 void setSpritePosition(uint8_t sprNum, uint16_t posX, uint16_t posY);
 void setSpriteType(uint8_t sprNum, uint8_t type);
 void setSpriteVisible(uint8_t sprNum, uint8_t state);
-void setSpriteTiles(uint8_t sprNum, uint8_t tle1, uint8_t tle2, uint8_t tle3, uint8_t tle4);
+void setSpriteTiles(void *src);
 void setSpritesAutoRedraw(uint8_t state);
 void drawSprite(uint8_t sprNum);
 
