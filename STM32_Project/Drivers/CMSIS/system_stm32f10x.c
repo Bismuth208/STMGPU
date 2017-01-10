@@ -436,8 +436,8 @@ static void SetSysClock(void)
   SetSysClockTo56();  
 #elif defined SYSCLK_FREQ_72MHz
   SetSysClockTo72();
-#elif defined SYSCLK_FREQ_96MHz
-  SetSysClockTo96();
+#elif defined SYSCLK_FREQ_80MHz
+  SetSysClockTo80();
 #endif
  
  /* If none of the define above is enabled, the HSI is used as System clock
@@ -1095,7 +1095,7 @@ static void SetSysClockTo72(void)
   * @param  None
   * @retval None
   */
-static void SetSysClockTo96(void)
+static void SetSysClockTo80(void)
 {
   __IO uint32_t StartUpCounter = 0, HSEStatus = 0;
   

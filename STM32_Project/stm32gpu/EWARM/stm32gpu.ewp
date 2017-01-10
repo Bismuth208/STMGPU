@@ -1172,7 +1172,7 @@
         <option>
           <name>CCAllowList</name>
           <version>1</version>
-          <state>11111111</state>
+          <state>11111110</state>
         </option>
         <option>
           <name>CCDebugInfo</name>
@@ -1249,6 +1249,7 @@
           <state>$PROJ_DIR$\..\..\Drivers\gfx_tft\</state>
           <state>$PROJ_DIR$\..\..\Drivers\ILI9341\</state>
           <state>$PROJ_DIR$\..\..\Drivers\FatFS\</state>
+          <state>$PROJ_DIR$\..\..\Drivers\memory\</state>
         </option>
         <option>
           <name>CCStdIncCheck</name>
@@ -1936,6 +1937,9 @@
         </file>
       </group>
       <file>
+        <name>$PROJ_DIR$\..\..\Drivers\gfx_tft\fonts.h</name>
+      </file>
+      <file>
         <name>$PROJ_DIR$\..\..\Drivers\gfx_tft\gfx.c</name>
       </file>
       <file>
@@ -1946,12 +1950,6 @@
       </file>
       <file>
         <name>$PROJ_DIR$\..\..\Drivers\gfx_tft\gfxDMA.h</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$\..\..\Drivers\gfx_tft\glcdfont.h</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$\..\..\Drivers\gfx_tft\glcdfont_cyrillic.h</name>
       </file>
     </group>
     <group>
@@ -2015,6 +2013,9 @@
       <name>$PROJ_DIR$\..\gpuWorker.h</name>
     </file>
     <file>
+      <name>$PROJ_DIR$\..\initGPU.c</name>
+    </file>
+    <file>
       <name>$PROJ_DIR$\..\nesPalette_ext.h</name>
     </file>
     <file>
@@ -2030,6 +2031,9 @@
       <name>inc</name>
       <file>
         <name>$PROJ_DIR$\..\..\Drivers\STM32F10x_StdPeriph_Driver\inc\misc.h</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\..\Drivers\STM32F10x_StdPeriph_Driver\inc\stm32f10x_adc.h</name>
       </file>
       <file>
         <name>$PROJ_DIR$\..\..\Drivers\STM32F10x_StdPeriph_Driver\inc\stm32f10x_dma.h</name>
@@ -2063,6 +2067,9 @@
       <name>src</name>
       <file>
         <name>$PROJ_DIR$\..\..\Drivers\STM32F10x_StdPeriph_Driver\src\misc.c</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\..\Drivers\STM32F10x_StdPeriph_Driver\src\stm32f10x_adc.c</name>
       </file>
       <file>
         <name>$PROJ_DIR$\..\..\Drivers\STM32F10x_StdPeriph_Driver\src\stm32f10x_dma.c</name>
@@ -2122,6 +2129,12 @@
   </group>
   <file>
     <name>$PROJ_DIR$\..\main.c</name>
+  </file>
+  <file>
+    <name>$PROJ_DIR$\..\..\Drivers\memory\memHelper.c</name>
+  </file>
+  <file>
+    <name>$PROJ_DIR$\..\..\Drivers\memory\memHelper.h</name>
   </file>
 </project>
 

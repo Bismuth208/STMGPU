@@ -1,50 +1,52 @@
 // ------------------------- General Description -------------------- //
 #Tiles:
--	up to 96 tiles 8x8;
--	up to 16 tiles 16x16;
+-	up to 70 tiles 8x8 (160 on PRO ver.);
+-	up to 10 tiles 16x16 (80 on PRO ver.);
+-	up to 10 tiles 32x32 (only on PRO ver.);
 -	add tiles;
 -	delete tiles;
 -	draw tiles;
 
 #Sprites
--	up to 56 sprites ( 63 only on STM32F103VET6 )
+-	up to 56 sprites ( 63 only on PRO ver. )
 -	tiles grouping to sprite (up to 4 tiles);
--	any colors per sprite from palette of 80 colors;
--	check spites collision*;
+-	any colors per sprite from palette of 80 colors or user loaded (max 256);
+-	check spites collision;
 -	set coordinates for sprites;
 
 #Background
 -	load and draw background screen (40x30 tiles);
 
 #Draw functions:
--	almost all from GFX lib;
+-	almost all from GFX lib (primitives, text, etc);
 -	tiles;
 -	sprites;
 -	background;
 -	GUI*;
 
 #Interface:
--	USART to interface GPU (1200*, 2400*, 9600, 57600, 115200, 1M);
--	SPI2 to interface SD;
--	Paralel (8080) to interface LCD (STM32F103VET6)*;
--	SPI1 to interface LCD (STM32F103C8T6);
+-	USART to interface GPU (9600, 57600, 115200, 1M);
+-	SPI2 to interface SD card;
+-	Paralel (8080) to interface LCD (only on PRO ver.)*;
+-	SPI1 to interface LCD (Mini and PRO ver.);
 
 #Input GPU buffer:
--	at least 200 commands (depend on size of commands and size of MCU RAM);
+-	at least 200 commands (depend on size of commands);
 
 #Data packet size:
 -	CMD consume 1 byte;
 -	DATA consume max 6*uint16_t bytes;
 
 #MCU:
--	STM32F103C8T6	64 Flash, 20 RAM;
--	STM32F103VET6	512 Flash, 64 RAM;
+-	Mini ver.	64 Flash, 20 RAM;
+-	Pro ver.	512 Flash, 64 RAM;
 
 #DMA supported by:
--	STM32F103C8T6	64 Flash, 20 RAM;
--	STM32F103VET6	512 Flash, 64 RAM;
+-	Mini ver.	64 Flash, 20 RAM;
+-	Pro ver.	512 Flash, 64 RAM;
 
 #FSMC:
--	only by STM32F103VET6	512 Flash, 64 RAM;
+-	only on Pro ver.  512 Flash, 64 RAM;
 
 * - not yet ready;
+** - PRO ver. is STM32F103VET6, Mini is STM32F103C8T6;
