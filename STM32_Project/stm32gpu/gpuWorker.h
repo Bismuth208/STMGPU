@@ -27,7 +27,6 @@
 
 #define CALC_BUF_FILL(a)   ((SERIAL_BUFFER_SIZE/100)*a)
 
-// calculated value
 #define CALC_MAX_FILL_SIZE      3800    // for 95 %   \ __ and SERIAL_BUFFER_SIZE = 4096 
 #define CALC_MIN_FILL_SIZE      200     // for 5 %   /
 
@@ -36,16 +35,17 @@
 #define GPU_BSY_PIN             GPIO_Pin_11
 #define GPU_BSY_PORT            GPIOA
 
-// mini stm32 board
-//#define GPU_BSY_LED_PIN         GPIO_Pin_5
-//#define GPU_BSY_LED_PORT        GPIOE
-// maple mini board
-#define GPU_BSY_LED_PIN         GPIO_Pin_13
-#define GPU_BSY_LED_PORT        GPIOC
+#ifdef STM32F10X_MD  // maple mini board
+ #define GPU_BSY_LED_PIN         GPIO_Pin_13
+ #define GPU_BSY_LED_PORT        GPIOC
+#endif
+#ifdef STM32F10X_HD  // mini stm32 board
+ #define GPU_BSY_LED_PIN         GPIO_Pin_5
+ #define GPU_BSY_LED_PORT        GPIOE
+#endif
 
-
-#define USE_BSY_PROTECTION      1
-#define USE_HARD_BSY            0       // 1 - use GPIO, 0 - send message to CPU
+//#define USE_BSY_PROTECTION      1
+//#define USE_HARD_BSY            0       // 1 - use GPIO, 0 - send message to CPU
 
 #define BSY_MSG_CODE_WAIT       0xEE
 #define BSY_MSG_CODE_READY      0xEA
@@ -54,36 +54,27 @@
 //===========================================================================//
 #define T_SELECT_WAY    "Selected interface: "
 #define T_USART_WAY     "USART_1\n"
-#define T_INIT_BUF      "Init command buffer... "
+#define T_INIT          "Init... "
 #define T_WAIT_SYNC     "Waiting for sync... "
 #define T_TFT_SIZE      "Sending TFT size to host... "
 #define T_GPU_START     "Start GPU...\n"
+
+#define T_SOFT_BSY      "Software "
+#define T_HARD_BSY      "Hardware "
+#define T_BSY_STATE     "BSY is set by default.\n"
+
+#define T_BAUD_SPEED            "UART speed: "
+#define T_BAUD_9600             "9600 Bd/s\n"
+#define T_BAUD_57K              "57600 Bd/s\n"
+#define T_BAUD_115K             "115200 Bd/s\n"
+#define T_BAUD_1M               "1M Bd/s\n"
+#define T_DAUD_DEFAULT          "Default (57600)\n"
 
 #define T_OK            "ok.\n"
 #define T_FAIL          "fail.\n"
 
 //===========================================================================//
 
-
-//===========================================================================//
-
-typedef union {
-  uint8_t data[14];
-  struct {
-    uint16_t par1;
-    uint16_t par2;
-    uint16_t par3;
-    uint16_t par4;
-    uint16_t par5;
-    uint16_t par6;
-    uint16_t par7;
-  };
-} cmdBuffer_t;
-
-typedef struct {
-  uint8_t cmdBufferStr[MAX_TEXT_SIZE];
-  cmdBuffer_t cmdBuffer;
-} cmdStructBuf_t;
 
 //===========================================================================//
 
@@ -128,7 +119,7 @@ typedef struct {
 #define DRW_CHAR        0x10    // drawChar()
 #define DRW_PRNT        0x11    // print()
 #define DRW_PRNT_C      0x12    // printChar()
-#define DRW_PRNT_POS_C  0x13    // printCharPos()
+#define DRW_PRNT_POS_C  0x13    // printCharAt()
 #define SET_CURSOR      0x14    // setCursor()
 #define SET_TXT_CR      0x15    // setTextColor()
 #define SET_TXT_CR_BG   0x16    // setTextColorBG()
@@ -150,36 +141,41 @@ typedef struct {
 #define WRT_CMD         0x23    // writeCommand()
 #define WRT_DATA        0x24    // writeData()
 #define WRT_DATA_U16    0x25    // writeWordData()
-#define SET_V_SCRL_ADR  0x26    // tftScrollAddress()
-#define SET_SLEEP       0x27    // tftSetSleep()
-#define SET_IDLE        0x28    // tftSetIdleMode()
-#define SET_BRIGHTNES   0x29    // tftSetDispBrightness()
-#define SET_INVERTION   0x2A    // tftSetInvertion()
+#define SET_V_SCRL_ADR  0x26    // scrollAddress()
+#define SET_SLEEP       0x27    // setSleep()
+#define SET_IDLE        0x28    // setIdleMode()
+#define SET_BRIGHTNES   0x29    // setDispBrightness()
+#define SET_INVERTION   0x2A    // setInvertion()
 #define SET_GAMMA       0x2B    // setGamma()
-#define MAK_SCRL        0x2C    // tftScroll()
-#define MAK_SCRL_SMTH   0x2D    // tftScrollSmooth()
+#define MAK_SCRL        0x2C    // scrollScreen()
+#define MAK_SCRL_SMTH   0x2D    // scrollScreenSmooth()
 #define PSH_CR          0x2E
-//#define NOT_USED        0x2F
+
+// ------- BSY protect selection ------------ //
+#define BSY_SELECT      0x2F
 
 
 // ------------------- Tile ----------------- //
 #define LDD_TLE_8       0x30    // load tile 8x8 size from SD
 #define LDD_TLES_8      0x31    // load tiles 8x8 size from SD
 #define LDD_TLES_RG_8   0x32    // load region of tiles 8x8 size from SD
-#define DRW_TLE_8_POS   0x33    // draw tile 8x8 size on TFT screen
-#define LDD_TLE_MAP     0x34    // load background tile map 8x8 from SD
-#define DRW_TLE_MAP     0x35    // draw background tile map 8x8 on TFT screen
-//#define NOT_USED        0x36
-//#define NOT_USED        0x37
-//#define NOT_USED        0x38
-//#define NOT_USED        0x39
-//#define NOT_USED        0x3A
-//#define NOT_USED        0x3B
-//#define NOT_USED        0x3C
-//#define NOT_USED        0x3D
-//#define NOT_USED        0x3E
-//#define NOT_USED        0x3F
+#define DRW_TLE_8       0x33    // draw tile 8x8 size on TFT screen
 
+#define LDD_TLE_16      0x34    // load tile 16x16 size from SD
+#define LDD_TLES_16     0x35    // load tiles 16x16 size from SD
+#define LDD_TLES_RG_16  0x36    // load region of tiles 16x16 size from SD
+#define DRW_TLE_16      0x37    // draw tile 16x16 size on TFT screen
+
+#define LDD_TLE_32      0x38    // load tile 32x32 size from SD
+#define LDD_TLES_32     0x39    // load tiles 32x32 size from SD
+#define LDD_TLES_RG_32  0x3A    // load region of tiles 32x32 size from SD
+#define DRW_TLE_32      0x3B    // draw tile 32x32 size on TFT screen
+
+#define LDD_TLE_MAP     0x3C    // load background tile map 8x8 from SD
+#define DRW_TLE_MAP     0x3D    // draw background tile map 8x8 on TFT screen
+
+#define LDD_TLE_U       0x3E    // load specified tile size from SD
+#define DRW_TLE_U       0x3F    // draw specified tile size on TFT screen
 
 // ----------------- Sprite ----------------- //
 #define SET_SPR_POS     0x40    // set sprite position
@@ -202,7 +198,7 @@ typedef struct {
 
 // ----------------- SD card ---------------- //
 #define LDD_USR_PAL     0x50    // load user palette from SD card
-#define DRW_MBP_FIL     0x51    // draw bmp file located on SD card
+#define DRW_BMP_FIL     0x51    // draw bmp file located on SD card
 //#define NOT_USED        0x52
 //#define NOT_USED        0x53
 //#define NOT_USED        0x54
@@ -243,10 +239,28 @@ typedef struct {
 //===========================================================================//
 
 
+typedef union {
+  uint8_t data[14];
+  struct {
+    uint16_t par1;
+    uint16_t par2;
+    uint16_t par3;
+    uint16_t par4;
+    uint16_t par5;
+    uint16_t par6;
+    uint16_t par7;
+  };
+} cmdBuffer_t;
+
+extern cmdBuffer_t cmdBuffer;
+extern uint8_t bsyState; // 0 - use sofware, 1 - use hardware
+
+//===========================================================================//
+
 
 void init_GPU(void);
 void sync_CPU(void);
-__noreturn __task void run_GPU(void);
+__noreturn void run_GPU(void);
 
 
 
