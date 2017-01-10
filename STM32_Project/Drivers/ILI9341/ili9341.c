@@ -27,7 +27,6 @@ void writeCommand(uint8_t c)
   ENABLE_CMD();
   
   sendData8_SPI1(c);
-  RELEASE_TFT();
 #endif
 }
 
@@ -39,7 +38,6 @@ void writeData(uint8_t c)
   ENABLE_DATA();
   
   sendData8_SPI1(c);
-  RELEASE_TFT();
 #endif
 }
 
@@ -51,7 +49,6 @@ void writeWordData(uint16_t c)
   ENABLE_DATA();
   
   sendData16_SPI1(c);
-  RELEASE_TFT();
 #endif
 }
 
@@ -167,7 +164,7 @@ void tftBegin(void)
   SET_TFT_RES_LOW;
   
 #if TFT_CS_ALWAS_ACTIVE
-  GRAB_TFT_CS;
+  GRAB_TFT_CS; // maybe remove this? And connect CS to Vcc?
 #endif
   
   SET_TFT_CS_HI;
@@ -191,10 +188,8 @@ void tftBegin(void)
 }
 
 // blow your mind
-void tftSetAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1)
+void setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1)
 {    
-  wait_DMA1_SPI1_busy();
-  
 #if USE_FSMC
   FSMC_SEND_CMD(ILI9341_CASET);    // Column addr set
   FSMC_SEND_DATA(x0);           // XSTART
@@ -205,9 +200,11 @@ void tftSetAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1)
   FSMC_SEND_DATA(y1);           // YEND
   
   FSMC_SEND_CMD(ILI9341_RAMWR);     // write to RAM
-#else
   
-  ENABLE_CMD();             // grab TFT CS and writecommand:
+#else
+  wait_DMA1_SPI1_busy();
+  
+  SET_TFT_DC_LOW;             // writecommand:
   sendData8_SPI1(ILI9341_CASET); // Column addr set
   
   SET_TFT_DC_HI;          // writeData:
@@ -223,15 +220,47 @@ void tftSetAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1)
   sendData8_SPI1(ILI9341_RAMWR); // write to RAM
   
   SET_TFT_DC_HI;  // ready accept data
-  
-  //SET_TFT_CS_HI; // disable in other func
 #endif // USE_FSMC  
 }
 
-void tftSetVAddrWindow(uint16_t x0, uint16_t y0, uint16_t y1)
-{  
+// square window
+void setSqAddrWindow(uint16_t x0, uint16_t y0, uint16_t size)
+{
+#if USE_FSMC
+  FSMC_SEND_CMD(ILI9341_CASET);    // Column addr set
+  FSMC_SEND_DATA(x0);           // XSTART
+  FSMC_SEND_DATA(x0+size);           // XEND
+  
+  FSMC_SEND_CMD(ILI9341_RASET);    // Row addr set
+  FSMC_SEND_DATA(y0);           // YSTART
+  FSMC_SEND_DATA(y0+size);           // YEND
+  
+  FSMC_SEND_CMD(ILI9341_RAMWR);     // write to RAM
+  
+#else
   wait_DMA1_SPI1_busy();
   
+  SET_TFT_DC_LOW;             // writecommand:
+  sendData8_SPI1(ILI9341_CASET); // Column addr set
+  
+  SET_TFT_DC_HI;          // writeData:
+  sendData32_SPI1(x0, x0+size); // XSTART, XEND
+  
+  SET_TFT_DC_LOW;             // writecommand:
+  sendData8_SPI1(ILI9341_RASET); // Row addr set
+  
+  SET_TFT_DC_HI;           // writeData:
+  sendData32_SPI1(y0, y0+size); // YSTART, YEND
+  
+  SET_TFT_DC_LOW;             // writecommand:
+  sendData8_SPI1(ILI9341_RAMWR); // write to RAM
+  
+  SET_TFT_DC_HI;  // ready accept data
+#endif // USE_FSMC 
+}
+
+void setVAddrWindow(uint16_t x0, uint16_t y0, uint16_t y1)
+{
 #if USE_FSMC
   FSMC_SEND_CMD(ILI9341_CASET);    // Column addr set
   FSMC_SEND_DATA(x0);           // XSTART
@@ -242,9 +271,11 @@ void tftSetVAddrWindow(uint16_t x0, uint16_t y0, uint16_t y1)
   FSMC_SEND_DATA(y1);           // YEND
   
   FSMC_SEND_CMD(ILI9341_RAMWR);     // write to RAM  
-#else
   
-  ENABLE_CMD();             // grab TFT CS and writecommand:
+#else
+  wait_DMA1_SPI1_busy();
+  
+  SET_TFT_DC_LOW;             // writecommand:
   sendData8_SPI1(ILI9341_CASET); // Column addr set
   
   SET_TFT_DC_HI;          // writeData:
@@ -260,15 +291,11 @@ void tftSetVAddrWindow(uint16_t x0, uint16_t y0, uint16_t y1)
   sendData8_SPI1(ILI9341_RAMWR); // write to RAM
   
   SET_TFT_DC_HI;  // ready accept data
-  
-  //SET_TFT_CS_HI; // disable in other func
 #endif // USE_FSMC
 }
 
-void tftSetHAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1)
-{ 
-  wait_DMA1_SPI1_busy();
-  
+void setHAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1)
+{
 #if USE_FSMC
   FSMC_SEND_CMD(ILI9341_CASET);    // Column addr set
   FSMC_SEND_DATA(x0);           // XSTART
@@ -279,9 +306,11 @@ void tftSetHAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1)
   FSMC_SEND_DATA(y0);           // YEND
   
   FSMC_SEND_CMD(ILI9341_RAMWR);     // write to RAM
-#else
   
-  ENABLE_CMD();             // grab TFT CS and writecommand:
+#else
+  wait_DMA1_SPI1_busy();
+  
+  SET_TFT_DC_LOW;             // writecommand:
   sendData8_SPI1(ILI9341_CASET); // Column addr set
   
   SET_TFT_DC_HI;          // writeData:
@@ -297,15 +326,11 @@ void tftSetHAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1)
   sendData8_SPI1(ILI9341_RAMWR); // write to RAM
   
   SET_TFT_DC_HI;  // ready accept data
-  
-  //SET_TFT_CS_HI; // disable in other func
 #endif // USE_FSMC
 }
 
-void tftSetAddrPixel(uint16_t x0, uint16_t y0)
+void setAddrPixel(uint16_t x0, uint16_t y0)
 { 
-  wait_DMA1_SPI1_busy();
-  
 #if USE_FSMC
   FSMC_SEND_CMD(ILI9341_CASET);    // Column addr set
   FSMC_SEND_DATA(x0);           // XSTART
@@ -316,9 +341,11 @@ void tftSetAddrPixel(uint16_t x0, uint16_t y0)
   FSMC_SEND_DATA(y0);           // YEND
   
   FSMC_SEND_CMD(ILI9341_RAMWR);     // write to RAM
-#else
   
-  ENABLE_CMD();             // grab TFT CS and writecommand:
+#else
+  wait_DMA1_SPI1_busy();
+  
+  SET_TFT_DC_LOW;             // writecommand:
   sendData8_SPI1(ILI9341_CASET); // Column addr set
   
   SET_TFT_DC_HI;          // writeData:
@@ -334,12 +361,10 @@ void tftSetAddrPixel(uint16_t x0, uint16_t y0)
   sendData8_SPI1(ILI9341_RAMWR); // write to RAM
   
   SET_TFT_DC_HI;  // ready accept data
-  
-  //SET_TFT_CS_HI; // disable in other func
 #endif // USE_FSMC
 }
 
-void tftSetRotation(uint8_t m)
+void setRotation(uint8_t m)
 {
   writeCommand(ILI9341_MADCTL);
   uint8_t rotation = m % 4; // can't be higher than 3
@@ -369,14 +394,14 @@ void tftSetRotation(uint8_t m)
 }
 
 // how much to scroll
-void tftScrollAddress(uint16_t VSP)
+void scrollAddress(uint16_t VSP)
 {
   writeCommand(ILI9341_VSCRSADD); // Vertical scrolling start address
   writeWordData(VSP);
 }
 
 // set scrollong zone
-void tftSetScrollArea(uint16_t TFA, uint16_t BFA)
+void setScrollArea(uint16_t TFA, uint16_t BFA)
 {
   writeCommand(ILI9341_VSCRDEF); // Vertical scroll definition
   writeWordData(TFA);
@@ -384,26 +409,26 @@ void tftSetScrollArea(uint16_t TFA, uint16_t BFA)
   writeWordData(BFA);
 }
 
-uint16_t tftScroll(uint16_t lines, uint16_t yStart)
+uint16_t scrollScreen(uint16_t lines, uint16_t yStart)
 {
   for (uint16_t i = 0; i < lines; i++) {
     if ((++yStart) == (_height - TFT_BOT_FIXED_AREA)) yStart = TFT_TOP_FIXED_AREA;
-    tftScrollAddress(yStart);
+    scrollAddress(yStart);
   }
   return  yStart;
 }
 
-uint16_t tftScrollSmooth(uint16_t lines, uint16_t yStart, uint8_t wait)
+uint16_t scrollScreenSmooth(uint16_t lines, uint16_t yStart, uint8_t wait)
 {
   for (uint16_t i = 0; i < lines; i++) {
     if ((++yStart) == (_height - TFT_BOT_FIXED_AREA)) yStart = TFT_TOP_FIXED_AREA;
-    tftScrollAddress(yStart);
+    scrollAddress(yStart);
     _delayMS(wait);
   }
   return  yStart;
 }
 
-void tftSetSleep(bool enable)
+void setSleep(bool enable)
 {
   if (enable) {
     writeCommand(ILI9341_SLPIN);
@@ -415,7 +440,7 @@ void tftSetSleep(bool enable)
   }
 }
 
-void tftSetIdleMode(bool mode)
+void setIdleMode(bool mode)
 {
   if (mode) {
     writeCommand(ILI9341_IDLEON);
@@ -424,18 +449,18 @@ void tftSetIdleMode(bool mode)
   }
 }
 
-void tftSetDispBrightness(uint8_t brightness)
+void setDispBrightness(uint8_t brightness)
 {
   writeCommand(ILI9341_WRDBR);
   writeWordData(brightness);
 }
 
-void tftSetInvertion(bool i)
+void setInvertion(bool i)
 {
   writeCommand(i ? ILI9341_INVON : ILI9341_INVOFF);
 }
 
-void tftSetAdaptiveBrightness(uint8_t value)
+void setAdaptiveBrightness(uint8_t value)
 {
   /*
   b00   Off

@@ -260,23 +260,25 @@ uint16_t color;
 //-------------------------------------------------------------------------------------------//
 
 static const uint8_t init_commands[] = {
-  4, 0xEF, 0x03, 0x80, 0x02,
-  4, 0xCF, 0x00, 0XC1, 0X30,
-  5, 0xED, 0x64, 0x03, 0X12, 0X81,
-  4, 0xE8, 0x85, 0x00, 0x78,
-  6, 0xCB, 0x39, 0x2C, 0x00, 0x34, 0x02,
-  2, 0xF7, 0x20,
-  3, 0xEA, 0x00, 0x00,
-  2, ILI9341_PWCTR1, 0x23, // Power control  (VRH[5:0])
-  2, ILI9341_PWCTR2, 0x10, // Power control (SAP[2:0];BT[3:0])
-  3, ILI9341_VMCTR1, 0x3e, 0x28, // VCM control
-  2, ILI9341_VMCTR2, 0x86, // VCM control2
-  2, ILI9341_MADCTL, 0x48, // Memory Access Control
-  2, ILI9341_PIXFMT, 0x55,
-  3, ILI9341_FRMCTR1, 0x00, 0x18,
-  4, ILI9341_DFUNCTR, 0x08, 0x82, 0x27, // Display Function Control
-  2, 0xF2, 0x00, // Gamma Function Disable
-  2, ILI9341_GAMMASET, 0x01, // Gamma curve selected
+  4, 0xEF, 0x03, 0x80, 0x02,                    // Memory to Display Address Mapping
+  4, 0xCF, 0x00, 0XC1, 0X30,                    // Power control B
+  5, 0xED, 0x64, 0x03, 0X12, 0X81,              // Power on sequence control
+  4, 0xE8, 0x85, 0x00, 0x78,                    // Driver timing control A
+  6, 0xCB, 0x39, 0x2C, 0x00, 0x34, 0x02,        // Power control A
+  2, 0xF7, 0x20,                                // Pump ratio control 
+  3, 0xEA, 0x00, 0x00,                          // Driver timing control B
+  2, ILI9341_PWCTR1, 0x23,                      // Power control  (VRH[5:0])
+  2, ILI9341_PWCTR2, 0x10,                      // Power control (SAP[2:0];BT[3:0])
+  3, ILI9341_VMCTR1, 0x3e, 0x28,                // VCM control
+  2, ILI9341_VMCTR2, 0x86,                      // VCM control2
+  2, ILI9341_MADCTL, 0x48,                      // Memory Access Control
+  2, ILI9341_PIXFMT, 0x55,                      // Pixel Format Set
+  3, ILI9341_FRMCTR1, 0x00, 0x10,               // Frame Rate Control (In Normal Mode/Full Colors)
+  3, ILI9341_FRMCTR2, 0x00, 0x1F,               // Frame Rate Control (In Idle Mode/8 colors)
+  3, ILI9341_FRMCTR2, 0x00, 0x10,               // Frame Rate control (In Partial Mode/Full Colors)
+  4, ILI9341_DFUNCTR, 0x00, 0x80, 0x27,         // Display Function Control
+  2, 0xF2, 0x00,                                // Gamma Function Disable
+  2, ILI9341_GAMMASET, 0x01,                    // Gamma curve selected
   16, ILI9341_GMCTRP1, 0x0F, 0x31, 0x2B, 0x0C, 0x0E, 0x08,
       0x4E, 0xF1, 0x37, 0x07, 0x10, 0x03, 0x0E, 0x09, 0x00, // Set Gamma
   16, ILI9341_GMCTRN1, 0x00, 0x0E, 0x14, 0x03, 0x11, 0x07,
@@ -296,20 +298,21 @@ extern "C"{
   void commandList(const uint8_t *addr);
   
   void tftBegin(void);
-  void tftSetAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
-  void tftSetVAddrWindow(uint16_t x0, uint16_t y0, uint16_t y1);
-  void tftSetHAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1);
-  void tftSetAddrPixel(uint16_t x0, uint16_t y0);
-  void tftSetRotation(uint8_t m);
-  void tftSetScrollArea(uint16_t TFA, uint16_t BFA);
-  void tftScrollAddress(uint16_t VSP);
-  uint16_t tftScroll(uint16_t lines, uint16_t yStart);
-  uint16_t tftScrollSmooth(uint16_t lines, uint16_t yStart, uint8_t wait);
-  void tftSetSleep(bool enable);
-  void tftSetIdleMode(bool mode);
-  void tftSetDispBrightness(uint8_t brightness);
-  void tftSetInvertion(bool i);
-  void tftSetAdaptiveBrightness(uint8_t value);
+  void setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
+  void setSqAddrWindow(uint16_t x0, uint16_t y0, uint16_t size);
+  void setVAddrWindow(uint16_t x0, uint16_t y0, uint16_t y1);
+  void setHAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1);
+  void setAddrPixel(uint16_t x0, uint16_t y0);
+  void setRotation(uint8_t m);
+  void setScrollArea(uint16_t TFA, uint16_t BFA);
+  void scrollAddress(uint16_t VSP);
+  uint16_t scrollScreen(uint16_t lines, uint16_t yStart);
+  uint16_t scrollScreenSmooth(uint16_t lines, uint16_t yStart, uint8_t wait);
+  void setSleep(bool enable);
+  void setIdleMode(bool mode);
+  void setDispBrightness(uint8_t brightness);
+  void setInvertion(bool i);
+  void setAdaptiveBrightness(uint8_t value);
   //void setGamma(uint8_t gamma);
   
 #ifdef __cplusplus
