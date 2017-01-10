@@ -43,7 +43,24 @@ uint32_t randNum(void)
 
 void initRand(void)
 {
-  /* TODO: add here something really randomised */
+  RCC->APB2ENR |= RCC_APB2Periph_ADC1; // Enable ADC1 Clock
+  RCC->CFGR |= (0x2<<14);     //set ADC Prescaler '6'
+  
+  ADC1->CR2 |= (1<<4);         //Input Channel 16
+  ADC1->SMPR1 |= (0x4<<18);  //41.5 cycles sample time
+  ADC1->CR2 |= (1<<23);        //Enable Temperature Sensor & Vref
+  ADC1->CR2 |= (1<<0);         //Enable ADC and start conversion
+  
+  for (uint8_t i = 0; i < 8; i++) {
+    ADC1->CR2 |= (1<<0);         //Enable ADC and start conversion
+    while(!(ADC1->SR & (1<<1))); //Wait until end of conversion
+    
+    nextInt += ADC1->DR;
+  }
+  
+  //disable ADC1 to save power
+  ADC1->CR2 &= ~(1<<0);
+  RCC->APB2ENR &= ~RCC_APB2Periph_ADC1;
 }
 
 //===========================================================================//
@@ -51,40 +68,45 @@ void initRand(void)
 // pic consist of 18 tiles wide and 6 tiles high
 void drawSturtupScreen(void)
 {
-  tftFillScreen(COLOR_BLACK);
+  fillScreen(COLOR_BLACK);
   
-  uint8_t rndTileX, rndTileY, tileIndex;
   uint8_t tilesLesft = 108; //stmGpuTileMap[0] * stmGpuTileMap[1];     // 18*6 = 108, tiles in pic
   // bit field? no no no, what you talking about?
   uint8_t tilesDrawed[108];     // array of flags to show drawed tiles
   
+  struct tile_t {
+    uint16_t rndTileX;
+    uint16_t rndTileY;
+    uint8_t tileIndex;
+  } tile;
+  
   memset(tilesDrawed, 0x01, tilesLesft); // 1 - need to draw, 0 - drawed
   
   while(tilesLesft) {
-    rndTileX = ( randNum() % stmGpuTileMap[0] ); // from 0 to 18
-    rndTileY = ( randNum() % stmGpuTileMap[1] ); // from 0 to 6
+    tile.rndTileX = ( randNum() % stmGpuTileMap[0] ); // from 0 to 18
+    tile.rndTileY = ( randNum() % stmGpuTileMap[1] ); // from 0 to 6
     
     // index to draw is: x + y*wide
     
-    tileIndex = rndTileX + rndTileY*stmGpuTileMap[0];
+    tile.tileIndex = tile.rndTileX + tile.rndTileY*stmGpuTileMap[0];
     
-    if(tilesDrawed[tileIndex]) { // == 1, need to draw tile?
+    if(tilesDrawed[tile.tileIndex]) { // == 1, need to draw tile?
       
-      tilesDrawed[tileIndex] = 0; // change flag to 'drawed'
+      tilesDrawed[tile.tileIndex] = 0; // change flag to 'drawed'
       
       --tilesLesft;
       
       // get tile index from tile map
       // 2 is offet from tileswide and tileshigh
-      tileIndex = stmGpuTileMap[2 + tileIndex];
+      tile.tileIndex = stmGpuTileMap[2 + tile.tileIndex];
       
       // reuse rndTileX and rndTileY vars to show where to draw;
       // trying to draw in centre of screen
-      rndTileX = ((_width/6) + ( rndTileX * TILE_BASE_SIZE ));
-      rndTileY = (( _height/4) + ( rndTileY * TILE_BASE_SIZE ));
+      tile.rndTileX = ((_width/6) + ( tile.rndTileX * TILE_BASE_SIZE ));
+      tile.rndTileY = (( _height/4) + ( tile.rndTileY * TILE_BASE_SIZE ));
       
       // draw tile
-      drawTile8x8(rndTileX, rndTileY, tileIndex);
+      drawTile8x8(&tile);
       
       // make a little delay, overvise we don`t see mosaic effect (too fast)
       _delayMS(10);
@@ -100,20 +122,21 @@ void drawSturtupScreen(void)
 
 void init_GPIO_RCC(void)
 {
-  //RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA | RCC_APB2Periph_GPIOB | RCC_APB2Periph_GPIOC, ENABLE);
+  SET_BIT(RCC->APB2ENR, RCC_APB2Periph_GPIOA); // GPIOA
+  SET_BIT(RCC->APB2ENR, RCC_APB2Periph_GPIOB); // GPIOB
   
-  SET_BIT(RCC->APB2ENR, RCC_APB2ENR_IOPAEN); // GPIOA
-  SET_BIT(RCC->APB2ENR, RCC_APB2ENR_IOPBEN); // GPIOB
-  SET_BIT(RCC->APB2ENR, RCC_APB2ENR_IOPCEN); // GPIOC
+#ifdef STM32F10X_MD
+  SET_BIT(RCC->APB2ENR, RCC_APB2Periph_GPIOC); // GPIOC
+#endif
+
+#ifdef STM32F10X_HD
+  SET_BIT(RCC->APB2ENR, RCC_APB2Periph_GPIOE); // GPIOE
   
-#if USE_FSMC
-  //RCC_APB2PeriphClockCmd( RCC_APB2Periph_GPIOD | RCC_APB2Periph_GPIOE , ENABLE);
-  
-  //SET_BIT(RCC->APB2ENR, RCC_APB2ENR_IOPCEN); // GPIOC
-  SET_BIT(RCC->APB2ENR, RCC_APB2ENR_IOPDEN); // GPIOD
-  SET_BIT(RCC->APB2ENR, RCC_APB2ENR_IOPEEN); // GPIOE
-  
-#endif  
+ #if USE_FSMC
+  SET_BIT(RCC->APB2ENR, RCC_APB2Periph_GPIOC); // GPIOC
+  SET_BIT(RCC->APB2ENR, RCC_APB2Periph_GPIOD); // GPIOD
+ #endif  
+#endif
 }
 
 void startupInit(void)
@@ -130,10 +153,11 @@ void startupInit(void)
   
   init_GPIO_RCC();
   init_SPI1();
-  //initRand();
+  initRand();
   
   tftBegin();         /* initialize a ILI9341 chip */
-  tftSetRotation(1); // Horizontal
+  setRotation(1); // Horizontal
+  setCurrentFont(1);
   
   // 67 tiles, 17 wide, tiles array, tile size 8x8
   loadLogoTileSet(67, 17, stm_gpu_nes_tiles2_data);      // startup logo
@@ -146,7 +170,7 @@ void startupInit(void)
 }
 
 //------------------------- yep, here's how it all began... -------------------//
-__noreturn __task void main(void)
+__noreturn void main(void)
 {
   startupInit();
   
