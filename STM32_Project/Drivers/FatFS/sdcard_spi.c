@@ -67,27 +67,36 @@ void sd_spi_init(void)
   SPI_CalculateCRC(SPI_SD, DISABLE);
   SPI_Cmd(SPI_SD, ENABLE);
   
+#pragma diag_suppress=Pe550
   uint32_t dummyread;
   /* drain SPI */
   while (SPI_I2S_GetFlagStatus(SPI_SD, SPI_I2S_FLAG_TXE) == RESET) { ; }
   dummyread = SPI_I2S_ReceiveData(SPI_SD);
+#pragma diag_default=Pe550
   
   spi_set_speed(SD_SPEED_400KHZ);
 }
 
 void spi_set_speed(enum sd_speed speed)
 {
-  if (speed == SD_SPEED_400KHZ)
-    SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_128;
-  else if (speed == SD_SPEED_25MHZ)
-    SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_2;
+  if (speed == SD_SPEED_400KHZ) {
+    //SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_128;
+    CLEAR_BIT(SPI_SD->CR1, SPI_BaudRatePrescaler_2);
+    SET_BIT(SPI_SD->CR1, SPI_BaudRatePrescaler_128);
+    
+  } else if (speed == SD_SPEED_25MHZ) {
+    //SPI_InitStructure.SPI_BaudRatePrescaler = SPI_BaudRatePrescaler_2;
+    CLEAR_BIT(SPI_SD->CR1, SPI_BaudRatePrescaler_128);
+    SET_BIT(SPI_SD->CR1, SPI_BaudRatePrescaler_2);
+  }
   // ^ with /2 APB1 this will be 15mhz/234k at 60mhz
   // 18/281 at 72. which is ok, 100<x<400khz, and <25mhz
-  
+  /*
   SPI_Cmd(SPI_SD, DISABLE);
   SPI_InitStructure.SPI_CRCPolynomial = 7;
   SPI_Init(SPI_SD, &SPI_InitStructure);
   SPI_Cmd(SPI_SD, ENABLE);
+  */
 }
 
 u8 spi_txrx(u8 data)
@@ -95,9 +104,60 @@ u8 spi_txrx(u8 data)
   /* RXNE always happens after TXE, so if this function is used
   * we don't need to check for TXE */
   SPI_SD->DR = data;
-  while ((SPI_SD->SR & SPI_I2S_FLAG_RXNE) == 0);
+  WAIT_FOR_RX;
   
   return SPI_SD->DR;
+}
+
+u16 spi_txrx16(u16 data)
+{
+  u16 r;
+  
+  SPI_SD->DR = data>>8;
+  WAIT_FOR_RX;
+  r = SPI_SD->DR <<8;
+  
+  SPI_SD->DR = data;
+  WAIT_FOR_RX;
+  r |= SPI_SD->DR;
+  
+  return r;
+}
+
+u32 spi_txrx32(uint32_t data)
+{
+  union uResult_t {
+    uint8_t resultArr[4];
+    uint32_t result32;
+  } uResult;
+  
+  SPI_SD->DR = (data>>24);
+  WAIT_FOR_RX;
+  uResult.resultArr[3] = SPI_SD->DR;
+  
+  SPI_SD->DR = (data>>16);
+  WAIT_FOR_RX;
+  uResult.resultArr[2] = SPI_SD->DR;
+  
+  SPI_SD->DR = (data>>8);
+  WAIT_FOR_RX;
+  uResult.resultArr[1] = SPI_SD->DR;
+  
+  SPI_SD->DR = (data);
+  WAIT_FOR_RX;
+  uResult.resultArr[0] = SPI_SD->DR;
+  
+  return uResult.result32;
+}
+
+void spi_txrxArr(u8 *buf, u16 len, u8 data)
+{
+  for (u16 i=0; i<len; i++) {
+    SPI_SD->DR = data;
+    WAIT_FOR_RX;
+    
+    buf[i] = SPI_SD->DR;
+  }
 }
 
 /* crc helpers */
@@ -154,16 +214,14 @@ u16 crc16(const u8 *p, int len)
 void sd_cmd(u8 cmd, u32 arg)
 {
   u8 crc = 0;
-  spi_txrx(0x40 | cmd);
   crc = crc7_one(crc, 0x40 | cmd);
-  spi_txrx(arg >> 24);
   crc = crc7_one(crc, arg >> 24);
-  spi_txrx(arg >> 16);
   crc = crc7_one(crc, arg >> 16);
-  spi_txrx(arg >> 8);
   crc = crc7_one(crc, arg >> 8);
-  spi_txrx(arg);
   crc = crc7_one(crc, arg);
+  
+  spi_txrx(0x40 | cmd);
+  spi_txrx32(arg);
   //spi_txrx(0x95);	/* crc7, for cmd0 */
   spi_txrx(crc | 0x1);	/* crc7, for cmd0 */
 }
@@ -208,12 +266,7 @@ u8 sd_get_r7(u32 *r7)
   if (r != 0x01)
     return r;
   
-  r = spi_txrx(0xff) << 24;
-  r |= spi_txrx(0xff) << 16;
-  r |= spi_txrx(0xff) << 8;
-  r |= spi_txrx(0xff);
-  
-  *r7 = r;
+  *r7 = spi_txrx32(0xffffffff);
   return 0x01;
 }
 
@@ -222,9 +275,8 @@ u8 sd_get_r7(u32 *r7)
 * as described in sandisk doc, 5.4. */
 void sd_nec()
 {
-  int i;
-  for (i=0; i<8; i++)
-    spi_txrx(0xff);
+  spi_txrx32(0xffffffff);
+  spi_txrx32(0xffffffff);
 }
 
 
@@ -244,8 +296,8 @@ int sd_init(hwif *hw)
   /* cmd0 - reset.. */
   spi_cs_high();
   /* 74+ clocks with CS high */
-  for (i=0; i<10; i++)
-    spi_txrx(0xff);
+  for (i=0; i<5; i++)
+    spi_txrx16(0xffff);
   
   /* reset */
   spi_cs_low();
@@ -453,7 +505,6 @@ int sd_get_data(hwif *hw, u8 *buf, int len)
   u8 r;
   u16 _crc16;
   u16 calc_crc;
-  int i;
   
   while (tries--) {
     r = spi_txrx(0xff);
@@ -463,11 +514,9 @@ int sd_get_data(hwif *hw, u8 *buf, int len)
   if (tries < 0)
     return -1;
   
-  for (i=0; i<len; i++)
-    buf[i] = spi_txrx(0xff);
+  spi_txrxArr(buf, len, 0xff);
   
-  _crc16 = spi_txrx(0xff) << 8;
-  _crc16 |= spi_txrx(0xff);
+  _crc16 = spi_txrx16(0xffff);
   
   calc_crc = crc16(buf, len);
   if (_crc16 != calc_crc) {

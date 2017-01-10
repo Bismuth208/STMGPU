@@ -38,11 +38,13 @@ extern "C" {
 #define GPIO_Pin_SPI_SD_MOSI     GPIO_Pin_15
 #define RCC_APBPeriphClockCmd_SPI_SD  RCC_APB1PeriphClockCmd
 #define RCC_APBPeriph_SPI_SD     RCC_APB1Periph_SPI2
-#define SPI_BaudRatePrescaler_SPI_SD  SPI_BaudRatePrescaler_256
+#define SPI_BaudRatePrescaler_SPI_SD  SPI_BaudRatePrescaler_2
 
 
 #define spi_cs_low() do { GPIO_SPI_SD_CS->BRR = GPIO_Pin_SPI_SD_CS; } while (0)
 #define spi_cs_high() do { GPIO_SPI_SD_CS->BSRR = GPIO_Pin_SPI_SD_CS; } while (0)
+    
+#define WAIT_FOR_RX while ((SPI_SD->SR & SPI_I2S_FLAG_RXNE) == 0)
   
   
 #define CAP_VER2_00	(1<<0)
