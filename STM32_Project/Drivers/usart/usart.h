@@ -3,18 +3,11 @@
 
 // --------------------------------------------------//
 
-#define SERIAL_BUFFER_SIZE 4096     //3072 2048
+#define SERIAL_BUFFER_SIZE 4096
 
 // --------------------------------------------------//
-/*
-typedef struct {
-  uint8_t buffer[SERIAL_BUFFER_SIZE];
-  uint16_t head;
-  uint16_t tail;
-} ring_buffer_t;
-*/
 
-// #pragma pack(push, 1)
+//#pragma pack(push, 1)
 typedef struct {
   // just overflow, no check and additional code need
   uint16_t head         :12;
@@ -22,14 +15,8 @@ typedef struct {
   uint16_t tail         :12;
   uint16_t align2       :4;     // not used
 } ring_buffer_t;
-// #pragma pack(pop)
+//#pragma pack(pop)
 
-/*
-typedef struct {
-  uint16_t head;
-  uint16_t tail;
-} ring_buffer_t;
-*/
 
 typedef enum {
   USART_BAUD_9600 = 9600,
@@ -40,7 +27,7 @@ typedef enum {
 
 // --------------------------------------------------//
 
-uint8_t init_UART1(uint32_t baud);
+void init_UART1(uint32_t baud);
 void sendData8_USART1(uint8_t data);
 void fflush_USART1(void);
 uint8_t readData8_USART1(void);
