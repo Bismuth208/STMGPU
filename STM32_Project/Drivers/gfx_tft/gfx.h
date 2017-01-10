@@ -32,18 +32,18 @@
 extern "C"{
 #endif
 
-void tftPushColor(uint16_t color);
-void tftDrawPixel(int16_t x, int16_t y, uint16_t color);
-void tftFillScreen(uint16_t color);
+void pushColor(uint16_t color);
+void drawPixel(int16_t x, int16_t y, uint16_t color);
+void fillScreen(uint16_t color);
 
-void tftFillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
-void tftDrawRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
+void fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
+void drawRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
 
 void drawRoundRect(int16_t x0, int16_t y0, int16_t w, int16_t h, int16_t radius, uint16_t color);
 void fillRoundRect(int16_t x0, int16_t y0, int16_t w, int16_t h, int16_t radius, uint16_t color);
-void tftDrawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint16_t color);
-void tftDrawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color);
-void tftDrawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color);
+void drawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint16_t color);
+void drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color);
+void drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color);
 
 void drawCircle(int16_t x0, int16_t y0, int16_t r, uint16_t color);
 void drawCircleHelper(int16_t x0, int16_t y0, int16_t r, uint8_t cornername, uint16_t color);
@@ -80,9 +80,11 @@ void setTextSize(uint8_t s);
 void setTextWrap(bool w);
 void cp437(bool x);
 
+void setCurrentFont(uint8_t num);
+
 void print(const char *str);
 void printChar(uint8_t c);
-void printCharPos(int16_t x, int16_t y, uint8_t c);
+void printCharAt(int16_t x, int16_t y, uint8_t c);
     
 #ifdef __cplusplus
 } // extern "C"
