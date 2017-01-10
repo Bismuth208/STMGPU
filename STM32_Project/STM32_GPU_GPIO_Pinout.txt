@@ -6,12 +6,31 @@
 |      -              |   USART1_RX          | GPIOA      | GPIO_Pin_10 |
 |      -              |   USART1_TX          | GPIOA      | GPIO_Pin_9  |
 | GPU_BSY_PIN(*)      |     -                | GPIOA      | GPIO_Pin_11 |
-| BAUD_9600_PIN       | -not yet ready-      |     -      |      -      |
-| BAUD_57600_PIN      | -not yet ready-      |     -      |      -      |
-| BAUD_115200_PIN     | -not yet ready-      |     -      |      -      |
-| BAUD_1M_PIN         | -not yet ready-      |     -      |      -      |
+| BAUD_9600_PIN       |     -                | GPIOA      |   (**)      |
+| BAUD_57600_PIN      |     -                | GPIOA      |   (**)      |
+| BAUD_115200_PIN     |     -                | GPIOA      |   (**)      |
+| BAUD_1M_PIN         |     -                | GPIOA      |   (**)      |
  -----------------------------------------------------------------------
- (*) not used if enabled software protection
+ (*)  not used if enabled software protection
+ (**) Used GPIO: GPIO_Pin_0, GPIO_Pin_1, GPIO_Pin_2;
+      GPIO is set to input pull-down; By connecting to VCC (+3V),
+	  or left unconnected allow to select BAUD speed. See table below.
+ (***) UART set-up: 8 bits of data, 1 stop bit and no parity.
+	  
+#GPIO baud select:
+ ----------------------------------------------------------------------
+| Baud rate          | Used GPIO             | Port value              |
+|----------------------------------------------------------------------|
+| 9600               | PA0                   |          0x01           |
+| 57600 (*)          | PA1                   |          0x02           |
+| 115200             | PA0 & PA1             |          0x03           |
+| 1M                 | PA2                   |          0x04           |
+| reserved           | PA2 & PA0             |          0x05           |
+| reserved           | PA2 & PA1             |          0x06           |
+| reserved           | PA2 & PA1 & PA0       |          0x07           |
+ ----------------------------------------------------------------------
+ (*) Default value if no GPIO is used or reserved value used;
+    
  
 #SD Card (SPI2):
  -----------------------------------------------------------------------
