@@ -1,5 +1,0 @@
-Bin files located in «Software_BSY» folder used command code transfered by selected communication interface ( USART, SPI, I2C, etc... ), and signature what GPU`s command Rx buffer is almost full. That mean, what CPU must stop send commands until ready command will send from GPU.
-
-«Hardware_BSY» folder have almost same bin files, but they used defined GPIO to signature.
-
-*_USART_9600Baud.bin in name mean what used USART communication interface at speed == 9600 baud
