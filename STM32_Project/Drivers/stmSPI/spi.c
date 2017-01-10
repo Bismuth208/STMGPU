@@ -69,31 +69,17 @@ void init_SPI1(void)
   */ 
 }
 
-void sendData8_SPI1(uint8_t data)
+inline void sendData8_SPI1(uint8_t data)
 {
-  //CLEAR_BIT(SPI1->CR1, SPI_DataSize_16b);       // set 8bit size
-  //WAIT_FREE_TX;         // wait for empty SPI_DR
-  SPI1->DR = data;      // add data to Tx queue
-  
-  WAIT_FREE_TX;
-  WAIT_FOR_BSY;
-  //SET_BIT(SPI1->CR1, SPI_DataSize_16b);
-}
-
-void sendData16_SPI1(uint16_t data)
-{
-#if 0
-  //WAIT_FREE_TX;
-  SET_BIT(SPI1->CR1, SPI_DataSize_16b);
-  
   SPI1->DR = data;
   
   WAIT_FREE_TX;
   WAIT_FOR_BSY;
-  CLEAR_BIT(SPI1->CR1, SPI_DataSize_16b);       // set 8bit size
-  
-#else // i don't know how, but this faster...
-  
+}
+
+inline void sendData16_SPI1(uint16_t data)
+{
+  // this faster, than change data size...
   SPI1->DR = (data>>8);
   
   WAIT_FREE_TX;
@@ -101,15 +87,11 @@ void sendData16_SPI1(uint16_t data)
   
   WAIT_FREE_TX;
   WAIT_FOR_BSY;
-#endif
 }
 
-void sendData32_SPI1(uint16_t data0, uint16_t data1)
+inline void sendData32_SPI1(uint16_t data0, uint16_t data1)
 {
-#if 0
- //WAIT_FREE_TX;
   SET_BIT(SPI1->CR1, SPI_DataSize_16b);
-  
   SPI1->DR = data0;
   
   WAIT_FREE_TX;
@@ -117,24 +99,7 @@ void sendData32_SPI1(uint16_t data0, uint16_t data1)
   
   WAIT_FREE_TX;
   WAIT_FOR_BSY;
-  CLEAR_BIT(SPI1->CR1, SPI_DataSize_16b);       // set 8bit size
-  
-#else // i don't know how, but this faster...
-  
-  SPI1->DR = (data0>>8);
-  
-  WAIT_FREE_TX;
-  SPI1->DR = (data0);
-  
-  WAIT_FREE_TX;
-  SPI1->DR = (data1>>8);
-  
-  WAIT_FREE_TX;
-  SPI1->DR = (data1);
-  
-  WAIT_FREE_TX;
-  WAIT_FOR_BSY;
-#endif
+  CLEAR_BIT(SPI1->CR1, SPI_DataSize_16b);
 }
 
 void sendArr8_SPI1(void *data, uint32_t size)
