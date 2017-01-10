@@ -2,8 +2,8 @@
 
 // --------------------------------------------------------- //
 
-const char tileFileName[] = "mario.tle";
-const char mapFileName[] = "mario.map";
+const char tileFileName[] = "mario";
+const char mapFileName[] = "mario";
 
 //#define CHK_GPU_BSY_PIN 2 // which pin arduino must check
 

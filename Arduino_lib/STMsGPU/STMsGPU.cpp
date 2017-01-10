@@ -296,6 +296,7 @@ int16_t STMGPU::width(void)
 }
 
 // --------------- Font/Print --------------- //
+// make a DDoS to GPU's buffer...
 #if ARDUINO >= 100
 size_t STMGPU::write(uint8_t c) {
 #else
@@ -372,26 +373,10 @@ void STMGPU::cp437(bool cp)
   
   sendCommand(cmdBuffer.data, 2);
 }
-
-// make a DDoS to GPU's buffer...
+  
+#if 0
 size_t STMGPU::print(const char *str)
 {
-  /*
-   while (*str) {
-   write((uint8_t)*str);
-   str++;
-   }
-   
-  uint16_t strSize = strlen(str);
-  
-  for (uint16_t count=0; count < strSize; count++) {
-    cmdBuffer.cmd = DRW_PRNT_C;
-    cmdBuffer.par1 = str[count];
-    
-    sendCommand(cmdBuffer.data, 2);
-  }
-   */
-  
   cmdBuffer.cmd = DRW_PRNT;
   cmdBuffer.data[1] = strlen(str);
   
@@ -399,127 +384,7 @@ size_t STMGPU::print(const char *str)
   sendCommand((void*)str, cmdBuffer.data[1]);
   return 0;
 }
-
-size_t STMGPU::print(const String &str)
-{
-  for (uint16_t i = 0; i < str.length(); i++) {
-    write(str[i]);
-  }
-  return 0;
-}
-
-size_t STMGPU::print(const __FlashStringHelper *str)
-{
-  PGM_P p = reinterpret_cast<PGM_P>(str);
-  uint8_t c;
-  while ((c = pgm_read_byte(p)) != 0) {
-    write(c);
-    p++;
-  }
-  return 0;
-}
-
-size_t STMGPU::print(char c){
-  write(c);
-  return 0;
-}
-
-size_t STMGPU::print(unsigned char c, int b){
-  Print::print(c,b);
-  return 0;
-}
-
-size_t STMGPU::print(int d, int b){
-  Print::print(d,b);
-  return 0;
-}
-
-size_t STMGPU::print(unsigned int u, int b){
-  Print::print(u,b);
-  return 0;
-}
-
-size_t STMGPU::print(long l, int b){
-  Print::print(l,b);
-  return 0;
-}
-
-size_t STMGPU::print(unsigned long ul, int b){
-  Print::print(ul,b);
-  return 0;
-}
-
-size_t STMGPU::print(double d, int b){
-  Print::print(d,b);
-  return 0;
-}
-
-size_t STMGPU::print(const Printable& str){
-  Print::print(str);
-  return 0;
-}
-  
-// --------- //
-size_t STMGPU::println(const __FlashStringHelper *str){
-  Print::println(str);
-  return 0;
-}
-  
-size_t STMGPU::println(const String &str){
-  Print::println(str);
-  return 0;
-}
-  
-size_t STMGPU::println(const char* str){
-  Print::println(str);
-  return 0;
-}
-  
-size_t STMGPU::println(char c){
-  Print::println(c);
-  return 0;
-}
-  
-size_t STMGPU::println(unsigned char c, int b){
-  Print::println(c,b);
-  return 0;
-}
-  
-size_t STMGPU::println(int d, int b){
-  Print::println(d,b);
-  return 0;
-}
-  
-size_t STMGPU::println(unsigned int u, int b){
-  Print::println(u,b);
-  return 0;
-}
-  
-size_t STMGPU::println(long l, int b){
-  Print::println(l,b);
-  return 0;
-}
-  
-size_t STMGPU::println(unsigned long ul, int b){
-  Print::println(ul,b);
-  return 0;
-}
-  
-size_t STMGPU::println(double d, int b){
-  Print::println(d,b);
-  return 0;
-}
-  
-size_t STMGPU::println(const Printable& str){
-  Print::println(str);
-  return 0;
-}
-  
-size_t STMGPU::println(void){
-  Print::println();
-  return 0;
-}
-  
+#endif
 // --------- //
 void STMGPU::printAt(int16_t x, int16_t y,  char c)
 {
@@ -719,7 +584,7 @@ void STMGPU::loadRegionOfTileSet8x8(const char *tileSetArrName, uint8_t tileSetW
 
 void STMGPU::drawTile8x8(int16_t posX, int16_t posY, uint8_t tileNum)
 {
-  cmdBuffer.cmd = DRW_TLE_8_POS;
+  cmdBuffer.cmd = DRW_TLE_8;
   cmdBuffer.par1 = posX;
   cmdBuffer.par2 = posY;
   cmdBuffer.data[5] = tileNum;
@@ -799,6 +664,17 @@ void STMGPU::drawSprite(uint8_t sprNum)
   
   sendCommand(cmdBuffer.data, 2);
 }
+  
+// in future i fix that...
+void STMGPU::drawSprite(uint8_t sprNum, uint16_t posX, uint16_t posY)
+{
+  setSpritePosition(sprNum, posX, posY);
+  
+  cmdBuffer.cmd = DRW_SPR;
+  cmdBuffer.data[1] = sprNum;
+  
+  sendCommand(cmdBuffer.data, 2);
+}
 
 bool STMGPU::getSpriteCollision(uint8_t sprNum1, uint8_t sprNum2)
 {
@@ -814,20 +690,9 @@ bool STMGPU::getSpriteCollision(uint8_t sprNum1, uint8_t sprNum2)
 }
 
 // ----------------- SD card ---------------- //
-void STMGPU::printBMP(uint16_t x, uint16_t y, const char *fileName)
-{
-  cmdBuffer.cmd = DRW_MBP_FIL;
-  cmdBuffer.par1 = x;
-  cmdBuffer.par2 = y;
-  cmdBuffer.data[5] = strlen(fileName);
-  
-  sendCommand(cmdBuffer.data, 6);
-  sendCommand((void*)fileName, cmdBuffer.data[5]); // send name of file
-}
-
 void STMGPU::printBMP(const char *fileName)
 {
-  cmdBuffer.cmd = DRW_MBP_FIL;
+  cmdBuffer.cmd = DRW_BMP_FIL;
   cmdBuffer.par1 = 0;
   cmdBuffer.par2 = 0;
   cmdBuffer.data[5] = strlen(fileName);
@@ -835,9 +700,68 @@ void STMGPU::printBMP(const char *fileName)
   sendCommand(cmdBuffer.data, 6);
   sendCommand((void*)fileName, cmdBuffer.data[5]); // send name of file
 }
-
-
-
+  
+void STMGPU::printBMP(const __FlashStringHelper* str)
+{
+  uint8_t c;
+  PGM_P p = reinterpret_cast<PGM_P>(str);
+    
+  cmdBuffer.cmd = DRW_BMP_FIL;
+  cmdBuffer.par1 = 0;
+  cmdBuffer.par2 = 0;
+  cmdBuffer.data[5] = strlen_P(p);
+    
+  sendCommand(cmdBuffer.data, 6);
+    
+  while ((c = pgm_read_byte(p)) != 0) {
+    Serial.write(c);
+    p++;
+  }
+}
+  
+void STMGPU::printBMP(uint16_t x, uint16_t y, const String &str)
+{
+  cmdBuffer.cmd = DRW_BMP_FIL;
+  cmdBuffer.par1 = x;
+  cmdBuffer.par2 = y;
+  cmdBuffer.data[5] = str.length();
+  
+  sendCommand(cmdBuffer.data, 6);
+  
+  for (uint16_t i = 0; i < str.length(); i++) {
+    Serial.write(str[i]);
+  }
+}
+  
+void STMGPU::printBMP(uint16_t x, uint16_t y, const char *fileName)
+{
+  cmdBuffer.cmd = DRW_BMP_FIL;
+  cmdBuffer.par1 = x;
+  cmdBuffer.par2 = y;
+  cmdBuffer.data[5] = strlen(fileName);
+  
+  sendCommand(cmdBuffer.data, 6);
+  sendCommand((void*)fileName, cmdBuffer.data[5]);
+}
+  
+void STMGPU::printBMP(uint16_t x, uint16_t y, const __FlashStringHelper* str)
+{
+  uint8_t c;
+  PGM_P p = reinterpret_cast<PGM_P>(str);
+  
+  cmdBuffer.cmd = DRW_BMP_FIL;
+  cmdBuffer.par1 = x;
+  cmdBuffer.par2 = y;
+  cmdBuffer.data[5] = strlen_P(p);
+  
+  sendCommand(cmdBuffer.data, 6);
+  
+  while ((c = pgm_read_byte(p)) != 0) {
+    Serial.write(c);
+    p++;
+  }
+}
+  
 // -------------------- ___ ---------------------- //
 
 // Pass 8-bit (each) R,G,B, get back 16-bit packed color

@@ -1,5 +1,7 @@
 #include <STMsGPU.h>
 
+#define FS(x) (__FlashStringHelper*)(x)
+
 // --------------------------------------------------------- //
 
 //#define CHK_GPU_BSY_PIN 2 // which pin arduino must check
@@ -12,10 +14,11 @@
 STMGPU gpu = STMGPU(); // use software BSY check, no pin used
 
 // --------------------------------------------------------- //
-
-const char bmpFileName1[] = "vice24.bmp";
-const char bmpFileName2[] = "circuit.bmp";
-const char bmpFileName3[] = "tiger.bmp";
+// sGPU add *.bmp extension automatically
+const char bmpFileName1[] = "vice24";
+const char bmpFileName2[] = "circuit";
+const char bmpFileName3[] = "tiger";
+const char bmpFileName4[] PROGMEM = "house"; // this string as example for RAM save
 
 // ---------------------------------------------------------- //
 void setup() {
@@ -27,10 +30,10 @@ void setup() {
 }
 
 void loop() {
-
-  gpu.printBMP(0, 20, bmpFileName1);
-  gpu.printBMP(bmpFileName2);
-  gpu.printBMP(bmpFileName3);
+  gpu.printBMP(0, 20, bmpFileName1); // draw bmp picture at position
+  gpu.printBMP(bmpFileName2);        // \__ draw pic at 0,0 position
+  gpu.printBMP(bmpFileName3);        // /
+  gpu.printBMP(FS(bmpFileName4));    // same as above, but name stored in ROM
 
   gpu.fillScreen(COLOR_BLACK);
 }

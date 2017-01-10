@@ -8,6 +8,10 @@
 #define TEST_SAMPLE_SIZE    300
 #define TEST_SAMPLE_SCREENS 20 // this is equal to 24000 tiles
 
+#define MAX_TILES 70
+
+#define SPRITE_NUMBER 0
+
 // --------------------------------------------------------- //
 
 //#define CHK_GPU_BSY_PIN 2 // which pin arduino must check
@@ -21,7 +25,7 @@ STMGPU gpu = STMGPU(); // use software BSY check, no pin used
 
 // --------------------------------------------------------- //
 
-const char tileFileName[] = "pcs8x8.tle";
+const char tileFileName[] = "pcs8x8";
 
 static uint16_t nextInt = 9;
 
@@ -37,11 +41,18 @@ uint16_t randNum(void)
 }
 // --------------------------------------------------------- //
 
-void gpuMakeSprites(void)
+// setup single sprite - number SPRITE_NUMBER
+void gpuMakeSprite(void)
 {
-  gpu.setSpriteTiles(0, 0, 1, 2, 3);
-  gpu.setSpriteType(0, SPR_2X1_8);
-  gpu.setSpriteVisible(0, 1);
+  // set tiles for sprite
+  // always 4 numbers, even when sprite consist of 1 tile,
+  // not used tiles may be set to any value (best is 0)
+  gpu.setSpriteTiles(SPRITE_NUMBER, 0, 1, 0, 0);
+  // set sprite type: 
+  // SPR_2X1_8 mean: 2 sprites high, 1 widht, 8x8 pix single tile
+  gpu.setSpriteType(SPRITE_NUMBER, SPR_2X1_8);
+  // if you do not set this to 1, then the sprite will not be drawn
+  gpu.setSpriteVisible(SPRITE_NUMBER, 1);
 }
 
 // --------------------------------------------------------- //
@@ -55,9 +66,8 @@ void drawRandSprites(void)
     rndPosX = randNum() % TFT_W;
     rndPosY = randNum() % TFT_H;
     
-    // draw sprite 0 at random position
-    gpu.setSpritePosition(0, rndPosX, rndPosY);
-    gpu.drawSprite(0);
+    // draw sprite SPRITE_NUMBER at random position
+    gpu.drawSprite(SPRITE_NUMBER, rndPosX, rndPosY);
   }
 }
 
@@ -69,16 +79,16 @@ void setup() {
   //USART_BAUD_1M = 1000000
   gpu.sync(USART_BAUD_1M);
 
-  /* load 90 tiles to GPU's RAM at 0 position in RAM,
+  /* load MAX_TILES tiles to GPU's RAM at 0 position in RAM,
   *  from tileFileName,
   *  located on SD card attached to STM32 GPU
   *  9 - is width of tileSet in tiles ( 9 tiles width == 72 pixels)
   *  file name must respond to 8.3 name system
   *  8 chars max for filename, 3 chars max for file extension
   */
-  gpu.loadTileSet8x8(tileFileName, 9, 0, 90);
+  gpu.loadTileSet8x8(tileFileName, 9, 0, MAX_TILES);
 
-  gpuMakeSprites();
+  gpuMakeSprite();
 }
 
 void loop() {

@@ -45,24 +45,25 @@ void testDrawTiles(void)
     rndPosX = randNum() % TFT_W;
     rndPosY = randNum() % TFT_H;
     
-    // draw random tile form 0 to 90, at random position
-    gpu.drawTile8x8(rndPosX, rndPosY, randNum()%90);
+    // draw random tile from 0 to MAX_TILES, at random position
+    gpu.drawTile8x8(rndPosX, rndPosY, randNum()%MAX_TILES);
   }
 }
 
 // Draw on screen limited range of tiles
-// on screen must apear square 10x9 tiles
+// on screen must apear square 10x8 tiles
 void drawRamTileSet8x8(void)
 {
   int16_t posX, posY;
   uint8_t count =0;
   
   // draw 90 tiles
-  for(uint8_t countY =0; countY <10; countY++) {
-    for(uint8_t countX =0; countX <9; countX++) {
+  for(uint8_t countY =0; countY <TILE_SET_W; countY++) {
+    for(uint8_t countX =0; countX <TILE_SET_H; countX++) {
       
-      posX = (50 + ( countX * 8 )); // \__ 50 is default position in px on screen
-      posY = (50 + ( countY * 8 )); // /   8 is single tile size, each tile 8x8 in px
+      // 50 is default position in px on screen
+      posX = (50 + ( countX * TLE_8X8_SIZE ));
+      posY = (50 + ( countY * TLE_8X8_SIZE ));
       
       gpu.drawTile8x8(posX, posY, count);
       
@@ -77,15 +78,15 @@ void fillScreenByTiles(void)
   uint8_t xStep, yStep;
   uint8_t maxXSize, maxYSize;
 
-  maxXSize = TFT_W / 8;
-  maxYSize = TFT_H / 8;
+  maxXSize = TFT_W / TLE_8X8_SIZE;
+  maxYSize = TFT_H / TLE_8X8_SIZE;
 
   for (uint8_t i = 0; i < TEST_SAMPLE_SCREENS; i++) {
     for (yStep = 0; yStep < maxYSize; yStep++) {
       for (xStep = 0; xStep < maxXSize; xStep++) {
 
-        // draw random tile form 0 to 90
-        gpu.drawTile8x8(xStep*8, yStep*8, randNum()%90);
+        // draw random tile form 0 to MAX_TILES
+        gpu.drawTile8x8(xStep*TLE_8X8_SIZE, yStep*TLE_8X8_SIZE, randNum()%MAX_TILES);
       }
     } 
   }
@@ -99,14 +100,14 @@ void setup() {
   //USART_BAUD_1M = 1000000
   gpu.sync(USART_BAUD_1M);
 
-  /* load 90 tiles to GPU's RAM at 0 position in RAM,
+  /* load MAX_TILES tiles to GPU's RAM at 0 position in RAM,
   *  from tileFileName,
   *  located on SD card attached to STM32 GPU
   *  9 - is width of tileSet in tiles ( 9 tiles width == 72 pixels)
   *  file name must respond to 8.3 name system
   *  8 chars max for filename, 3 chars max for file extension
   */
-  gpu.loadTileSet8x8(tileFileName, 9, 0, 90);
+  gpu.loadTileSet8x8(tileFileName, 9, 0, MAX_TILES);
 }
 
 

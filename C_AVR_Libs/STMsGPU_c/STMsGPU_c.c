@@ -35,7 +35,8 @@
 #define MAX_TEXT_SIZE   30
 
 // ------------------------------------------------------------------------------------ //
-static cmdBuffer_t cmdBuffer;   // more RAM used but little faster and less ROM used
+// more RAM used but little faster, less ROM used and less problems whith stack
+static cmdBuffer_t cmdBuffer;
 //static uint8_t cmdBufferStr[MAX_TEXT_SIZE];
 
 // at sync, GPU return it`s LCD resolution,
@@ -656,6 +657,15 @@ bool getSpriteCollision(uint8_t sprNum1, uint8_t sprNum2)
 
 
 // ---------------- SD card ----------------- //
+void SDLoadPalette(const char *palleteArrName)
+{
+  cmdBuffer.cmd = LDD_USR_PAL;
+  cmdBuffer.data[1] = strlen(palleteArrName);
+  
+  sendCommand(cmdBuffer.data, 2);
+  sendCommand((void*)palleteArrName, cmdBuffer.data[1]); // send name of file
+}
+
 void SDPrintBMP(uint16_t x, uint16_t y, const char *fileName)
 {
   cmdBuffer.cmd = DRW_MBP_FIL;

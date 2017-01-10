@@ -16,30 +16,13 @@
 #include <pgmspace.h>
 #endif
 
-// -------------------------- Command list --------------------------- //
-// CLR  - CLEAR
-// FLL  - FILL
-// DRW  - DRAW
-// PSH  - PUSH
-// CR   - COLOR
-// PRNT - PRINT
-// POS  - POSITION
-// WRT  - WRITE
-// LDD  - LOAD
-// UPD  - UPDATE
-// SCR  - SCREEN
-// MAK  - MAKE
-// TLE  - TILE
-// SCRL - SCROLL
-// SMTH - SMOOTH
-
 // ------------------ Base ------------------ //
 //#define NOT_USED         0x00
 #define FLL_SCR         0x01
 //#define NOT_USED          0x02
 #define DRW_PIXEL       0x03
 
-// ------------- Primitives/GFX ------------- ///
+// ------------- Primitives/GFX ------------- //
 #define FLL_RECT        0x04
 #define DRW_RECT        0x05
 #define DRW_ROUND_RECT  0x06
@@ -51,13 +34,13 @@
 #define FLL_CIRCLE      0x0C
 #define DRW_TRINGLE     0x0D
 #define FLL_TRINGLE     0x0E
-#define GET_RESOLUTION  0x0F
+#define GET_RESOLUTION  0x0F  //
 
 // --------------- Font/Print --------------- //
 #define DRW_CHAR        0x10    // drawChar()
 #define DRW_PRNT        0x11    // print()
 #define DRW_PRNT_C      0x12    // printChar()
-#define DRW_PRNT_POS_C  0x13    // printCharPos()
+#define DRW_PRNT_POS_C  0x13    // printCharAt()
 #define SET_CURSOR      0x14    // setCursor()
 #define SET_TXT_CR      0x15    // setTextColor()
 #define SET_TXT_CR_BG   0x16    // setTextColorBG()
@@ -79,36 +62,41 @@
 #define WRT_CMD         0x23    // writeCommand()
 #define WRT_DATA        0x24    // writeData()
 #define WRT_DATA_U16    0x25    // writeWordData()
-#define SET_V_SCRL_ADR  0x26    // tftScrollAddress()
-#define SET_SLEEP       0x27    // tftSetSleep()
-#define SET_IDLE        0x28    // tftSetIdleMode()
-#define SET_BRIGHTNES   0x29    // tftSetDispBrightness()
-#define SET_INVERTION   0x2A    // tftSetInvertion()
+#define SET_V_SCRL_ADR  0x26    // scrollAddress()
+#define SET_SLEEP       0x27    // setSleep()
+#define SET_IDLE        0x28    // setIdleMode()
+#define SET_BRIGHTNES   0x29    // setDispBrightness()
+#define SET_INVERTION   0x2A    // setInvertion()
 #define SET_GAMMA       0x2B    // setGamma()
-#define MAK_SCRL        0x2C    // tftScroll()
-#define MAK_SCRL_SMTH   0x2D    // tftScrollSmooth()
+#define MAK_SCRL        0x2C    // scrollScreen()
+#define MAK_SCRL_SMTH   0x2D    // scrollScreenSmooth()
 #define PSH_CR          0x2E
-//#define NOT_USED        0x2F
+
+// ------- BSY protect selection ------------ //
+#define BSY_SELECT      0x2F
 
 
 // ------------------- Tile ----------------- //
 #define LDD_TLE_8       0x30    // load tile 8x8 size from SD
 #define LDD_TLES_8      0x31    // load tiles 8x8 size from SD
 #define LDD_TLES_RG_8   0x32    // load region of tiles 8x8 size from SD
-#define DRW_TLE_8_POS   0x33    // draw tile 8x8 size on TFT screen
-#define LDD_TLE_MAP     0x34    // load background tile map 8x8 from SD
-#define DRW_TLE_MAP     0x35    // draw background tile map 8x8 on TFT screen
-//#define DRW_TLE_SCR     0x36    // draw tile screen on TFT screen
-//#define MAK_METTLE      0x37    // group tiles to metatile
-//#define DRW_METTLE_SCR  0x38    // draw metatile on screen
-//#define DRW_METTLE_POS  0x39    // draw metatile in tile screen
-//#define DRW_METSCR_POS  0x3A    // draw all tile screens on screen
-//#define NOT_USED        0x3B
-//#define NOT_USED        0x3C
-//#define NOT_USED        0x3D
-//#define NOT_USED        0x3E
-//#define NOT_USED        0x3F
+#define DRW_TLE_8       0x33    // draw tile 8x8 size on TFT screen
 
+#define LDD_TLE_16      0x34    // load tile 16x16 size from SD
+#define LDD_TLES_16     0x35    // load tiles 16x16 size from SD
+#define LDD_TLES_RG_16  0x36    // load region of tiles 16x16 size from SD
+#define DRW_TLE_16      0x37    // draw tile 16x16 size on TFT screen
+
+#define LDD_TLE_32      0x38    // load tile 32x32 size from SD
+#define LDD_TLES_32     0x39    // load tiles 32x32 size from SD
+#define LDD_TLES_RG_32  0x3A    // load region of tiles 32x32 size from SD
+#define DRW_TLE_32      0x3B    // draw tile 32x32 size on TFT screen
+
+#define LDD_TLE_MAP     0x3C    // load background tile map 8x8 from SD
+#define DRW_TLE_MAP     0x3D    // draw background tile map 8x8 on TFT screen
+
+#define LDD_TLE_U       0x3E    // load specified tile size from SD
+#define DRW_TLE_U       0x3F    // draw specified tile size on TFT screen
 
 // ----------------- Sprite ----------------- //
 #define SET_SPR_POS     0x40    // set sprite position
@@ -131,7 +119,7 @@
 
 // ----------------- SD card ---------------- //
 #define LDD_USR_PAL     0x50    // load user palette from SD card
-#define DRW_MBP_FIL     0x51    // draw bmp file located on SD card
+#define DRW_BMP_FIL     0x51    // draw bmp file located on SD card
 //#define NOT_USED        0x52
 //#define NOT_USED        0x53
 //#define NOT_USED        0x54
@@ -148,8 +136,26 @@
 //#define NOT_USED        0x5F
 
 
+// --------------- GUI commands -------------- //
+#define SET_WND_CR      0x60    // Set window colors
+#define DRW_WND         0x61    // draw window
+#define DRW_WND_TXT     0x62    // draw window whith text
+#define DRW_BTN_NUM     0x63    // draw numerated buttons
+//#define NOT_USED        0x64
+//#define NOT_USED        0x65
+//#define NOT_USED        0x66
+//#define NOT_USED        0x67
+//#define NOT_USED        0x68
+//#define NOT_USED        0x69
+//#define NOT_USED        0x6A
+//#define NOT_USED        0x6B
+//#define NOT_USED        0x6C
+//#define NOT_USED        0x6D
+//#define NOT_USED        0x6E
+//#define NOT_USED        0x6F
+
 // ---------------- NOT_USED ---------------- //
-// -------------- 0x60 - 0xFF --------------- //
+// -------------- 0x70 - 0xFF --------------- //
 
 
 
@@ -239,38 +245,37 @@ public:
   STMGPU(int8_t bsyPin);
   STMGPU();
   
-  void begin(uint32_t);
-
-  void sync(uint32_t baudRate);
-  void sendCommand(void *buf, uint8_t size);
+  void  begin(uint32_t),
+        sync(uint32_t baudRate),
+        sendCommand(void *buf, uint8_t size);
 
 // ------------------ Base ------------------ //
-  void drawPixel(int16_t x, int16_t y, uint16_t color);
-  void fillScreen(uint16_t color);
+  void  drawPixel(int16_t x, int16_t y, uint16_t color),
+        fillScreen(uint16_t color);
    
 // ------------- Primitives/GFX ------------- //
-  void fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
-  void drawRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
-  void drawRoundRect(int16_t x, int16_t y, int16_t w, int16_t h, int16_t radius, uint16_t color);
-  void fillRoundRect(int16_t x, int16_t y, int16_t w, int16_t h, int16_t radius, uint16_t color);
-  void drawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint16_t color);
-  void drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color);
-  void drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color);
+  void  fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color),
+        drawRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color),
+        drawRoundRect(int16_t x, int16_t y, int16_t w, int16_t h, int16_t radius, uint16_t color),
+        fillRoundRect(int16_t x, int16_t y, int16_t w, int16_t h, int16_t radius, uint16_t color),
+        drawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint16_t color),
+        drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color),
+        drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color),
   
-  void drawCircle(int16_t x, int16_t y, int16_t r, uint16_t color);
-  void fillCircle(int16_t x, int16_t y0, int16_t r, uint16_t color);
-  void drawTriangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t color);
-  void fillTriangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t color);
+        drawCircle(int16_t x, int16_t y, int16_t r, uint16_t color),
+        fillCircle(int16_t x, int16_t y0, int16_t r, uint16_t color),
+        drawTriangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t color),
+        fillTriangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t color);
   
-  uint16_t scroll(uint16_t lines, uint16_t yStart);
-  uint16_t scrollSmooth(uint16_t lines, uint16_t yStart, uint8_t wait);
+  uint16_t  scroll(uint16_t lines, uint16_t yStart),
+            scrollSmooth(uint16_t lines, uint16_t yStart, uint8_t wait);
   
   //void drawBitmap(int16_t x, int16_t y, const uint8_t *bitmap, int16_t w, int16_t h, uint16_t color);
   //void drawBitmapBG(int16_t x, int16_t y, const uint8_t *bitmap, int16_t w, int16_t h, uint16_t color, uint16_t bg);
   void drawXBitmap(int16_t x, int16_t y, const uint8_t *bitmap, int16_t w, int16_t h, uint16_t color);
   
-  uint16_t color565(uint8_t r, uint8_t g, uint8_t b);
-  uint16_t conv8to16(uint8_t x);
+  uint16_t  color565(uint8_t r, uint8_t g, uint8_t b),
+            conv8to16(uint8_t x);
   
   //uint16_t columns(void);
   //uint16_t rows(void);
@@ -288,13 +293,13 @@ public:
   //int16_t getCursorY(void);
   
   //void setTextFont(unsigned char* f);
-  void drawChar(int16_t x, int16_t y, uint8_t c, uint16_t color, uint16_t bg, uint8_t size);
-  void setCursor(int16_t x, int16_t y);
-  void setTextColor(uint16_t color);
-  void setTextColor(uint16_t color, uint16_t bg);
-  void setTextSize(uint8_t size);
-  void setTextWrap(bool wrap);
-  void cp437(bool cp);
+  void  drawChar(int16_t x, int16_t y, uint8_t c, uint16_t color, uint16_t bg, uint8_t size),
+        setCursor(int16_t x, int16_t y),
+        setTextColor(uint16_t color),
+        setTextColor(uint16_t color, uint16_t bg),
+        setTextSize(uint8_t size),
+        setTextWrap(bool wrap),
+        cp437(bool cp);
   
 #if ARDUINO >= 100
   virtual size_t write(uint8_t);
@@ -302,51 +307,28 @@ public:
   virtual void   write(uint8_t);
 #endif
   
-  virtual size_t print(const __FlashStringHelper *);
-  virtual size_t print(const String &);
-  virtual size_t print(const char[]);
-  virtual size_t print(char);
-  virtual size_t print(unsigned char, int = DEC);
-  virtual size_t print(int, int = DEC);
-  virtual size_t print(unsigned int, int = DEC);
-  virtual size_t print(long, int = DEC);
-  virtual size_t print(unsigned long, int = DEC);
-  virtual size_t print(double, int = 2);
-  virtual size_t print(const Printable&);
+  //virtual size_t print(const char[]);
   
-  virtual size_t println(const __FlashStringHelper *);
-  virtual size_t println(const String &s);
-  virtual size_t println(const char[]);
-  virtual size_t println(char);
-  virtual size_t println(unsigned char, int = DEC);
-  virtual size_t println(int, int = DEC);
-  virtual size_t println(unsigned int, int = DEC);
-  virtual size_t println(long, int = DEC);
-  virtual size_t println(unsigned long, int = DEC);
-  virtual size_t println(double, int = 2);
-  virtual size_t println(const Printable&);
-  virtual size_t println(void);
-  
-  void printAt(int16_t x, int16_t y, char);
-  void printAt(int16_t x, int16_t y, const char *str);
-  void printAt(int16_t x, int16_t y, const String &str);
-  void printAt(int16_t x, int16_t y, const __FlashStringHelper* str);
+  void printAt(int16_t x, int16_t y, char),
+       printAt(int16_t x, int16_t y, const char *str),
+       printAt(int16_t x, int16_t y, const String &str),
+       printAt(int16_t x, int16_t y, const __FlashStringHelper* str);
 
 // ---------------- Low Level --------------- //
-  void setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
-  void setRotation(uint8_t m);
-  void setScrollArea(uint16_t TFA, uint16_t BFA);
-  void scrollAddress(uint16_t VSP);
-  void setSleep(bool enable);
-  void setIdleMode(bool mode);
-  void setDispBrightness(uint8_t brightness);
-  void setInvertion(bool i);
-  //void setGamma(uint8_t gamma);
-  void pushColor(uint16_t color);
+  void setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1),
+       setRotation(uint8_t m),
+       setScrollArea(uint16_t TFA, uint16_t BFA),
+       scrollAddress(uint16_t VSP),
+       setSleep(bool enable),
+       setIdleMode(bool mode),
+       setDispBrightness(uint8_t brightness),
+       setInvertion(bool i),
+  //     setGamma(uint8_t gamma),
+       pushColor(uint16_t color);
   
-  void writeCommand(uint8_t c);
-  void writeData(uint8_t d);
-  void writeWordData(uint16_t c);
+  void writeCommand(uint8_t c),
+       writeData(uint8_t d),
+       writeWordData(uint16_t c);
   
 // ------------------- Tile ----------------- //
   void loadTileFromSet8x8(const char *tileSetArrName, uint8_t tileSetW,
@@ -369,17 +351,19 @@ public:
                       uint8_t tle3, uint8_t tle4);
   void setSpritesAutoRedraw(uint8_t state);
   void drawSprite(uint8_t sprNum);
+  void drawSprite(uint8_t sprNum, uint16_t posX, uint16_t posY);
   bool getSpriteCollision(uint8_t sprNum1, uint8_t sprNum2);
   
   
 // ----------------- SD card ---------------- //
-  void printBMP(uint16_t x, uint16_t y, const char *fileName);
   void printBMP(const char *fileName);
-  //void printBMP(uint16_t x, uint16_t y, const String &str);
-  //void printBMP(uint16_t x, uint16_t y, const __FlashStringHelper* str);
-  
+  void printBMP(const __FlashStringHelper* str);
+  void printBMP(uint16_t x, uint16_t y, const String &str);
+  void printBMP(uint16_t x, uint16_t y, const char *fileName);
+  void printBMP(uint16_t x, uint16_t y, const __FlashStringHelper* str);
   
 private:
+  // more RAM used but little faster, less ROM used and less problems whith stack
   cmdBuffer_t cmdBuffer;
   
 #if defined (__AVR__) || defined(TEENSYDUINO)
@@ -388,8 +372,8 @@ private:
   int8_t  _bsyPin;
 #elif defined (__arm__)
   //volatile RwReg *bsyPort;
-  int32_t _bsyPin;
   //uint32_t bsyPinMask;
+  int32_t _bsyPin;
 #elif defined (ARDUINO_ARCH_ARC32)
   int8_t  _bsyPin;
 #elif defined (ESP8266)

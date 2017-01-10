@@ -4,10 +4,11 @@
 #include <STMsGPU_c.h>
 
 // ---------------------------------------------------------- //
-
-const uint8_t bmpFileName1[] = "vice24.bmp";
-const uint8_t bmpFileName2[] = "circuit.bmp";
-const uint8_t bmpFileName3[] = "tiger.bmp";
+// sGPU add *.bmp extension automatically
+const uint8_t bmpFileName1[] = "vice24";
+const uint8_t bmpFileName2[] = "circuit";
+const uint8_t bmpFileName3[] = "tiger";
+const uint8_t bmpFileName4[] = "house";
 
 // ---------------------------------------------------------- //
 __attribute__ ((noreturn)) int main(void)
@@ -18,11 +19,11 @@ __attribute__ ((noreturn)) int main(void)
   sync_gpu();
 
   for(;;) {
-    
-    SDPrintBMP(0, 20, (const char*)bmpFileName1);
+  	SDPrintBMP(0, 20, (const char*)bmpFileName1);
     SDPrintBMP(0, 0, (const char*)bmpFileName2);
     SDPrintBMP(0, 0, (const char*)bmpFileName3);
+    SDPrintBMP(0, 0, (const char*)bmpFileName4);
 
-    tftFillScreen(COLOR_BLACK);  // clear screen by black color
+    tftfillScreen(COLOR_BLACK);
   }
 }
