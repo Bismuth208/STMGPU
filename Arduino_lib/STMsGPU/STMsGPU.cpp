@@ -35,22 +35,21 @@
 
 // ------------------------------------------------------------------------------------ //
 
-STMGPU::STMGPU(int8_t bsyPin)
+// --------------- Constructor --------------- //
+STMGPU::STMGPU(int8_t bsyPin):_bsyPin(bsyPin)
 {
   if(bsyPin) {
-    _bsyPin = bsyPin;
     _useHardwareBsy = true;
   } else {
     _useHardwareBsy = false;
   }
 }
 
-STMGPU::STMGPU()
-{
-  _useHardwareBsy = false;
-}
+STMGPU::STMGPU():_useHardwareBsy(false) {}
+// ------------------------------------------- //
 
-void STMGPU::sync(uint32_t baudRate)
+// this one make sync whith GPU
+void STMGPU::begin(uint32_t baudRate)
 {
   uint8_t syncData[2] = { 0x42, 0xDD};
 

@@ -11,7 +11,7 @@ const uint8_t bmpFileName3[] = "tiger";
 const uint8_t bmpFileName4[] = "house";
 
 // ---------------------------------------------------------- //
-__attribute__ ((noreturn)) int main(void)
+int main(void)
 {
   initSysTickTimer(); //it`s enable timer0 on atmega328p;
 
@@ -26,4 +26,6 @@ __attribute__ ((noreturn)) int main(void)
 
     tftfillScreen(COLOR_BLACK);
   }
+
+  return 0;
 }

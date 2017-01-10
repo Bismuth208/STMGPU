@@ -14,11 +14,15 @@
 #define TEST_SAMPLE_SIZE    300
 #define TEST_SAMPLE_SCREENS 20 // this is equal to 24000 tiles
 
+#define MAX_TILES 70
+
+#define SPRITE_NUMBER 0
+
 // --------------------------------------------------------- //
 
 static uint16_t nextInt = 9;
 
-const uint8_t tileFileName[] = "pcs8x8.tle";
+const uint8_t tileFileName[] = "pcs8x8";
 
 // --------------------------------------------------------- //
 
@@ -35,20 +39,28 @@ uint16_t randNum(void)
 
 void gpuLoadTiles(void)
 {
-  // load 90 tiles to GPU's RAM at 0 position in RAM,
-  // from tileFileName,
-  // located on SD card attached to STM32 GPU
-  // 9 - is width of tileSet in tiles ( 9 tiles width == 72 pixels)
-  // file name must respond to 8.3 name system
-  // 8 chars max for filename, 3 chars max for file extension
-  SDLoadTileSet8x8((const char*)tileFileName, 9, 0, 90);
+  /* load MAX_TILES tiles to GPU's RAM at 0 position in it's RAM,
+  *  from tileFileName,
+  *  located on SD card attached to STM32 GPU
+  *  9 - is width of tileSet in tiles ( 9 tiles width == 72 pixels)
+  *  file name must respond to 8.3 name system
+  *  8 chars max for filename, 3 chars max for file extension
+  *  sGPU add *.tle extension automatically
+  */
+  SDLoadTileSet8x8((const char*)tileFileName, 9, 0, MAX_TILES);
 }
 
 void gpuMakeSprites(void)
 {
-  setSpriteTiles(0, 0, 1, 2, 3);
-  setSpriteType(0, SPR_2X1_8);
-  setSpriteVisible(0, 1);
+  // set tiles for sprite
+  // always 4 numbers, even when sprite consist of 1 tile,
+  // not used tiles may be set to any value (best is 0)
+  setSpriteTiles(SPRITE_NUMBER, 0, 1, 0, 0);
+  // set sprite type: 
+  // SPR_2X1_8 mean: 2 sprites high, 1 widht, 8x8 pix single tile
+  setSpriteType(SPRITE_NUMBER, SPR_2X1_8);
+  // if you do not set this to 1, then the sprite will not be drawn
+  setSpriteVisible(SPRITE_NUMBER, 1);
 }
 
 // --------------------------------------------------------- //
@@ -62,9 +74,9 @@ void testDrawSprites(void)
     rndPosX = randNum() % TFT_W;
     rndPosY = randNum() % TFT_H;
     
-    // draw sprite 0 at random position
-    setSpritePosition(0, rndPosX, rndPosY);
-    drawSprite(0);
+    // draw sprite SPRITE_NUMBER at random position
+    setSpritePosition(SPRITE_NUMBER, rndPosX, rndPosY);
+    drawSprite(SPRITE_NUMBER);
   }
 }
 
@@ -80,10 +92,9 @@ __attribute__ ((noreturn)) int main(void)
   gpuMakeSprites();
 
   for(;;) {
-
     testDrawSprites();  // exec test function
 
-    _delayMS(500);  // actual 500 // little delay to see what happend on screen
+    _delayMS(500);               // little delay to see what happend on screen
     tftFillScreen(COLOR_BLACK);  // clear screen by black color
   }
 }

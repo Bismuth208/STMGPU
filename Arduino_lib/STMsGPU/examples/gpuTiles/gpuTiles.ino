@@ -3,22 +3,14 @@
 
 // --------------------------------------------------------- //
 
-#define TFT_W gpu.width()
-#define TFT_H gpu.height()
-
-#define TEST_SAMPLE_SIZE    12000
-#define TEST_SAMPLE_SCREENS 20 // this is equal to 24000 tiles
-
-// --------------------------------------------------------- //
-
 //#define CHK_GPU_BSY_PIN 2 // which pin arduino must check
 
 /* BE CAREFULL!! USED ONLY HARDWARE SERIAL PORT!!
 *  If your board have only ONE hardware serial,
 *  then you MUST use SoftWareSerial instead!
 */
-//STMGPU gpu = STMGPU(CHK_GPU_BSY_PIN); // use hardware BSY check, pin used
-STMGPU gpu = STMGPU(); // use software BSY check, no pin used
+//STMGPU gpu(CHK_GPU_BSY_PIN); // use hardware BSY check, pin used
+STMGPU gpu; // use software BSY check, no pin used
 
 // --------------------------------------------------------- //
 
@@ -98,16 +90,17 @@ void setup() {
   //USART_BAUD_57600 = 57600
   //USART_BAUD_115200 = 115200
   //USART_BAUD_1M = 1000000
-  gpu.sync(USART_BAUD_1M);
+  gpu.begin(USART_BAUD_1M);
 
-  /* load MAX_TILES tiles to GPU's RAM at 0 position in RAM,
+  /* load MAX_TILES tiles to GPU's RAM at 0 position in it's RAM,
   *  from tileFileName,
   *  located on SD card attached to STM32 GPU
   *  9 - is width of tileSet in tiles ( 9 tiles width == 72 pixels)
   *  file name must respond to 8.3 name system
   *  8 chars max for filename, 3 chars max for file extension
+  *  sGPU add *.tle extension automatically
   */
-  gpu.loadTileSet8x8(tileFileName, 9, 0, MAX_TILES);
+  gpu.loadTileSet8x8("pcs8x8", 9, 0, MAX_TILES);
 }
 
 

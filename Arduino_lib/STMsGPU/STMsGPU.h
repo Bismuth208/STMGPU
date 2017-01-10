@@ -245,8 +245,7 @@ public:
   STMGPU(int8_t bsyPin);
   STMGPU();
   
-  void  begin(uint32_t),
-        sync(uint32_t baudRate),
+  void  begin(uint32_t baudRate),
         sendCommand(void *buf, uint8_t size);
 
 // ------------------ Base ------------------ //
@@ -367,12 +366,8 @@ private:
   cmdBuffer_t cmdBuffer;
   
 #if defined (__AVR__) || defined(TEENSYDUINO)
-  //volatile *bsyPort;
-  //uint8_t  bsyPinMask;
   int8_t  _bsyPin;
 #elif defined (__arm__)
-  //volatile RwReg *bsyPort;
-  //uint32_t bsyPinMask;
   int32_t _bsyPin;
 #elif defined (ARDUINO_ARCH_ARC32)
   int8_t  _bsyPin;

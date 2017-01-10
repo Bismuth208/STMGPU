@@ -8,14 +8,6 @@ Sed porttitor neque ut ante pretium vitae malesuada nunc bibendum. \
 Nullam aliquet ultrices massa eu hendrerit. Ut sed nisi lorem. \
 In vestibulum purus a tortor imperdiet posuere.\n\n";
 
-const char textSize2[] PROGMEM = "\
-Text size 2\n";
-
-const char textSize3[] PROGMEM = "\
-Even bigger 3\n";
-
-const char textSize4[] PROGMEM = "\
-Seruious txt\n";
 
 void testdrawtext(void);
 void testlines(void);
@@ -61,3 +53,19 @@ void (*pArrExecGFXFunc[])(void) = {
   };
 
   #define FUNC_TO_TEST_COUNT (sizeof(pArrExecGFXFunc)/sizeof(pArrExecGFXFunc[0]))
+
+// --------------------------------------------------------- //
+
+#define TFT_W gpu.width()
+#define TFT_H gpu.height()
+
+#define TEST_SAMPLE_SIZE 2000
+#define TEST_SAMPLE_SCREENS 2
+
+#define MIN_COLOR 32
+#define MAX_COLOR 255
+#define COLOR_RANGE (((MAX_COLOR + 1) - MIN_COLOR) + MIN_COLOR)
+#define RND_COLOR (randNum() % COLOR_RANGE)
+
+#define RND_POSX(offset) (randNum() % (TFT_W-offset))
+#define RND_POSY(offset) (randNum() % (TFT_H-offset)) 

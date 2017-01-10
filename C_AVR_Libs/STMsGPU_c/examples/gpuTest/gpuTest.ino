@@ -16,6 +16,14 @@
 #define TEST_SAMPLE_SIZE 2000
 #define TEST_SAMPLE_SCREENS 2
 
+#define MIN_COLOR 32
+#define MAX_COLOR 255
+#define COLOR_RANGE (((MAX_COLOR + 1) - MIN_COLOR) + MIN_COLOR)
+#define RND_COLOR (randNum() % COLOR_RANGE)
+
+#define RND_POSX(offset) (randNum() % (TFT_W-offset))
+#define RND_POSY(offset) (randNum() % (TFT_H-offset)) 
+
 // --------------------------------------------------------- //
 
 static uint16_t nextInt = 9;
@@ -23,29 +31,6 @@ static uint16_t nextInt = 9;
 unsigned long thisMicros = 0;
 unsigned long lastMicros = 0;
 
-// --------------------------------------------------------- //
-
-void (*pArrExecGFXFunc[])(void) = {
-    testdrawtext,
-    testlines,
-    testfastlines,
-    //testdrawrects,
-    testfillrects,
-    testfillcircles,
-    testroundrects,
-    testtriangles,
-
-    drawRandPixels,
-    drawRandLines,
-    drawRandRect,
-    drawRandFillRect,
-    //drawRandTriangles,
-    //drawRandRoundRect,
-    //drawRandRoundFillRect,
-    drawRandCircle,
-    drawRandFillCircle,
-    matrixScreen
-  };
 
 // --------------------------------------------------------- //
 
@@ -66,12 +51,12 @@ void drawRandPixels(void)
   uint16_t posX, posY;
 
   for (uint16_t i = 0; i < TEST_SAMPLE_SIZE; i++) {
-    r = randNum() % ((255 + 1) - 64) + 64;
-    g = randNum() % ((255 + 1) - 64) + 64;
-    b = randNum() % ((255 + 1) - 64) + 64;
+    r = RND_COLOR;
+    g = RND_COLOR;
+    b = RND_COLOR;
 
-    posX = (randNum() % (TFT_W-1));
-    posY = (randNum() % (TFT_H-1));
+    posX = RND_POSX(1);
+    posY = RND_POSY(1);
 
     tftDrawPixel(posX, posY, color565(r, g, b));
   }
@@ -84,15 +69,15 @@ void drawRandLines(void)
   uint16_t posX1, posY1;
 
   for (uint16_t i = 0; i < TEST_SAMPLE_SIZE; i++) {
-    r = randNum() % ((255 + 1) - 64) + 64;
-    g = randNum() % ((255 + 1) - 64) + 64;
-    b = randNum() % ((255 + 1) - 64) + 64;
+    r = RND_COLOR;
+    g = RND_COLOR;
+    b = RND_COLOR;
 
-    posX = (randNum() % (TFT_W-1));
-    posY = (randNum() % (TFT_H-1));
+    posX = RND_POSX(1);
+    posY = RND_POSY(1);
 
-    posX1 = (randNum() % (TFT_W-1));
-    posY1 = (randNum() % (TFT_H-1));
+    posX1 = RND_POSX(1);
+    posY1 = RND_POSY(1);
 
     tftDrawLine(posX, posY, posX1, posY1, color565(r, g, b));
   }
@@ -106,15 +91,15 @@ void drawRandRect(void)
   uint16_t posX, posY;
 
   for (uint16_t i = 0; i < TEST_SAMPLE_SIZE; i++) {
-    r = randNum() % ((255 + 1) - 64) + 64;
-    g = randNum() % ((255 + 1) - 64) + 64;
-    b = randNum() % ((255 + 1) - 64) + 64;
+    r = RND_COLOR;
+    g = RND_COLOR;
+    b = RND_COLOR;
 
-    posX = (randNum() % (TFT_W-4));
-    posY = (randNum() % (TFT_H-4));
+    posX = RND_POSX(4);
+    posY = RND_POSY(4);
 
-    widght = (randNum() % ((TFT_W - posX -4)));
-    height = (randNum() % ((TFT_H - posY -4)));
+    widght = RND_POSX(posX-4);
+    height = RND_POSY(posY-4);
 
     if (widght <= 1) {
       widght = 2;
@@ -135,15 +120,15 @@ void drawRandFillRect(void)
   uint16_t posX, posY;
 
   for (uint16_t i = 0; i < TEST_SAMPLE_SIZE; i++) {
-    r = randNum() % ((255 + 1) - 64) + 64;
-    g = randNum() % ((255 + 1) - 64) + 64;
-    b = randNum() % ((255 + 1) - 64) + 64;
+    r = RND_COLOR;
+    g = RND_COLOR;
+    b = RND_COLOR;
 
-    posX = (randNum() % (TFT_W-4));
-    posY = (randNum() % (TFT_H-4));
+    posX = RND_POSX(4);
+    posY = RND_POSY(4);
 
-    widght = (randNum() % ((TFT_W - posX -4)));
-    height = (randNum() % ((TFT_H - posY -4)));
+    widght = RND_POSX(posX-4);
+    height = RND_POSY(posY-4);
 
     if (widght <= 1) {
       widght = 2;
@@ -164,18 +149,18 @@ void drawRandTriangles(void)
   uint16_t y1, y2, y3;
 
   for (uint16_t i = 0; i < TEST_SAMPLE_SIZE; i++) {
-    r = randNum() % ((255 + 1) - 64) + 64;
-    g = randNum() % ((255 + 1) - 64) + 64;
-    b = randNum() % ((255 + 1) - 64) + 64;
+    r = RND_COLOR;
+    g = RND_COLOR;
+    b = RND_COLOR;
 
-    x1 = (randNum() % (TFT_W-4));
-    y1 = (randNum() % (TFT_H-4));
+    x1 = RND_POSX(4);
+    y1 = RND_POSY(4);
 
-    x2 = (randNum() % (TFT_W-4));
-    y2 = (randNum() % (TFT_H-4));
+    x2 = RND_POSX(4);
+    y2 = RND_POSY(4);
 
-    x3 = (randNum() % (TFT_W-4));
-    y3 = (randNum() % (TFT_H-4));
+    x3 = RND_POSX(4);
+    y3 = RND_POSY(4);
 
     fillTriangle(x1, y1, x2, y2, x3, y3, color565(r, g, b));
   }
@@ -188,9 +173,9 @@ void drawRandRoundRect(void)
   uint16_t posX, posY;
 
   for (uint16_t i = 0; i < TEST_SAMPLE_SIZE; i++) {
-    r = randNum() % ((255 + 1) - 64) + 64;
-    g = randNum() % ((255 + 1) - 64) + 64;
-    b = randNum() % ((255 + 1) - 64) + 64;
+    r = RND_COLOR;
+    g = RND_COLOR;
+    b = RND_COLOR;
 
     posX = (randNum() % TFT_W);
     posY = (randNum() % TFT_H);
@@ -210,12 +195,12 @@ void drawRandRoundFillRect(void)
   uint16_t posX, posY;
 
   for (uint16_t i = 0; i < TEST_SAMPLE_SIZE; i++) {
-    r = randNum() % ((255 + 1) - 64) + 64;
-    g = randNum() % ((255 + 1) - 64) + 64;
-    b = randNum() % ((255 + 1) - 64) + 64;
+    r = RND_COLOR;
+    g = RND_COLOR;
+    b = RND_COLOR;
 
-    posX = (randNum() % (TFT_W-1));
-    posY = (randNum() % (TFT_H-1));
+    posX = RND_POSX(1);
+    posY = RND_POSY(1);
 
     fillRoundRect(posX, posY,
                 (TFT_W - posX), (TFT_H - posY), 
@@ -227,28 +212,42 @@ void drawRandRoundFillRect(void)
 void drawRandCircle(void)
 {
   uint8_t r, g, b;
+  uint16_t posX, posY;
+  uint16_t color;
 
   for (uint16_t i = 0; i < TEST_SAMPLE_SIZE; i++) {
-    r = randNum() % ((255 + 1) - 64) + 64;
-    g = randNum() % ((255 + 1) - 64) + 64;
-    b = randNum() % ((255 + 1) - 64) + 64;
+    r = RND_COLOR;
+    g = RND_COLOR;
+    b = RND_COLOR;
 
-    drawCircle((randNum() % (TFT_W-1)), (randNum() % (TFT_H-1)),
-               ((randNum() % TFT_H)/4), color565(r, g, b));
+    posX = RND_POSX(1);
+    posY = RND_POSY(1);
+
+    color = color565(r, g, b);
+    r = ((randNum() % TFT_H)/4); // reuse for radius
+
+    drawCircle(posX, posY, r, color);
   }
 }
 
 void drawRandFillCircle(void)
 {
   uint8_t r, g, b;
+  uint16_t posX, posY;
+  uint16_t color;
 
   for (uint16_t i = 0; i < TEST_SAMPLE_SIZE; i++) {
-    r = randNum() % ((255 + 1) - 64) + 64;
-    g = randNum() % ((255 + 1) - 64) + 64;
-    b = randNum() % ((255 + 1) - 64) + 64;
+    r = RND_COLOR;
+    g = RND_COLOR;
+    b = RND_COLOR;
 
-    fillCircle((randNum() % (TFT_W-1)), (randNum() % (TFT_H-1)),
-               ((randNum() % TFT_H)/4), color565(r, g, b));
+    posX = RND_POSX(1);
+    posY = RND_POSY(1);
+
+    color = color565(r, g, b);
+    r = ((randNum() % TFT_H)/4); // reuse for radius
+
+    fillCircle(posX, posY, r, color);
   }
 }
 
@@ -432,7 +431,7 @@ void testdrawtext(void)
 }
 
 // ---------------------------------------------------------- //
-__attribute__ ((noreturn)) int main(void)
+int main(void)
 {
   initSysTickTimer(); //it`s enable timer0 on atmega328p;
 
@@ -443,16 +442,17 @@ __attribute__ ((noreturn)) int main(void)
   uartSetup(USART_BAUD_1M);
   sync_gpu();
 
-  uint8_t count =0;
-  uint8_t testsCount = (sizeof(pArrExecGFXFunc)/sizeof(pArrExecGFXFunc[0]));
+  uint8_t testsCount = FUNC_TO_TEST_COUNT;
 
   for(;;) {
 
-    for (count = 0; count < testsCount; count++) {
+    for (uint8_t count = 0; count < testsCount; count++) {
       pArrExecGFXFunc[count]();
 
       _delayMS(1000);  // actual 500
       tftFillScreen(COLOR_BLACK);
     }
   }
+
+  return 0;
 }

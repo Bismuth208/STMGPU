@@ -41,13 +41,14 @@ uint16_t randNum(void)
 
 void gpuLoadTiles(void)
 {
-  // load MAX_TILES tiles to GPU's RAM at 0 position in RAM,
-  // from tileFileName,
-  // located on SD card attached to STM32 GPU
-  // 9 - is width of tileSet in tiles ( 9 tiles width == 72 pixels)
-  // file name must respond to 8.3 name system
-  // 8 chars max for filename, 
-  // 3 chars max for file extension (not need, GPU add it by default)
+  /* load MAX_TILES tiles to GPU's RAM at 0 position in it's RAM,
+  *  from tileFileName,
+  *  located on SD card attached to STM32 GPU
+  *  9 - is width of tileSet in tiles ( 9 tiles width == 72 pixels)
+  *  file name must respond to 8.3 name system
+  *  8 chars max for filename, 3 chars max for file extension
+  *  sGPU add *.tle extension automatically
+  */
   SDLoadTileSet8x8((const char*)tileFileName, 9, 0, MAX_TILES);
 }
 
@@ -110,7 +111,7 @@ void fillScreenByTiles(void)
 }
 
 // ---------------------------------------------------------- //
-__attribute__ ((noreturn)) int main(void)
+int main(void)
 {
   initSysTickTimer(); //it`s enable timer0 on atmega328p;
 
@@ -133,4 +134,6 @@ __attribute__ ((noreturn)) int main(void)
       tftFillScreen(COLOR_BLACK);  // clear screen by black color
     }
   }
+
+  return 0;
 }

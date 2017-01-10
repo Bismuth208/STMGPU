@@ -3,22 +3,14 @@
 
 // --------------------------------------------------------- //
 
-#define TFT_W gpu.width()
-#define TFT_H gpu.height()
-
-#define TEST_SAMPLE_SIZE 2000
-#define TEST_SAMPLE_SCREENS 2
-
-// --------------------------------------------------------- //
-
 //#define CHK_GPU_BSY_PIN 2 // which pin arduino must check
 
 /* BE CAREFULL!! USED ONLY HARDWARE SERIAL PORT!!
 *  If your board have only ONE hardware serial,
 *  then you MUST use SoftWareSerial instead!
 */
-//STMGPU gpu = STMGPU(CHK_GPU_BSY_PIN); // use hardware BSY check, pin used
-STMGPU gpu = STMGPU(); // use software BSY check, no pin used
+//STMGPU gpu(CHK_GPU_BSY_PIN); // use hardware BSY check, pin used
+STMGPU gpu; // use software BSY check, no pin used
 
 // --------------------------------------------------------- //
 
@@ -45,12 +37,12 @@ void drawRandPixels(void)
   uint16_t posX, posY;
 
   for (uint16_t i = 0; i < TEST_SAMPLE_SIZE; i++) {
-    r = randNum() % ((255 + 1) - 64) + 64;
-    g = randNum() % ((255 + 1) - 64) + 64;
-    b = randNum() % ((255 + 1) - 64) + 64;
+    r = RND_COLOR;
+    g = RND_COLOR;
+    b = RND_COLOR;
 
-    posX = (randNum() % (TFT_W-1));
-    posY = (randNum() % (TFT_H-1));
+    posX = RND_POSX(1);
+    posY = RND_POSY(1);
 
     gpu.drawPixel(posX, posY, gpu.color565(r, g, b));
   }
@@ -63,15 +55,15 @@ void drawRandLines(void)
   uint16_t posX1, posY1;
 
   for (uint16_t i = 0; i < TEST_SAMPLE_SIZE; i++) {
-    r = randNum() % ((255 + 1) - 64) + 64;
-    g = randNum() % ((255 + 1) - 64) + 64;
-    b = randNum() % ((255 + 1) - 64) + 64;
+    r = RND_COLOR;
+    g = RND_COLOR;
+    b = RND_COLOR;
 
-    posX = (randNum() % (TFT_W-1));
-    posY = (randNum() % (TFT_H-1));
+    posX = RND_POSX(1);
+    posY = RND_POSY(1);
 
-    posX1 = (randNum() % (TFT_W-1));
-    posY1 = (randNum() % (TFT_H-1));
+    posX1 = RND_POSX(1);
+    posY1 = RND_POSY(1);
 
     gpu.drawLine(posX, posY, posX1, posY1, gpu.color565(r, g, b));
   }
@@ -85,15 +77,15 @@ void drawRandRect(void)
   uint16_t posX, posY;
 
   for (uint16_t i = 0; i < TEST_SAMPLE_SIZE; i++) {
-    r = randNum() % ((255 + 1) - 64) + 64;
-    g = randNum() % ((255 + 1) - 64) + 64;
-    b = randNum() % ((255 + 1) - 64) + 64;
+    r = RND_COLOR;
+    g = RND_COLOR;
+    b = RND_COLOR;
 
-    posX = (randNum() % (TFT_W-4));
-    posY = (randNum() % (TFT_H-4));
+    posX = RND_POSX(4);
+    posY = RND_POSY(4);
 
-    widght = (randNum() % ((TFT_W - posX -4)));
-    height = (randNum() % ((TFT_H - posY -4)));
+    widght = RND_POSX(posX-4);
+    height = RND_POSY(posY-4);
 
     if (widght <= 1) {
       widght = 2;
@@ -114,15 +106,15 @@ void drawRandFillRect(void)
   uint16_t posX, posY;
 
   for (uint16_t i = 0; i < TEST_SAMPLE_SIZE; i++) {
-    r = randNum() % ((255 + 1) - 64) + 64;
-    g = randNum() % ((255 + 1) - 64) + 64;
-    b = randNum() % ((255 + 1) - 64) + 64;
+    r = RND_COLOR;
+    g = RND_COLOR;
+    b = RND_COLOR;
 
-    posX = (randNum() % (TFT_W-4));
-    posY = (randNum() % (TFT_H-4));
+    posX = RND_POSX(4);
+    posY = RND_POSY(4);
 
-    widght = (randNum() % ((TFT_W - posX -4)));
-    height = (randNum() % ((TFT_H - posY -4)));
+    widght = RND_POSX(posX-4);
+    height = RND_POSY(posY-4);
 
     if (widght <= 1) {
       widght = 2;
@@ -143,18 +135,18 @@ void drawRandTriangles(void)
   uint16_t y1, y2, y3;
 
   for (uint16_t i = 0; i < TEST_SAMPLE_SIZE; i++) {
-    r = randNum() % ((255 + 1) - 64) + 64;
-    g = randNum() % ((255 + 1) - 64) + 64;
-    b = randNum() % ((255 + 1) - 64) + 64;
+    r = RND_COLOR;
+    g = RND_COLOR;
+    b = RND_COLOR;
 
-    x1 = (randNum() % (TFT_W-4));
-    y1 = (randNum() % (TFT_H-4));
+    x1 = RND_POSX(4);
+    y1 = RND_POSY(4);
 
-    x2 = (randNum() % (TFT_W-4));
-    y2 = (randNum() % (TFT_H-4));
+    x2 = RND_POSX(4);
+    y2 = RND_POSY(4);
 
-    x3 = (randNum() % (TFT_W-4));
-    y3 = (randNum() % (TFT_H-4));
+    x3 = RND_POSX(4);
+    y3 = RND_POSY(4);
 
     gpu.fillTriangle(x1, y1, x2, y2, x3, y3, gpu.color565(r, g, b));
   }
@@ -167,9 +159,9 @@ void drawRandRoundRect(void)
   uint16_t posX, posY;
 
   for (uint16_t i = 0; i < TEST_SAMPLE_SIZE; i++) {
-    r = randNum() % ((255 + 1) - 64) + 64;
-    g = randNum() % ((255 + 1) - 64) + 64;
-    b = randNum() % ((255 + 1) - 64) + 64;
+    r = RND_COLOR;
+    g = RND_COLOR;
+    b = RND_COLOR;
 
     posX = (randNum() % TFT_W);
     posY = (randNum() % TFT_H);
@@ -189,12 +181,12 @@ void drawRandRoundFillRect(void)
   uint16_t posX, posY;
 
   for (uint16_t i = 0; i < TEST_SAMPLE_SIZE; i++) {
-    r = randNum() % ((255 + 1) - 64) + 64;
-    g = randNum() % ((255 + 1) - 64) + 64;
-    b = randNum() % ((255 + 1) - 64) + 64;
+    r = RND_COLOR;
+    g = RND_COLOR;
+    b = RND_COLOR;
 
-    posX = (randNum() % (TFT_W-1));
-    posY = (randNum() % (TFT_H-1));
+    posX = RND_POSX(1);
+    posY = RND_POSY(1);
 
     gpu.fillRoundRect(posX, posY,
                 (TFT_W - posX), (TFT_H - posY), 
@@ -206,28 +198,42 @@ void drawRandRoundFillRect(void)
 void drawRandCircle(void)
 {
   uint8_t r, g, b;
+  uint16_t posX, posY;
+  uint16_t color;
 
   for (uint16_t i = 0; i < TEST_SAMPLE_SIZE; i++) {
-    r = randNum() % ((255 + 1) - 64) + 64;
-    g = randNum() % ((255 + 1) - 64) + 64;
-    b = randNum() % ((255 + 1) - 64) + 64;
+    r = RND_COLOR;
+    g = RND_COLOR;
+    b = RND_COLOR;
 
-    gpu.drawCircle((randNum() % (TFT_W-1)), (randNum() % (TFT_H-1)),
-               ((randNum() % TFT_H)/4), gpu.color565(r, g, b));
+    posX = RND_POSX(1);
+    posY = RND_POSY(1);
+
+    color = gpu.color565(r, g, b);
+    r = ((randNum() % TFT_H)/4); // reuse for radius
+
+    gpu.drawCircle(posX, posY, r, color);
   }
 }
 
 void drawRandFillCircle(void)
 {
   uint8_t r, g, b;
+  uint16_t posX, posY;
+  uint16_t color;
 
   for (uint16_t i = 0; i < TEST_SAMPLE_SIZE; i++) {
-    r = randNum() % ((255 + 1) - 64) + 64;
-    g = randNum() % ((255 + 1) - 64) + 64;
-    b = randNum() % ((255 + 1) - 64) + 64;
+    r = RND_COLOR;
+    g = RND_COLOR;
+    b = RND_COLOR;
 
-    gpu.fillCircle((randNum() % (TFT_W-1)), (randNum() % (TFT_H-1)),
-               ((randNum() % TFT_H)/4), gpu.color565(r, g, b));
+    posX = RND_POSX(1);
+    posY = RND_POSY(1);
+
+    color = gpu.color565(r, g, b);
+    r = ((randNum() % TFT_H)/4); // reuse for radius
+
+    gpu.fillCircle(posX, posY, r, color);
   }
 }
 
@@ -399,15 +405,15 @@ void testdrawtext(void)
 
   gpu.setTextSize(2);
   gpu.setTextColor(COLOR_YELLOW);
-  gpu.print(FS(textSize2));
+  gpu.print(F("Text size 2\n"));
 
   gpu.setTextSize(3);
   gpu.setTextColor(COLOR_RED);
-  gpu.print(FS(textSize3));
+  gpu.print(F("Even bigger 3\n"));
 
   gpu.setTextSize(4);
   gpu.setTextColor(COLOR_GREEN);
-  gpu.print(FS(textSize4));
+  gpu.print(F("Seruious txt\n"));
 }
 
 // ---------------------------------------------------------- //
@@ -416,7 +422,7 @@ void setup() {
   //USART_BAUD_57600 = 57600
   //USART_BAUD_115200 = 115200
   //USART_BAUD_1M = 1000000
-  gpu.sync(USART_BAUD_1M);
+  gpu.begin(USART_BAUD_1M);
 }
 
 void loop() {

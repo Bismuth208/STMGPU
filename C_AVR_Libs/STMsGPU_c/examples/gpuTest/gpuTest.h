@@ -37,3 +37,27 @@ void drawRandRoundFillRect(void);
 void drawRandCircle(void);
 void drawRandFillCircle(void);
 void matrixScreen(void);
+
+void (*pArrExecGFXFunc[])(void) = {
+    testdrawtext,
+    testlines,
+    testfastlines,
+    //testdrawrects,
+    testfillrects,
+    testfillcircles,
+    testroundrects,
+    testtriangles,
+
+    drawRandPixels,
+    drawRandLines,
+    drawRandRect,
+    drawRandFillRect,
+    //drawRandTriangles,
+    //drawRandRoundRect,
+    //drawRandRoundFillRect,
+    drawRandCircle,
+    drawRandFillCircle,
+    matrixScreen
+  };
+
+  #define FUNC_TO_TEST_COUNT (sizeof(pArrExecGFXFunc)/sizeof(pArrExecGFXFunc[0]))
