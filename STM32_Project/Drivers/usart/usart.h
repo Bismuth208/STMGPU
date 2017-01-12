@@ -34,8 +34,8 @@ uint8_t readData8_USART1(void);
 void sendArrData8_USART1(void *src, uint32_t size);
 uint16_t dataAvailable_USART1(void);
 
-void waitForData_USART1(uint16_t size);
-void cutFromBuf_USART1(void *dest, uint16_t size);
+uint8_t waitCutByte_USART1(void);
+uint16_t waitCutWord_USART1(void);
 void waitCutBuf_USART1(void *dest, uint16_t size);
 
 // --------------------------------------------------//

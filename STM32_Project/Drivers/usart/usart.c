@@ -40,23 +40,53 @@ inline void cutData(uint8_t *pDest, uint16_t size)
   }
 }
 
+uint8_t waitCutByte_USART1(void)
+{
+#if 0
+  while(!RX_AVALIABLE); // wait for something in buf
+  
+  uint8_t byteData = rxBuffer[rx_buffer.tail];
+  ++rx_buffer.tail;
+  
+  return byteData;
+#endif
+  
+  uint8_t byteData =0;
+  
+  cutData(&byteData, 1);
+  
+  return byteData;
+}
+
+uint16_t waitCutWord_USART1(void)
+{
+  uint16_t wordData =0;
+  
+  cutData((uint8_t*)&wordData, 2);
+  
+  return wordData;
+}
+
 void waitCutBuf_USART1(void *dest, uint16_t size)
 {
   uint8_t *pDest = (uint8_t*)dest;
-  uint16_t dataToRead = rx_buffer.tail + size;
+  uint16_t dataToRead = rx_buffer.tail + size; // check for overflow
   
   // cross zero point (overflow)?
-  if(dataToRead > SERIAL_BUFFER_SIZE) {
-    cutData(pDest, size);
-  } else { // nope
-    if(RX_AVALIABLE >= size) { // have enough data?
-      // copy it
-      memcpy32(pDest, &rxBuffer[rx_buffer.tail], size);
-      rx_buffer.tail += size;
-    } else {
-      cutData(pDest, size);
+  if(SERIAL_BUFFER_SIZE < dataToRead ) {
+    if(size > 4) { // best case for memcpy32 is 4 byte align
+      // have enough data?
+      if(RX_AVALIABLE >= size) {
+        // copy it
+        memcpy32(pDest, &rxBuffer[rx_buffer.tail], size);
+        rx_buffer.tail += size;
+        return;
+      }
     }
-  }
+  } 
+  
+  // nope, nope, nope, no one condition fit to us
+  cutData(pDest, size);
 }
 
 void fflush_USART1(void)

@@ -79,9 +79,7 @@ __noreturn void run_GPU(void)
       // ------------------ Base ------------------ //  
         
       case FLL_SCR: {
-        waitCutBuf_USART1(cmdBuffer.data, 2);
-        
-        fillScreen(cmdBuffer.par1);
+        fillScreen(waitCutWord_USART1());
       } break;
       
       case DRW_PIXEL: {
@@ -175,23 +173,18 @@ __noreturn void run_GPU(void)
       case DRW_CHAR: {
         waitCutBuf_USART1(cmdBuffer.data, 10);
         
-        drawChar(cmdBuffer.par1, cmdBuffer.par2, cmdBuffer.data[8], cmdBuffer.par3, cmdBuffer.par4, cmdBuffer.data[9]);
+        drawChar(cmdBuffer.par1, cmdBuffer.par2, cmdBuffer.par3, cmdBuffer.par4, cmdBuffer.data[8], cmdBuffer.data[9]);
       } break;
       
       case DRW_PRNT: {
-        waitCutBuf_USART1(cmdBuffer.data, 1);
-        
-        waitCutBuf_USART1(cmdBufferStr, cmdBuffer.data[0]);
-        
-        print((const char*)cmdBufferStr);
+        uint16_t strSize = waitCutByte_USART1();
+        printStr(cmdBufferStr, strSize);
         //memset_DMA1(cmdBufferStr, 0x00, MAX_TEXT_SIZE);
         memset(cmdBufferStr, 0x00, MAX_TEXT_SIZE);
       } break;
       
       case DRW_PRNT_C: {
-        waitCutBuf_USART1(cmdBuffer.data, 1);
-        
-        printChar(cmdBuffer.data[0]);
+        printChar(waitCutByte_USART1());
       } break;
       
       case DRW_PRNT_POS_C: {
@@ -207,9 +200,7 @@ __noreturn void run_GPU(void)
       } break;
       
       case SET_TXT_CR: {
-        waitCutBuf_USART1(cmdBuffer.data, 2);
-        
-        setTextColor(cmdBuffer.par1);
+        setTextColor(waitCutWord_USART1());
       } break;
       
       case SET_TXT_CR_BG: {
@@ -219,21 +210,15 @@ __noreturn void run_GPU(void)
       } break;
       
       case SET_TXT_SIZE: {
-        waitCutBuf_USART1(cmdBuffer.data, 1);
-        
-        setTextSize(cmdBuffer.data[0]);
+        setTextSize(waitCutByte_USART1());
       } break;
       
       case SET_TXT_WRAP: {
-        waitCutBuf_USART1(cmdBuffer.data, 1);
-        
-        setTextWrap(cmdBuffer.data[0]);
+        setTextWrap(waitCutByte_USART1());
       } break;
       
       case SET_TXT_437: {
-        waitCutBuf_USART1(cmdBuffer.data, 1);
-        
-        cp437(cmdBuffer.data[0]);
+        cp437(waitCutByte_USART1());
       } break;
       
       /*
@@ -253,9 +238,7 @@ __noreturn void run_GPU(void)
       } break;
       
       case SET_ROTATION: {
-        waitCutBuf_USART1(cmdBuffer.data, 1);
-        
-        setRotation(cmdBuffer.data[0]);
+        setRotation(waitCutByte_USART1());
       } break;
       
       case SET_SCRL_AREA: {
@@ -265,51 +248,35 @@ __noreturn void run_GPU(void)
       } break;
       
       case WRT_CMD: {
-        waitCutBuf_USART1(cmdBuffer.data, 1);
-        
-        writeCommand(cmdBuffer.data[0]);
+        writeCommand(waitCutByte_USART1());
       } break;
       
       case WRT_DATA: {
-        waitCutBuf_USART1(cmdBuffer.data, 1);
-        
-        writeData(cmdBuffer.data[0]);
+        writeData(waitCutByte_USART1());
       } break;
       
       case WRT_DATA_U16: {
-        waitCutBuf_USART1(cmdBuffer.data, 2);
-        
-        writeWordData(cmdBuffer.par1);
+        writeWordData(waitCutWord_USART1());
       } break;
       
       case SET_V_SCRL_ADR: {
-        waitCutBuf_USART1(cmdBuffer.data, 2);
-        
-        scrollAddress(cmdBuffer.par1);
+        scrollAddress(waitCutWord_USART1());
       } break;
       
       case SET_SLEEP: {
-        waitCutBuf_USART1(cmdBuffer.data, 1);
-        
-        setSleep(cmdBuffer.data[0]);
+        setSleep(waitCutByte_USART1());
       } break;
       
       case SET_IDLE: {
-        waitCutBuf_USART1(cmdBuffer.data, 1);
-        
-        setIdleMode(cmdBuffer.data[0]);
+        setIdleMode(waitCutByte_USART1());
       } break;
       
       case SET_BRIGHTNES: {
-        waitCutBuf_USART1(cmdBuffer.data, 1);
-        
-        setDispBrightness(cmdBuffer.data[0]);
+        setDispBrightness(waitCutByte_USART1());
       } break;
       
       case SET_INVERTION: {
-        waitCutBuf_USART1(cmdBuffer.data, 1);
-        
-        setInvertion(cmdBuffer.data[0]);
+        setInvertion(waitCutByte_USART1());
       } break;
       
       /*
@@ -333,17 +300,13 @@ __noreturn void run_GPU(void)
       } break;
       
       case PSH_CR: {
-        waitCutBuf_USART1(cmdBuffer.data, 2);
-        
-        pushColor(cmdBuffer.par1);
+        pushColor(waitCutWord_USART1());
       } break;
       
       // ------- BSY protect selection ------------ //
         
       case BSY_SELECT: {
-        waitCutBuf_USART1(cmdBuffer.data, 1);
-        
-        bsyState = cmdBuffer.data[0];
+        bsyState = waitCutByte_USART1();
       } break;
       
       // ------------------- Tile ----------------- //
@@ -392,11 +355,8 @@ __noreturn void run_GPU(void)
       } break;
       
       case LDD_TLE_MAP: {
-        // get size of file name
-        waitCutBuf_USART1(cmdBuffer.data, 1);
-        
-        // get file name
-        waitCutBuf_USART1(cmdBufferStr, cmdBuffer.data[0]);
+        // get file name and it`s
+        waitCutBuf_USART1(cmdBufferStr, waitCutByte_USART1());
         
         setBusyStatus(1);
         SDLoadTileMap(cmdBufferStr);
@@ -442,15 +402,11 @@ __noreturn void run_GPU(void)
       } break;
       
       case SET_SPR_AUT_R: {
-        waitCutBuf_USART1(cmdBuffer.data, 1);
-        
-        setSpritesAutoRedraw(cmdBuffer.data[0]);
+        setSpritesAutoRedraw(waitCutByte_USART1());
       } break;
       
       case DRW_SPR: {
-        waitCutBuf_USART1(cmdBuffer.data, 1);
-        
-        drawSprite(cmdBuffer.data[0]);
+        drawSprite(waitCutByte_USART1());
       } break;
       
       case GET_SRP_COLISN: {
@@ -464,10 +420,11 @@ __noreturn void run_GPU(void)
       // ----------------- SD card ---------------- //
       
       case LDD_USR_PAL: {
-        waitCutBuf_USART1(cmdBuffer.data, 1);
+        //waitCutBuf_USART1(cmdBuffer.data, 1);
+        uint8_t nameSize = waitCutByte_USART1();
         
         // get file name
-        waitCutBuf_USART1(cmdBufferStr, cmdBuffer.data[0]);
+        waitCutBuf_USART1(cmdBufferStr, nameSize);
         
         setBusyStatus(1);
         SDLoadPalette(cmdBufferStr);
