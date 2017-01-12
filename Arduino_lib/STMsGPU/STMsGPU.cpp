@@ -302,7 +302,7 @@ size_t STMGPU::write(uint8_t c) {
   void STMGPU::write(uint8_t c) {
 #endif
     cmdBuffer.cmd = DRW_PRNT_C;
-    cmdBuffer.par1 = c;
+    cmdBuffer.data[1] = c;
     
     sendCommand(cmdBuffer.data, 2);
 #if ARDUINO >= 100
