@@ -56,7 +56,8 @@ void SysTick_Handler(void)
 void initSysTickTimer(void)
 {
   // 0.001 s = 1/1000 s = 1ms
-  if (SysTick_Config(SystemCoreClock / 1000)){
+  // 0.01 s = 1/100 s = 10ms
+  if (SysTick_Config(SystemCoreClock / 100)){
     /* if not 0 - error */
     while (1);
   }

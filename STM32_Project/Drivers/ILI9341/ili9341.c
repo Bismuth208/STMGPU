@@ -172,16 +172,16 @@ void tftBegin(void)
   
   // toggle RST low to reset
   SET_TFT_RES_HI;
-  _delayMS(5);
+  _delayMS(1);
   SET_TFT_RES_LOW;
-  _delayMS(20);
+  _delayMS(2);
   SET_TFT_RES_HI;
-  _delayMS(150);
+  _delayMS(15);
   
   commandList(init_commands);
   
   writeCommand(ILI9341_SLPOUT);    //Exit Sleep
-  _delayMS(120);
+  _delayMS(12);
   writeCommand(ILI9341_DISPON);    //Display on
   
   init_DMA1_SPI1();
@@ -436,7 +436,7 @@ void setSleep(bool enable)
   } else {
     writeCommand(ILI9341_SLPOUT);
     writeCommand(ILI9341_DISPON);
-    _delayMS(5);
+    _delayMS(1);
   }
 }
 

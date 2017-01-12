@@ -109,7 +109,7 @@ void drawSturtupScreen(void)
       drawTile8x8(&tile);
       
       // make a little delay, overvise we don`t see mosaic effect (too fast)
-      _delayMS(10);
+      _delayMS(1);
     }
   }
   
@@ -117,7 +117,7 @@ void drawSturtupScreen(void)
   setTextColorBG(currentPaletteArr[0x0A], COLOR_BLACK); // 0x0A - dark green
   print("Powered by Bismuth208");
   setCursor(0, 0);
-  _delayMS(500); // he he he :[)
+  _delayMS(50); // he he he :[)
 }
 
 void init_GPIO_RCC(void)
