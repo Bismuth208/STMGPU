@@ -46,7 +46,7 @@ ITMportsTermIO=0
 ITMportsLogFile=0
 ITMlogFile=$PROJ_DIR$\ITM.log
 [DebugChecksum]
-Checksum=1160543933
+Checksum=425036389
 [CodeCoverage]
 Enabled=_ 0
 [CallStack]
