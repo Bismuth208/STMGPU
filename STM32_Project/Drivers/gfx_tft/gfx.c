@@ -526,9 +526,19 @@ void print(const char *str)
   }
 }
 
+void printStr(void *str, uint16_t size)
+{  
+  const uint8_t *pArr = (const uint8_t *)str;
+  
+  while (size--) {
+    printChar(*pArr++);
+  }
+}
+
 void printCharAt(int16_t x, int16_t y, uint8_t c)
 {
-  setCursor(x, y);
+  cursor_x = x;
+  cursor_y = y;
   printChar(c);
 }
 
@@ -540,7 +550,7 @@ void printChar(uint8_t c)
   } else if (c == '\r') {
     // skip em
   } else {
-    drawChar(cursor_x, cursor_y, c, textcolor, textbgcolor, textsize);
+    drawChar(cursor_x, cursor_y, textcolor, textbgcolor, c, textsize);
     cursor_x += textsize*6;
     if (wrap && (cursor_y > (_height - textsize*8))) {
       cursor_y = 0;
@@ -550,12 +560,11 @@ void printChar(uint8_t c)
       cursor_y += textsize*8;
       cursor_x = 0;
     }
-    
   }
 }
 
 // Draw a character
-void drawChar(int16_t x, int16_t y, uint8_t c, uint16_t fgcolor, uint16_t bgcolor, uint8_t size)
+void drawChar(int16_t x, int16_t y, uint16_t fgcolor, uint16_t bgcolor, uint8_t c, uint8_t size)
 {
   // Rudimentary clipping
   if((x >= _width)            || // Clip right

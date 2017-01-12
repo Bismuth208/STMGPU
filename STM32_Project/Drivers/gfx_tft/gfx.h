@@ -72,7 +72,7 @@ int16_t getCursorX(void);
 int16_t getCursorY(void);
   
 //void setTextFont(unsigned char* f);
-void drawChar(int16_t x, int16_t y, unsigned char c, uint16_t color, uint16_t bg, uint8_t size);
+void drawChar(int16_t x, int16_t y, uint16_t color, uint16_t bg, uint8_t c, uint8_t size);
 void setCursor(int16_t x, int16_t y);
 void setTextColor(uint16_t c);
 void setTextColorBG(uint16_t c, uint16_t b);
@@ -83,6 +83,7 @@ void cp437(bool x);
 void setCurrentFont(uint8_t num);
 
 void print(const char *str);
+void printStr(void *str, uint16_t size);
 void printChar(uint8_t c);
 void printCharAt(int16_t x, int16_t y, uint8_t c);
     
