@@ -20,12 +20,11 @@ typedef union {
 
 void init_sdCard(void);
 
-void SDLoadTileFromSet8x8(void *tileSetArrName, uint8_t *pData);
-void SDLoadTileSet8x8(void *tileSetArrName, uint8_t *pData);
-void SDLoadRegionOfTileSet8x8(void *tileSetArrName, uint8_t *pData);
+void SDLoadTile8x8(void *fileName, uint8_t *pData);
+void SDLoadTileSet8x8(void *fileName, uint8_t *pData);
 
-void SDLoadTileMap(void *tileMapArrName);
-void SDLoadPalette(void *palleteArrName);
-void SDPrintBMP(uint16_t x, uint16_t y, void *name);
+void SDLoadTileMap(void *fileName);
+void SDLoadPalette(void *fileName);
+void SDPrintBMP(uint16_t x, uint16_t y, void *fileName);
 
 #endif /* _SDWORKER_H */

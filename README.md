@@ -1,5 +1,5 @@
 # STMGPU
-2D sofware GPU for Arduino
+2D software GPU for Arduino (or PC)
 
 Today a lot of code is written for AVR (Arduino), and we all know limitations of these MCUs, for example extremely slow drawing on LCD screens, not enough ROM, huge SD libs and other!
 But what if You want to use these MCUs longer, and You absolutely doesn’t want to waste time for porting sources, looking for hundreds of manuals and investigate STM32?
@@ -26,7 +26,7 @@ Code for STM32 was writed in IAR 7.40;
 
 Used MCU for sGPU: STM32F103C8T6 ( Mapple mini);
 
-Used MCU for CPU: Atmel AVR ATmega328p (Arduino Pro mini), but it can be defferent;
+Used MCU for CPU: Atmel AVR ATmega328p (Arduino Pro mini), but it can be different;
 
 There are two MCU libs for Arduino IDE:
  - C_AVR_Libs:  C version, mostly optimized for ATmega328p or similar;
@@ -36,3 +36,8 @@ GPIO pinout for sGPU can be find in:
 "STM32_Project/STM32_GPU_GPIO_Pinout.txt"
 or
 "STM32_Project/STM32F103C8T6_pinout.png".
+
+# ATTENTION!
+# This project is still unstable and in develop!
+# Any changes in main protocol are possible at any time,
+# and no backward capability is guaranteed!

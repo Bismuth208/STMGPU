@@ -522,7 +522,7 @@ void writeWordData(uint16_t c)
 }
 
 // ------------------- Tile ----------------- //
-void SDLoadTileFromSet8x8(const char *tileSetArrName, uint8_t tileSetW, uint8_t ramTileNum, uint8_t tileNum)
+void SDLoadTile8x8(const char *tileSetArrName, uint8_t tileSetW, uint8_t ramTileNum, uint8_t tileNum)
 {
   cmdBuffer.cmd = LDD_TLE_8;
   cmdBuffer.data[1] = strlen(tileSetArrName);
@@ -534,21 +534,9 @@ void SDLoadTileFromSet8x8(const char *tileSetArrName, uint8_t tileSetW, uint8_t 
   sendCommand((void*)tileSetArrName, cmdBuffer.data[1]); // send name of file
 }
 
-void SDLoadTileSet8x8(const char *tileSetArrName, uint8_t tileSetW, uint8_t ramTileBase, uint8_t tileMax)
+void SDLoadTileSet8x8(const char *tileSetArrName, uint8_t tileSetW, uint8_t ramTileBase, uint8_t tileMin, uint8_t tileMax)
 {
   cmdBuffer.cmd = LDD_TLES_8;
-  cmdBuffer.data[1] = strlen(tileSetArrName);
-  cmdBuffer.data[2] = tileSetW;
-  cmdBuffer.data[3] = ramTileBase;
-  cmdBuffer.data[4] = tileMax;
-  
-  sendCommand(cmdBuffer.data, 5);
-  sendCommand((void*)tileSetArrName, cmdBuffer.data[1]); // send name of file
-}
-
-void SDLoadRegionOfTileSet8x8(const char *tileSetArrName, uint8_t tileSetW, uint8_t ramTileBase, uint8_t tileMin, uint8_t tileMax)
-{
-  cmdBuffer.cmd = LDD_TLES_RG_8;
   cmdBuffer.data[1] = strlen(tileSetArrName);
   cmdBuffer.data[2] = tileSetW;
   cmdBuffer.data[3] = ramTileBase;

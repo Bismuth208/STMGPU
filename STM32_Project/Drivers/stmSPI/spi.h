@@ -23,33 +23,22 @@
 
 #define SET_MOSI_HI     (GPIO_SPI_LCD->BSRR = GPIO_Pin_SPI_LCD_MOSI);
    
-// ждем пока данные передадутся до конца
+// wait untill all data will be sent
 #define WAIT_FREE_TX    while ((SPI1->SR & SPI_I2S_FLAG_TXE) == (uint16_t)RESET);
 #define WAIT_FOR_BSY    while ((SPI1->SR & SPI_I2S_FLAG_BSY) != (uint16_t)RESET);
-
-#ifdef __cplusplus
-extern "C"{
-#endif
-  
 
 // ------------------------------------------------------- //
 
 // ------------------------- SPI_1 ------------------------- //
 void init_SPI1(void);
-//void beginTrSPI(uint8_t spcr, uint8_t spsr);
 void sendData8_SPI1(uint8_t data);
 void sendArr8_SPI1(void *data, uint32_t size);
 void sendData16_SPI1(uint16_t data);
 void sendData32_SPI1(uint16_t data0, uint16_t data1);
 void sendArr16_SPI1(void *data, uint32_t size);
 void repeatData16_SPI1(uint16_t data, uint32_t size);
-//void endTrSPI(void);
 
 // ------------------------- SPI_2 ------------------------- //
 void init_SPI2(void);
-    
-#ifdef __cplusplus
-} // extern "C"
-#endif
 
 #endif /* SPI_H */

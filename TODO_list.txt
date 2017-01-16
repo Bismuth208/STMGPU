@@ -7,10 +7,11 @@ draw *.bmp 16bit files;
 draw, load, tiles 16x16;
 draw, load, tiles 32x32;
 
-add collision detection for sprites;
 load, draw sprites for tiles 16px and 32px;
 
-reduce ROM usage for Arduino lib version;
+reduce ROM usage for Arduino lib version (almost done);
+
+add drawing text from SD card;
 
 /* add this soon */
 
@@ -28,7 +29,6 @@ add GUI commands:
 add FSMC;
 
 improve main switch() section;
-improve BSY protection;
 
 add re-sync with CPU;
 

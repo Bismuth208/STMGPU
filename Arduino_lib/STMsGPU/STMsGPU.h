@@ -330,11 +330,9 @@ public:
        writeWordData(uint16_t c);
   
 // ------------------- Tile ----------------- //
-  void loadTileFromSet8x8(const char *tileSetArrName, uint8_t tileSetW,
+  void loadTile8x8(const char *tileSetArrName, uint8_t tileSetW,
                             uint8_t ramTileNum, uint8_t tileNum);
   void loadTileSet8x8(const char *tileSetArrName, uint8_t tileSetW,
-                        uint8_t ramTileBase, uint8_t tileMax);
-  void loadRegionOfTileSet8x8(const char *tileSetArrName, uint8_t tileSetW,
                                 uint8_t ramTileBase, uint8_t tileMin, uint8_t tileMax);
   void drawTile8x8(int16_t posX, int16_t posY, uint8_t tileNum);
   void loadTileMap(const char *fileName);

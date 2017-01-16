@@ -223,9 +223,7 @@ __noreturn void run_GPU(void)
       
       /*
       case SET_TXT_FONT: {
-      while(dataAvailable_USART1() <= 1);
-      
-      setTextFont(readData8_USART1());
+      setTextFont(waitCutByte_USART1());
       } break;
       */
       
@@ -318,24 +316,12 @@ __noreturn void run_GPU(void)
         waitCutBuf_USART1(cmdBufferStr, cmdBuffer.data[0]);
         
         setBusyStatus(1);
-        SDLoadTileFromSet8x8(cmdBufferStr, &cmdBuffer.data[1]);
+        SDLoadTile8x8(cmdBufferStr, &cmdBuffer.data[1]);
         //memset_DMA1(cmdBufferStr, 0x00, MAX_TEXT_SIZE);
         memset(cmdBufferStr, 0x00, MAX_TEXT_SIZE);
       } break;
       
       case LDD_TLES_8: {
-        // get size of file name, tileset width, ram tile number, max number of tiles to load
-        waitCutBuf_USART1(cmdBuffer.data, 4);
-        // get file name
-        waitCutBuf_USART1(cmdBufferStr, cmdBuffer.data[0]);
-        
-        setBusyStatus(1);
-        SDLoadTileSet8x8(cmdBufferStr, &cmdBuffer.data[1]);
-        //memset_DMA1(cmdBufferStr, 0x00, MAX_TEXT_SIZE);
-        memset(cmdBufferStr, 0x00, MAX_TEXT_SIZE);
-      } break;
-      
-      case LDD_TLES_RG_8: {
         // get size of file name, tileset width, ram tile number,
         // base tile number in tileset, max number of tiles to load
         waitCutBuf_USART1(cmdBuffer.data, 5);
@@ -343,7 +329,7 @@ __noreturn void run_GPU(void)
         waitCutBuf_USART1(cmdBufferStr, cmdBuffer.data[0]);
         
         setBusyStatus(1);
-        SDLoadRegionOfTileSet8x8(cmdBufferStr, &cmdBuffer.data[1]);
+        SDLoadTileSet8x8(cmdBufferStr, &cmdBuffer.data[1]);
         //memset_DMA1(cmdBufferStr, 0x00, MAX_TEXT_SIZE);
         memset(cmdBufferStr, 0x00, MAX_TEXT_SIZE);
       } break;
@@ -420,11 +406,8 @@ __noreturn void run_GPU(void)
       // ----------------- SD card ---------------- //
       
       case LDD_USR_PAL: {
-        //waitCutBuf_USART1(cmdBuffer.data, 1);
-        uint8_t nameSize = waitCutByte_USART1();
-        
-        // get file name
-        waitCutBuf_USART1(cmdBufferStr, nameSize);
+        // get file name and it`s size
+        waitCutBuf_USART1(cmdBufferStr, waitCutByte_USART1());
         
         setBusyStatus(1);
         SDLoadPalette(cmdBufferStr);

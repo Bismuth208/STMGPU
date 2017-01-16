@@ -157,21 +157,31 @@ void drawRandRoundRect(void)
   uint8_t r, g, b;
   uint16_t widght, height;
   uint16_t posX, posY;
+  uint16_t color;
 
   for (uint16_t i = 0; i < TEST_SAMPLE_SIZE; i++) {
     r = RND_COLOR;
     g = RND_COLOR;
     b = RND_COLOR;
 
-    posX = (randNum() % TFT_W);
-    posY = (randNum() % TFT_H);
+    posX = RND_POSX(1);
+    posY = RND_POSY(1);
 
-    widght = (randNum() % (TFT_W -1)+ posX);
-    height = (randNum() % (TFT_H -1)+ posY);
+    widght = RND_POSX(posX-1);
+    height = RND_POSY(posY-1);
 
-    gpu.drawRoundRect(posX, posY,
-                widght, height, 
-                ((randNum() % 6)+4), gpu.color565(r, g, b));
+    if (widght <= 1) {
+      widght = 2;
+    }
+
+    if (height <= 1) {
+      height = 2;
+    }
+
+    color = gpu.color565(r, g, b);
+    r = ((randNum() % 6)+4); // reuse for raduis
+
+    gpu.drawRoundRect(posX, posY, widght, height, r, color);
   }
 }
 

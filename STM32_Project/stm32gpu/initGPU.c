@@ -77,7 +77,7 @@ void init_GPU_USART(void)
   print(T_SELECT_WAY T_USART_WAY);
   print(T_BAUD_SPEED);
 
-  switch(GPIOA->IDR & 0x07)
+  switch(GPIOA->IDR & 0x07) // get GPIO state
   {
   case 0x01: {
     init_UART1(USART_BAUD_9600);

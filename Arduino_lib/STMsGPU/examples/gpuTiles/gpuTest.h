@@ -5,6 +5,8 @@
 #define TEST_SAMPLE_SCREENS 20 // this is equal to 24000 tiles
 
 #define MAX_TILES 70
+#define RAM_BASE 0
+#define TLE_START 0
 #define TILE_SET_W 10 // real number (1-10)
 #define TILE_SET_H 7  // real number (1-8)
 

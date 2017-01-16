@@ -174,14 +174,14 @@ void tftBegin(void)
   SET_TFT_RES_HI;
   _delayMS(1);
   SET_TFT_RES_LOW;
-  _delayMS(2);
+  _delayMS(1);
   SET_TFT_RES_HI;
-  _delayMS(15);
+  _delayMS(5);
   
   commandList(init_commands);
   
   writeCommand(ILI9341_SLPOUT);    //Exit Sleep
-  _delayMS(12);
+  _delayMS(5);
   writeCommand(ILI9341_DISPON);    //Display on
   
   init_DMA1_SPI1();

@@ -44,7 +44,7 @@ void (*pArrExecGFXFunc[])(void) = {
     drawRandLines,
     drawRandRect,
     drawRandFillRect,
-    //drawRandTriangles,
+    drawRandTriangles,
     //drawRandRoundRect,
     //drawRandRoundFillRect,
     drawRandCircle,

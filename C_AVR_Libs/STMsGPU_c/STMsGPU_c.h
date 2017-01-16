@@ -101,22 +101,25 @@
 
 // ------------------- Tile ----------------- //
 #define LDD_TLE_8       0x30    // load tile 8x8 size from SD
-#define LDD_TLES_8      0x31    // load tiles 8x8 size from SD
-#define LDD_TLES_RG_8   0x32    // load region of tiles 8x8 size from SD
-#define DRW_TLE_8_POS   0x33    // draw tile 8x8 size on TFT screen
-#define LDD_TLE_MAP     0x34    // load background tile map 8x8 from SD
-#define DRW_TLE_MAP     0x35    // draw background tile map 8x8 on TFT screen
-//#define DRW_TLE_SCR     0x36    // draw tile screen on TFT screen
-//#define MAK_METTLE      0x37    // group tiles to metatile
-//#define DRW_METTLE_SCR  0x38    // draw metatile on screen
-//#define DRW_METTLE_POS  0x39    // draw metatile in tile screen
-//#define DRW_METSCR_POS  0x3A    // draw all tile screens on screen
-//#define NOT_USED        0x3B
-//#define NOT_USED        0x3C
-//#define NOT_USED        0x3D
-//#define NOT_USED        0x3E
-//#define NOT_USED        0x3F
+//#define NOT_USED        0x31
+#define LDD_TLES_8      0x32    // load region of tiles 8x8 size from SD
+#define DRW_TLE_8       0x33    // draw tile 8x8 size on TFT screen
 
+#define LDD_TLE_16      0x34    // load tile 16x16 size from SD
+//#define NOT_USED        0x35
+#define LDD_TLES_16     0x36    // load region of tiles 16x16 size from SD
+#define DRW_TLE_16      0x37    // draw tile 16x16 size on TFT screen
+
+#define LDD_TLE_32      0x38    // load tile 32x32 size from SD
+//#define NOT_USED        0x39
+#define LDD_TLES_32     0x3A    // load region of tiles 32x32 size from SD
+#define DRW_TLE_32      0x3B    // draw tile 32x32 size on TFT screen
+
+#define LDD_TLE_MAP     0x3C    // load background tile map 8x8 from SD
+#define DRW_TLE_MAP     0x3D    // draw background tile map 8x8 on TFT screen
+
+#define LDD_TLE_U       0x3E    // load specified tile size from SD
+#define DRW_TLE_U       0x3F    // draw specified tile size on TFT screen
 
 // ----------------- Sprite ----------------- //
 #define SET_SPR_POS     0x40    // set sprite position

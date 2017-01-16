@@ -45,7 +45,6 @@
 #endif
 
 //#define USE_BSY_PROTECTION      1
-//#define USE_HARD_BSY            0       // 1 - use GPIO, 0 - send message to CPU
 
 #define BSY_MSG_CODE_WAIT       0xEE
 #define BSY_MSG_CODE_READY      0xEA
@@ -157,18 +156,18 @@
 
 // ------------------- Tile ----------------- //
 #define LDD_TLE_8       0x30    // load tile 8x8 size from SD
-#define LDD_TLES_8      0x31    // load tiles 8x8 size from SD
-#define LDD_TLES_RG_8   0x32    // load region of tiles 8x8 size from SD
+//#define NOT_USED        0x31
+#define LDD_TLES_8      0x32    // load region of tiles 8x8 size from SD
 #define DRW_TLE_8       0x33    // draw tile 8x8 size on TFT screen
 
 #define LDD_TLE_16      0x34    // load tile 16x16 size from SD
-#define LDD_TLES_16     0x35    // load tiles 16x16 size from SD
-#define LDD_TLES_RG_16  0x36    // load region of tiles 16x16 size from SD
+//#define NOT_USED        0x35
+#define LDD_TLES_16     0x36    // load region of tiles 16x16 size from SD
 #define DRW_TLE_16      0x37    // draw tile 16x16 size on TFT screen
 
 #define LDD_TLE_32      0x38    // load tile 32x32 size from SD
-#define LDD_TLES_32     0x39    // load tiles 32x32 size from SD
-#define LDD_TLES_RG_32  0x3A    // load region of tiles 32x32 size from SD
+//#define NOT_USED        0x39
+#define LDD_TLES_32     0x3A    // load region of tiles 32x32 size from SD
 #define DRW_TLE_32      0x3B    // draw tile 32x32 size on TFT screen
 
 #define LDD_TLE_MAP     0x3C    // load background tile map 8x8 from SD
