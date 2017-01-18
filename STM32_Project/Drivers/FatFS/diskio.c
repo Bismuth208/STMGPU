@@ -35,7 +35,7 @@ DSTATUS disk_status(BYTE drv)
 }
 
 
-DRESULT disk_read(BYTE drv, BYTE *buff, DWORD sector, BYTE count)
+DRESULT disk_read(BYTE pdrv, BYTE *buff, DWORD sector, UINT count)
 {
   int i;
   
@@ -48,7 +48,7 @@ DRESULT disk_read(BYTE drv, BYTE *buff, DWORD sector, BYTE count)
 
 
 #if _READONLY == 0
-DRESULT disk_write(BYTE drv, const BYTE *buff, DWORD sector, BYTE count)
+DRESULT disk_write(BYTE pdrv, const BYTE *buff, DWORD sector, UINT count)
 {
   int i;
   
@@ -62,9 +62,9 @@ DRESULT disk_write(BYTE drv, const BYTE *buff, DWORD sector, BYTE count)
 
 
 
-DRESULT disk_ioctl(BYTE drv, BYTE ctrl, void *buff)
+DRESULT disk_ioctl(BYTE pdrv, BYTE cmd, void *buff)
 {
-  switch (ctrl) {
+  switch (cmd) {
   case CTRL_SYNC:
     return RES_OK;
   case GET_SECTOR_SIZE:
