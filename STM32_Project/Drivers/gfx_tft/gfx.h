@@ -28,9 +28,6 @@
 #define COLOR_WHITE       0xFFFF      // 255, 255, 255
 
 //-------------------------------------------------------------------------------------------//
-#ifdef __cplusplus
-extern "C"{
-#endif
 
 void pushColor(uint16_t color);
 void drawPixel(int16_t x, int16_t y, uint16_t color);
@@ -86,9 +83,5 @@ void print(const char *str);
 void printStr(void *str, uint16_t size);
 void printChar(uint8_t c);
 void printCharAt(int16_t x, int16_t y, uint8_t c);
-    
-#ifdef __cplusplus
-} // extern "C"
-#endif
 
 #endif /* _GFX_H */

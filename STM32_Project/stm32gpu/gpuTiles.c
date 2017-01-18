@@ -147,7 +147,7 @@ void drawTile8x8(void *tile)
     }
   }
   
-  setSqAddrWindow(posX, posY, 7);
+  setSqAddrWindow(posX, posY, 7); // on oscilloscope this one remove few uS
   sendData16_Fast_DMA1_SPI1(lastTile8x8, TILE_ARR_8X8_SIZE);
 }
 
@@ -168,7 +168,7 @@ void drawTile16x16(int16_t posX, int16_t posY, uint8_t tileNum)
     }
   }
   
-  setAddrWindow(posX, posY, posX+15, posY+15);
+  setSqAddrWindow(posX, posY, 15);
   sendData16_DMA1_SPI1(lastTile16x16, TILE_ARR_16X16_SIZE);
 }
 
@@ -191,7 +191,7 @@ void drawTile32x32(int16_t posX, int16_t posY, uint8_t tileNum)
     }
   }
   
-  setAddrWindow(posX, posY, posX+31, posY+31);
+  setSqAddrWindow(posX, posY, 31);
   sendData16_DMA1_SPI1(lastTileStruct32x32.pLastTileArr, TILE_ARR_16X16_SIZE);
 }
 #endif

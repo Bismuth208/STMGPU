@@ -241,11 +241,11 @@ void SDLoadPalette(void *fileName)
   
   if(result == FR_OK) {
     uint8_t  r, g, b;
-    uint16_t colors = File.fsize /3;
+    uint16_t colors = f_size(&File) /3;
     
     if(colors <= 255) {
       
-      f_read(&File, sdbuffer, File.fsize, &cnt);
+      f_read(&File, sdbuffer, f_size(&File), &cnt);
       
       for(uint16_t count =0; count<colors; count++) {
         r = sdbuffer[3 * count];

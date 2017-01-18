@@ -158,7 +158,7 @@ void initTFT_GPIO()
 #endif // USE_FSMC
 }
 
-void tftBegin(void)
+void initLCD(void)
 {
   initTFT_GPIO();
   SET_TFT_RES_LOW;

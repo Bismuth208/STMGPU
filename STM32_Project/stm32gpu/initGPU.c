@@ -111,6 +111,8 @@ void init_GPU_USART(void)
 
 void init_GPU(void)
 {
+  print(T_GPU_VERSION);
+  
   init_GPU_GPIO();
   init_GPU_USART();    // setup access to low level interface
   init_DMA_memset();

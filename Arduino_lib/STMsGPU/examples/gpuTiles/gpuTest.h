@@ -23,4 +23,4 @@ void (*pArrExecGFXFunc[])(void) = {
     fillScreenByTiles,
   };
 
-  #define FUNC_TO_TEST_COUNT (sizeof(pArrExecGFXFunc)/sizeof(pArrExecGFXFunc[0]))
+#define FUNC_TO_TEST_COUNT (sizeof(pArrExecGFXFunc)/sizeof(pArrExecGFXFunc[0]))

@@ -51,6 +51,8 @@
 
 
 //===========================================================================//
+#define T_GPU_VERSION   "Build: " __DATE__" " __TIME__ " \n"
+
 #define T_SELECT_WAY    "Selected interface: "
 #define T_USART_WAY     "USART_1\n"
 #define T_INIT          "Init... "
@@ -216,10 +218,10 @@
 
 // --------------- GUI commands -------------- //
 #define SET_WND_CR      0x60    // Set window colors
-#define DRW_WND         0x61    // draw window
+#define DRW_WND_AT      0x61    // draw window at position
 #define DRW_WND_TXT     0x62    // draw window whith text
 #define DRW_BTN_NUM     0x63    // draw numerated buttons
-//#define NOT_USED        0x64
+#define SET_CL_WND_TXT  0x64    // set colors for GUI text
 //#define NOT_USED        0x65
 //#define NOT_USED        0x66
 //#define NOT_USED        0x67

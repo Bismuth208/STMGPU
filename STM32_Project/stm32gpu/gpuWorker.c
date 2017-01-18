@@ -426,6 +426,14 @@ __noreturn void run_GPU(void)
         memset(cmdBufferStr, 0x00, MAX_TEXT_SIZE);
       } break;
       
+      
+      // --------------- GUI commands -------------- //
+      
+      case SET_WND_CR: {
+        
+        
+      } break;
+      
       // -------------  TO DO: ---------- //
       /*
       *

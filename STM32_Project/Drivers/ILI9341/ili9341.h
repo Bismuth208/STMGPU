@@ -287,17 +287,14 @@ static const uint8_t init_commands[] = {
 };
 
 //-------------------------------------------------------------------------------------------//
-#ifdef __cplusplus
-extern "C"{
-#endif
-  
+
   void writeCommand(uint8_t c);
   void writeData(uint8_t d);
   void writeWordData(uint16_t c);
   
   void commandList(const uint8_t *addr);
   
-  void tftBegin(void);
+  void initLCD(void);
   void setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
   void setSqAddrWindow(uint16_t x0, uint16_t y0, uint16_t size);
   void setVAddrWindow(uint16_t x0, uint16_t y0, uint16_t y1);
@@ -314,9 +311,5 @@ extern "C"{
   void setInvertion(bool i);
   void setAdaptiveBrightness(uint8_t value);
   //void setGamma(uint8_t gamma);
-  
-#ifdef __cplusplus
-} // extern "C"
-#endif
 
 #endif /* _ILI9341_H */

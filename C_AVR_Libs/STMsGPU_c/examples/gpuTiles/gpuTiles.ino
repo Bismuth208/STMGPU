@@ -41,15 +41,16 @@ uint16_t randNum(void)
 
 void gpuLoadTiles(void)
 {
-  /* load MAX_TILES tiles to GPU's RAM at 0 position in it's RAM,
+  /* load MAX_TILES tiles to GPU's RAM at RAM_BASE position in it's RAM,
   *  from tileFileName,
   *  located on SD card attached to STM32 GPU
   *  9 - is width of tileSet in tiles ( 9 tiles width == 72 pixels)
+  *  TLE_START - nunber of tile in tileset from which tiles will be loaded
   *  file name must respond to 8.3 name system
   *  8 chars max for filename, 3 chars max for file extension
   *  sGPU add *.tle extension automatically
   */
-  SDLoadTileSet8x8((const char*)tileFileName, 9, 0, MAX_TILES);
+  SDLoadTileSet8x8((const char*)tileFileName, TILE_SET_W-1, RAM_BASE, TLE_START, MAX_TILES);
 }
 
 // --------------------------------------------------------- //

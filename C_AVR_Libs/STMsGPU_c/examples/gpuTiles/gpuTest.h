@@ -3,6 +3,8 @@
 #define FUNC_TO_TEST_COUNT (sizeof(pArrExecGFXFunc)/sizeof(pArrExecGFXFunc[0]))
 
 #define MAX_TILES 70
+#define RAM_BASE 0
+#define TLE_START 0
 #define TILE_SET_W 10 // real number (1-10)
 #define TILE_SET_H 7  // real number (1-8)
 

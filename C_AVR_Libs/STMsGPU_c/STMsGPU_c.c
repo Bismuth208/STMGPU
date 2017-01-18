@@ -549,7 +549,7 @@ void SDLoadTileSet8x8(const char *tileSetArrName, uint8_t tileSetW, uint8_t ramT
 
 void drawTile8x8(int16_t posX, int16_t posY, uint8_t tileNum)
 {
-  cmdBuffer.cmd = DRW_TLE_8_POS;
+  cmdBuffer.cmd = DRW_TLE_8;
   cmdBuffer.par1 = posX;
   cmdBuffer.par2 = posY;
   cmdBuffer.data[5] = tileNum;

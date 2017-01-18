@@ -155,7 +155,7 @@ void startupInit(void)
   init_SPI1();
   initRand();
   
-  tftBegin();         /* initialize a ILI9341 chip */
+  initLCD();         /* initialize a ILI9341 chip */
   setRotation(1); // Horizontal
   setCurrentFont(1);
   
