@@ -48,6 +48,7 @@ STMGPU::STMGPU(int8_t bsyPin):_bsyPin(bsyPin)
 STMGPU::STMGPU():_useHardwareBsy(false) {}
 // ------------------------------------------- //
 
+#if defined (__AVR__)
 // this one make sync whith GPU
 void STMGPU::begin(uint32_t baudRate)
 {
@@ -55,6 +56,7 @@ void STMGPU::begin(uint32_t baudRate)
 
   bool syncEstablished = false;
   
+
   Serial.begin(baudRate);
   
   if(_useHardwareBsy) {
@@ -87,8 +89,51 @@ void STMGPU::begin(uint32_t baudRate)
     }
   }
 }
+#elif defined (__STM32F1__)
+// this one make sync whith GPU
+void STMGPU::begin(uint32_t baudRate)
+{
+  uint8_t syncData[2] = { 0x42, 0xDD};
+  
+  bool syncEstablished = false;
+  
+  
+  Serial1.begin(baudRate);
+  
+  if(_useHardwareBsy) {
+    // setup GPU bsy pin
+    pinMode(_bsyPin, INPUT);   // set as input
+    digitalWrite(_bsyPin, HIGH); // pull-up
+  }
+  
+  while(!syncEstablished) {
+    while(Serial1.available()==0){
+      Serial1.write(syncData, 0x02); // two bytes
+      delay(1000); // one transfer per second
+    }
+    
+    if(Serial1.read() == SYNC_OK) {
+      syncEstablished = true;
+      
+      while(Serial1.available() < 3); // wait for resolution
+      // get _width
+      cmdBuffer.data[1] = Serial1.read();
+      cmdBuffer.data[2] = Serial1.read();
+      // get _height
+      cmdBuffer.data[3] = Serial1.read();
+      cmdBuffer.data[4] = Serial1.read();
+      
+      _width  = cmdBuffer.par1;
+      _height = cmdBuffer.par2;
+      
+      Serial1.flush();
+    }
+  }
+}
+#endif
 
 // ------------------------------------------------------------------------------------ //
+#if defined (__AVR__)
 // this function is abstruction layer
 // this allow to simply change the interface
 void STMGPU::sendCommand(void *buf, uint8_t size)
@@ -107,6 +152,26 @@ void STMGPU::sendCommand(void *buf, uint8_t size)
   
   Serial.write((uint8_t*)buf, size);
 }
+#elif defined (__STM32F1__)
+// this function is abstruction layer
+// this allow to simply change the interface
+void STMGPU::sendCommand(void *buf, uint8_t size)
+{
+  // wait untill GPU buffer will ready
+  if(_useHardwareBsy) { // harware protection
+    
+    while(digitalRead(_bsyPin));
+    
+  } else { // software protection
+    
+    if(Serial1.read() == BSY_MSG_CODE_WAIT) {
+      while (Serial1.read() != BSY_MSG_CODE_READY);
+    }
+  }
+  
+  Serial1.write((uint8_t*)buf, size);
+}
+#endif
 
 // ------------------------------------------------------------------------------------ //
 
@@ -267,6 +332,7 @@ void STMGPU::fillTriangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_
   sendCommand(cmdBuffer.data, 15);
 }
 
+#if defined (__AVR__)
 void STMGPU::getResolution(void)
 {
   Serial.flush();
@@ -283,6 +349,24 @@ void STMGPU::getResolution(void)
   _width  = cmdBuffer.par1;
   _height = cmdBuffer.par2;
 }
+#elif defined (__STM32F1__)
+void STMGPU::getResolution(void)
+{
+  Serial1.flush();
+  Serial1.print(GET_RESOLUTION);
+  
+  while(Serial1.available() < 3); // wait for resolution
+  // get _width
+  cmdBuffer.data[1] = Serial1.read();
+  cmdBuffer.data[2] = Serial1.read();
+  // get _height
+  cmdBuffer.data[3] = Serial1.read();
+  cmdBuffer.data[4] = Serial1.read();
+  
+  _width  = cmdBuffer.par1;
+  _height = cmdBuffer.par2;
+}
+#endif
 
 int16_t STMGPU::height(void)
 {
