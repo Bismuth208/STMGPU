@@ -6,9 +6,14 @@
 #include <stdlib.h>
 
 #include <systicktimer.h>
-#include <spi.h>
 
 #include "ili9341.h"
+
+#if USE_FSMC
+ #include <fsmcdrv.h>
+#else
+ #include <spi.h>
+#endif
 
 #include <gfxDMA.h>
 
@@ -22,10 +27,10 @@ int16_t _height = ILI9341_TFTHEIGHT;
 void writeCommand(uint8_t c)
 {
 #if USE_FSMC
-  FSMC_SEND_CMD(c);
+  sendCMD8_FSMC(c);
 #else
+
   ENABLE_CMD();
-  
   sendData8_SPI1(c);
 #endif
 }
@@ -33,10 +38,10 @@ void writeCommand(uint8_t c)
 void writeData(uint8_t c)
 {
 #if USE_FSMC
-  FSMC_SEND_DATA(c);
+  sendData8_FSMC(c);
 #else
+
   ENABLE_DATA();
-  
   sendData8_SPI1(c);
 #endif
 }
@@ -44,15 +49,15 @@ void writeData(uint8_t c)
 void writeWordData(uint16_t c)
 {
 #if USE_FSMC
-  FSMC_SEND_DATA(c);
+  sendData16_FSMC(c);
 #else
+
   ENABLE_DATA();
-  
   sendData16_SPI1(c);
 #endif
 }
 
-void commandList(const uint8_t *addr)
+void execCommands(const uint8_t *addr)
 {
   uint8_t count;
   while (1) {
@@ -65,102 +70,25 @@ void commandList(const uint8_t *addr)
   }
 }
 
-#if USE_FSMC
-void initTFT_FSMC_GPIO(void)
-{
-  GPIO_InitTypeDef GPIO_InitStruct;
-  
-  // Init GPIO for FSMC
-  GPIO_InitStruct.GPIO_Pin = FSMC_PIN_D2 | FSMC_PIN_D3 | FSMC_PIN_RD | FSMC_PIN_WR | FSMC_PIN_CS | FSMC_PIN_D13 | FSMC_PIN_D14 | FSMC_PIN_D15 | FSMC_PIN_RS | FSMC_PIN_D0 | FSMC_PIN_D1;
-  GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF_PP;
-  GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
-  GPIO_Init(GPIOD, &GPIO_InitStruct);
-  
-  
-  GPIO_InitStruct.GPIO_Pin = FSMC_PIN_D4 | FSMC_PIN_D5 | FSMC_PIN_D6 | FSMC_PIN_D7 | FSMC_PIN_D8 | FSMC_PIN_D9 | FSMC_PIN_D10 | FSMC_PIN_D11 | FSMC_PIN_D12;
-  GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF_PP;
-  GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
-  GPIO_Init(GPIOE, &GPIO_InitStruct);
-  
-  // Reset
-  GPIO_InitStruct.GPIO_Pin = TFT_RES_PIN;
-  GPIO_Init(GPIOE, &GPIO_InitStruct);
-  
-  
-  /////////////////////////////////
-  // CS -> 1
-  // Reset -> 0
-  // RD -> 1
-  // WR -> 1
-  
-  GPIO_SET_PIN(GPIOD, FSMC_PIN_CS);
-  GPIO_SET_PIN(GPIOE, TFT_RES_PIN);
-  GPIO_SET_PIN(GPIOD, FSMC_PIN_RD);
-  GPIO_SET_PIN(GPIOD, FSMC_PIN_WR);
-  
-  //GPIO_SetBits(GPIOD, FSMC_PIN_CS);
-  //GPIO_ResetBits(GPIOE, TFT_RES_PIN);
-  //GPIO_SetBits(GPIOD, FSMC_PIN_RD);
-  //GPIO_SetBits(GPIOD, FSMC_PIN_WR);
-}
-
-void initTFT_FSMC(void)
-{
-  FSMC_NORSRAMInitTypeDef fsmc;
-  FSMC_NORSRAMTimingInitTypeDef fsmcTiming;
-  
-  
-  RCC_AHBPeriphClockCmd(RCC_AHBPeriph_FSMC, ENABLE);
-  
-  initTFT_FSMC_GPIO();
-  
-  // setup FSMC
-  fsmcTiming.FSMC_AddressSetupTime = 0x02;
-  fsmcTiming.FSMC_AddressHoldTime = 0x00;
-  fsmcTiming.FSMC_DataSetupTime = 0x05;
-  fsmcTiming.FSMC_BusTurnAroundDuration = 0x00;
-  fsmcTiming.FSMC_CLKDivision = 0x00;
-  fsmcTiming.FSMC_DataLatency = 0x00;
-  fsmcTiming.FSMC_AccessMode = FSMC_AccessMode_B;
-  
-  
-  fsmc.FSMC_Bank = FSMC_Bank1_NORSRAM1;
-  fsmc.FSMC_DataAddressMux = FSMC_DataAddressMux_Disable;
-  fsmc.FSMC_MemoryType = FSMC_MemoryType_SRAM; //FSMC_MemoryType_NOR;
-  fsmc.FSMC_MemoryDataWidth = FSMC_MemoryDataWidth_16b;
-  fsmc.FSMC_BurstAccessMode = FSMC_BurstAccessMode_Disable;
-  fsmc.FSMC_WaitSignalPolarity = FSMC_WaitSignalPolarity_Low;
-  fsmc.FSMC_WrapMode = FSMC_WrapMode_Disable;
-  fsmc.FSMC_WaitSignalActive = FSMC_WaitSignalActive_BeforeWaitState;
-  fsmc.FSMC_WriteOperation = FSMC_WriteOperation_Enable;
-  fsmc.FSMC_WaitSignal = FSMC_WaitSignal_Disable;
-  fsmc.FSMC_ExtendedMode = FSMC_ExtendedMode_Disable;
-  fsmc.FSMC_WriteBurst = FSMC_WriteBurst_Disable;
-  fsmc.FSMC_ReadWriteTimingStruct = &fsmcTiming;
-  fsmc.FSMC_WriteTimingStruct = &fsmcTiming;
-  
-  FSMC_NORSRAMInit(&fsmc);
-  FSMC_NORSRAMCmd(FSMC_Bank1_NORSRAM1, ENABLE);
-}
-#endif
-
 void initTFT_GPIO()
 {
-#if USE_FSMC
-  initTFT_FSMC();
-#else
   GPIO_InitTypeDef GPIO_InitStruct;
   
   GPIO_InitStruct.GPIO_Mode = GPIO_Mode_Out_PP;     // Mode: output "Push-Pull"
   GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;     // Set speed
   GPIO_InitStruct.GPIO_Pin = TFT_DC_PIN | TFT_RES_PIN | TFT_SS_PIN;
   GPIO_Init(GPIOB, &GPIO_InitStruct);        // Aply settings to port B
-#endif // USE_FSMC
 }
 
 void initLCD(void)
 {
+#if USE_FSMC
+  initFSMC_GPIO();
+  initFSMC();
+#else
   initTFT_GPIO();
+#endif
+  
   SET_TFT_RES_LOW;
   
 #if TFT_CS_ALWAS_ACTIVE
@@ -178,7 +106,7 @@ void initLCD(void)
   SET_TFT_RES_HI;
   _delayMS(5);
   
-  commandList(init_commands);
+  execCommands(initSequence);
   
   writeCommand(ILI9341_SLPOUT);    //Exit Sleep
   _delayMS(5);
@@ -191,15 +119,13 @@ void initLCD(void)
 void setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1)
 {    
 #if USE_FSMC
-  FSMC_SEND_CMD(ILI9341_CASET);    // Column addr set
-  FSMC_SEND_DATA(x0);           // XSTART
-  FSMC_SEND_DATA(x1);           // XEND
+  sendCMD8_FSMC(ILI9341_CASET);    // Column addr set
+  sendData32_FSMC(x0, x1); // XSTART, XEND
   
-  FSMC_SEND_CMD(ILI9341_RASET);    // Row addr set
-  FSMC_SEND_DATA(y0);           // YSTART
-  FSMC_SEND_DATA(y1);           // YEND
+  sendCMD8_FSMC(ILI9341_RASET);    // Row addr set
+  sendData32_FSMC(y0, y1); // YSTART, YEND
   
-  FSMC_SEND_CMD(ILI9341_RAMWR);     // write to RAM
+  sendCMD8_FSMC(ILI9341_RAMWR);     // write to RAM
   
 #else
   wait_DMA1_SPI1_busy();
@@ -227,15 +153,13 @@ void setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1)
 void setSqAddrWindow(uint16_t x0, uint16_t y0, uint16_t size)
 {
 #if USE_FSMC
-  FSMC_SEND_CMD(ILI9341_CASET);    // Column addr set
-  FSMC_SEND_DATA(x0);           // XSTART
-  FSMC_SEND_DATA(x0+size);           // XEND
+  sendCMD8_FSMC(ILI9341_CASET);    // Column addr set
+  sendData32_FSMC(x0, x0+size); // XSTART, XEND
   
-  FSMC_SEND_CMD(ILI9341_RASET);    // Row addr set
-  FSMC_SEND_DATA(y0);           // YSTART
-  FSMC_SEND_DATA(y0+size);           // YEND
+  sendCMD8_FSMC(ILI9341_RASET);    // Row addr set
+  sendData32_FSMC(y0, y0+size); // YSTART, YEND
   
-  FSMC_SEND_CMD(ILI9341_RAMWR);     // write to RAM
+  sendCMD8_FSMC(ILI9341_RAMWR);     // write to RAM
   
 #else
   wait_DMA1_SPI1_busy();
@@ -262,15 +186,13 @@ void setSqAddrWindow(uint16_t x0, uint16_t y0, uint16_t size)
 void setVAddrWindow(uint16_t x0, uint16_t y0, uint16_t y1)
 {
 #if USE_FSMC
-  FSMC_SEND_CMD(ILI9341_CASET);    // Column addr set
-  FSMC_SEND_DATA(x0);           // XSTART
-  FSMC_SEND_DATA(x0);           // XEND
+  sendCMD8_FSMC(ILI9341_CASET);    // Column addr set
+  sendData32_FSMC(x0, x0); // XSTART, XEND
   
-  FSMC_SEND_CMD(ILI9341_RASET);    // Row addr set
-  FSMC_SEND_DATA(y0);           // YSTART
-  FSMC_SEND_DATA(y1);           // YEND
+  sendCMD8_FSMC(ILI9341_RASET);    // Row addr set
+  sendData32_FSMC(y0, y1); // YSTART, YEND
   
-  FSMC_SEND_CMD(ILI9341_RAMWR);     // write to RAM  
+  sendCMD8_FSMC(ILI9341_RAMWR);     // write to RAM  
   
 #else
   wait_DMA1_SPI1_busy();
@@ -297,15 +219,13 @@ void setVAddrWindow(uint16_t x0, uint16_t y0, uint16_t y1)
 void setHAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1)
 {
 #if USE_FSMC
-  FSMC_SEND_CMD(ILI9341_CASET);    // Column addr set
-  FSMC_SEND_DATA(x0);           // XSTART
-  FSMC_SEND_DATA(x1);           // XEND
+  sendCMD8_FSMC(ILI9341_CASET);    // Column addr set
+  sendData32_FSMC(x0, x1); // XSTART, XEND
   
-  FSMC_SEND_CMD(ILI9341_RASET);    // Row addr set
-  FSMC_SEND_DATA(y0);           // YSTART
-  FSMC_SEND_DATA(y0);           // YEND
+  sendCMD8_FSMC(ILI9341_RASET);    // Row addr set
+  sendData32_FSMC(y0, y0); // YSTART, YEND
   
-  FSMC_SEND_CMD(ILI9341_RAMWR);     // write to RAM
+  sendCMD8_FSMC(ILI9341_RAMWR);     // write to RAM
   
 #else
   wait_DMA1_SPI1_busy();
@@ -332,15 +252,13 @@ void setHAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1)
 void setAddrPixel(uint16_t x0, uint16_t y0)
 { 
 #if USE_FSMC
-  FSMC_SEND_CMD(ILI9341_CASET);    // Column addr set
-  FSMC_SEND_DATA(x0);           // XSTART
-  FSMC_SEND_DATA(x0);           // XEND
+  sendCMD8_FSMC(ILI9341_CASET);    // Column addr set
+  sendData32_FSMC(x0, x0); // XSTART, XEND
   
-  FSMC_SEND_CMD(ILI9341_RASET);    // Row addr set
-  FSMC_SEND_DATA(y0);           // YSTART
-  FSMC_SEND_DATA(y0);           // YEND
+  sendCMD8_FSMC(ILI9341_RASET);    // Row addr set
+  sendData32_FSMC(y0, y0); // YSTART, YEND
   
-  FSMC_SEND_CMD(ILI9341_RAMWR);     // write to RAM
+  sendCMD8_FSMC(ILI9341_RAMWR);     // write to RAM
   
 #else
   wait_DMA1_SPI1_busy();
@@ -469,5 +387,9 @@ void setAdaptiveBrightness(uint8_t value)
   b11   Moving Image
   */
   writeCommand(ILI9341_WRCABC);
+#if USE_FSMC
+  sendData8_FSMC(value);
+#else
   sendData8_SPI1(value);
+#endif
 }

@@ -42,12 +42,15 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #include <systicktimer.h>
 
-#include <spi.h>
+#include <gfx.h>
+#include <gfxDMA.h>
+#include <fonts.h>
 
-#include "gfx.h"
-#include "fonts.h"
-
-#include "gfxDMA.h"
+#if USE_FSMC
+ #include <fsmcdrv.h>
+#else
+ #include <spi.h>
+#endif
 
 //-------------------------------------------------------------------------------------------//
 
@@ -331,11 +334,7 @@ void fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color)
   setAddrWindow(x, y, x+w-1, y+h-1);
   
 #if USE_FSMC
-  for(y=h; y>0; y--) {
-    for(x=w; x>0; x--) {
-      FSMC_SEND_DATA(color);
-    }
-  }
+  repeatData16_Arr_FSMC(color, w*h);
 #else
   fillColor_DMA1_SPI1(color, w*h);
 #endif // USE_FSMC
@@ -695,9 +694,7 @@ void drawChar(int16_t x, int16_t y, uint16_t fgcolor, uint16_t bgcolor, uint8_t 
     bufCount++;
     
 #if USE_FSMC
-    while(bufCount--) {
-      FSMC_SEND_DATA(charBuffer[bufCount]); // fix this mirror in future
-    }
+    sendData16_Arr_FSMC(charBuffer, bufCount);
 #else
     sendData16_Fast_DMA1_SPI1(charBuffer, bufCount);
 #endif /* USE_FSMC */
@@ -781,7 +778,7 @@ int16_t height(void)
 void pushColor(uint16_t color)
 {
 #if USE_FSMC
-  FSMC_SEND_DATA(color);
+  sendData16_FSMC(color);
 #else
   sendData16_SPI1(color);
 #endif /* USE_FSMC */
@@ -794,7 +791,7 @@ void drawPixel(int16_t x, int16_t y, uint16_t color)
   setAddrPixel(x, y);
   
 #if USE_FSMC
-  FSMC_SEND_DATA(color);
+  sendData16_FSMC(color);
 #else
   sendData16_SPI1(color);
 #endif /* USE_FSMC */
@@ -809,9 +806,7 @@ void drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color)
   setVAddrWindow(x, y, y+h);
   
 #if USE_FSMC
-  while (h--) {
-    FSMC_SEND_DATA(color);
-  }
+  repeatData16_Arr_FSMC(color, h);
 #else
   fillColor_DMA1_SPI1(color, h);
 #endif /* USE_FSMC */
@@ -826,9 +821,7 @@ void drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color)
   setHAddrWindow(x, y, x+w);
   
 #if USE_FSMC
-  while (w--) {
-    FSMC_SEND_DATA(color);
-  }
+  repeatData16_Arr_FSMC(color, w);
 #else
   fillColor_DMA1_SPI1(color, w);
 #endif /* USE_FSMC */
@@ -838,16 +831,20 @@ void fillScreen(uint16_t color)
 {
   setAddrWindow(0, 0, _width-1, _height-1);
   
+#if USE_FSMC
+  repeatData16_Arr_FSMC(color, _width * _height);
+#else
   fillColor_DMA1_SPI1(color, _width * _height);
+#endif
 }
 
-// Pass 8-bit (each) R,G,B, get back 16-bit packed color
-uint16_t color565(uint8_t r, uint8_t g, uint8_t b)
+// converts 8-bit (each) R,G,B, to rgb565
+inline uint16_t convRGBto565(uint8_t r, uint8_t g, uint8_t b)
 {
   return ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3);
 }
 
-// converts rgb 332 to rgb 565
+// converts rgb332 to rgb565
 uint16_t conv8to16(uint8_t x)
 {
   uint16_t r = x>>5;

@@ -11,7 +11,7 @@
 #include <usart.h>
 #include <memHelper.h>
 
-#include "gpuWorker.h"
+#include "gpuMain.h"
 
 //===========================================================================//
 
@@ -115,7 +115,7 @@ void init_GPU(void)
   
   init_GPU_GPIO();
   init_GPU_USART();    // setup access to low level interface
-  init_DMA_memset();
+  //init_DMA_memset();
   
   if(bsyState){
     print(T_BSY_STATE T_SOFT_BSY);

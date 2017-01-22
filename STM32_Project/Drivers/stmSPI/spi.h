@@ -27,6 +27,7 @@
 #define WAIT_FREE_TX    while ((SPI1->SR & SPI_I2S_FLAG_TXE) == (uint16_t)RESET);
 #define WAIT_FOR_BSY    while ((SPI1->SR & SPI_I2S_FLAG_BSY) != (uint16_t)RESET);
 
+//#define WAIT_FOR_END    while((SPI1->DR & (SPI_I2S_FLAG_TXE | SPI_I2S_FLAG_BSY)) != 0x02)
 // ------------------------------------------------------- //
 
 // ------------------------- SPI_1 ------------------------- //

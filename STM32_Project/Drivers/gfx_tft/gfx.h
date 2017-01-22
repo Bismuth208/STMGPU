@@ -53,7 +53,7 @@ void drawBitmap(int16_t x, int16_t y, const uint8_t *bitmap, int16_t w, int16_t 
 void drawBitmapBG(int16_t x, int16_t y, const uint8_t *bitmap, int16_t w, int16_t h, uint16_t color, uint16_t bg);
 void drawXBitmap(int16_t x, int16_t y, const uint8_t *bitmap, int16_t w, int16_t h, uint16_t color);
 
-uint16_t color565(uint8_t r, uint8_t g, uint8_t b);
+uint16_t convRGBto565(uint8_t r, uint8_t g, uint8_t b);
 uint16_t conv8to16(uint8_t x);
   
 int16_t height(void);

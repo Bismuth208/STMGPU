@@ -94,7 +94,7 @@ inline void sendData32_SPI1(uint16_t data0, uint16_t data1)
   
   WAIT_FREE_TX;
   SPI1->DR = data1;
-  
+
   WAIT_FREE_TX;
   WAIT_FOR_BSY;
   CLEAR_BIT(SPI1->CR1, SPI_DataSize_16b);

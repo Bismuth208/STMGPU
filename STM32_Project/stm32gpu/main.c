@@ -20,8 +20,8 @@
 #include <usart.h>
 #include <systicktimer.h>
 
-#include "sdWorker.h"
-#include "gpuWorker.h"
+#include "sdLoader.h"
+#include "gpuMain.h"
 #include "gpuTiles.h"
 
 #include "stm_gpu_nes_tiles2.h"

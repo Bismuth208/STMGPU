@@ -37,4 +37,5 @@ reduce registers and stack usage by minimise number of params to func (struct);
 /* veeeery veeeery far far future */
 load, draw 3d model(s);
 add sound engine;
+command execution from .csv file;
 

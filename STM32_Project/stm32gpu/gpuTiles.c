@@ -4,7 +4,12 @@
 
 #include <gfx.h>
 #include <gfxDMA.h>
-#include <spi.h>
+
+#if USE_FSMC
+ #include <fsmcdrv.h>
+#else
+ #include <spi.h>
+#endif
 
 #include "gpuTiles.h"
 #include "nesPalette_ext.h"
@@ -148,7 +153,11 @@ void drawTile8x8(void *tile)
   }
   
   setSqAddrWindow(posX, posY, 7); // on oscilloscope this one remove few uS
+#if USE_FSMC
+  sendData16_Arr_FSMC(lastTile8x8, TILE_ARR_8X8_SIZE);
+#else
   sendData16_Fast_DMA1_SPI1(lastTile8x8, TILE_ARR_8X8_SIZE);
+#endif
 }
 
 void drawTile16x16(int16_t posX, int16_t posY, uint8_t tileNum)
@@ -169,11 +178,16 @@ void drawTile16x16(int16_t posX, int16_t posY, uint8_t tileNum)
   }
   
   setSqAddrWindow(posX, posY, 15);
+#if USE_FSMC
+  sendData16_Arr_FSMC(lastTile16x16, TILE_ARR_16X16_SIZE);
+#else
   sendData16_DMA1_SPI1(lastTile16x16, TILE_ARR_16X16_SIZE);
+#endif
 }
 
 
 #ifdef STM32F10X_HD
+#if 0
 void drawTile32x32(int16_t posX, int16_t posY, uint8_t tileNum)
 {
   // little trick, if tile same, just redraw it
@@ -192,8 +206,13 @@ void drawTile32x32(int16_t posX, int16_t posY, uint8_t tileNum)
   }
   
   setSqAddrWindow(posX, posY, 31);
-  sendData16_DMA1_SPI1(lastTileStruct32x32.pLastTileArr, TILE_ARR_16X16_SIZE);
+#if USE_FSMC
+  sendData16_Arr_FSMC(lastTileStruct32x32.pLastTileArr, TILE_ARR_32X32_SIZE);
+#else
+  sendData16_DMA1_SPI1(lastTileStruct32x32.pLastTileArr, TILE_ARR_32X32_SIZE);
+#endif
 }
+#endif
 #endif
 
 // -------------------------------------------------------- //

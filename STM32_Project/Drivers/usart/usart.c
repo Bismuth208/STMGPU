@@ -45,17 +45,15 @@ uint8_t waitCutByte_USART1(void)
 #if 0
   while(!RX_AVALIABLE); // wait for something in buf
   
-  uint8_t byteData = rxBuffer[rx_buffer.tail];
-  ++rx_buffer.tail;
+  return rxBuffer[rx_buffer.tail++];
+#else
   
-  return byteData;
-#endif
-  
-  uint8_t byteData =0;
+  uint8_t byteData;
   
   cutData(&byteData, 1);
   
   return byteData;
+#endif
 }
 
 uint16_t waitCutWord_USART1(void)

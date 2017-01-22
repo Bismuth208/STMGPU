@@ -45,14 +45,23 @@ void init_DMA_memset(void)
             DMA_Mode_Normal |                  // .DMA_Mode
             DMA_PeripheralInc_Enable |         // .DMA_PeripheralInc
             DMA_MemoryInc_Disable |            // .DMA_MemoryInc
-            DMA_PeripheralDataSize_Byte |      // .DMA_PeripheralDataSize
-            DMA_MemoryDataSize_Byte |          // .DMA_MemoryDataSize
+            DMA_PeripheralDataSize_Word |      // .DMA_PeripheralDataSize
+            DMA_MemoryDataSize_Word |          // .DMA_MemoryDataSize
             DMA_Priority_VeryHigh |            // .DMA_Priority
-            DMA_M2M_Enable );                  // .DMA_M2M
-            //DMA_IT_TC );                       // enable interupt
+            DMA_M2M_Enable |                   // .DMA_M2M
+            DMA_IT_TC );                       // enable interupt
                  
   /* Clear MEM2MEM, PL, MSIZE, PSIZE, MINC, PINC, CIRC and DIR bits */
   MODIFY_REG(DMA1_Channel1->CCR, CCR_CLEAR_Mask, tmpreg); // apply new settings
+  
+  
+  NVIC_InitTypeDef NVIC_InitStructure;
+  //Enable DMA1 channel IRQ Channel
+  NVIC_InitStructure.NVIC_IRQChannel = DMA1_Channel1_IRQn;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
+  NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
+  NVIC_Init(&NVIC_InitStructure);
 }
 
 // NOTE: len must be less than 65535!
@@ -65,4 +74,14 @@ void memset_DMA1(void *dst, void const *data, size_t len)
   DMA1_Channel1->CMAR = (uint32_t) &dmaDataBuf;  // apply DMA_MemoryBaseAddr
   DMA1_Channel1->CNDTR = len;                    // set how much data to transfer
   DMA1_Channel1->CCR |= DMA_CCR1_EN;             // shot DMA to transer;
+}
+
+void DMA1_Channel1_IRQHandler(void) 
+{
+  if((DMA1->ISR & DMA1_IT_TC1)) {    // is it our IRQ? // != (uint32_t)RESET
+    
+    CLEAR_BIT(DMA1_Channel1->CCR, DMA_CCR1_EN);
+    
+    DMA1->IFCR = DMA1_IT_TC1;   // clear interrupt
+  }
 }

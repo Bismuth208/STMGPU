@@ -53,6 +53,7 @@
 #define ILI9341_FRMCTR3 0xB3
 #define ILI9341_INVCTR  0xB4
 #define ILI9341_DFUNCTR 0xB6
+#define ILI9341_ENTRYMODE 0xB7
 
 #define ILI9341_PWCTR1  0xC0
 #define ILI9341_PWCTR2  0xC1
@@ -61,6 +62,7 @@
 #define ILI9341_PWCTR5  0xC4
 #define ILI9341_VMCTR1  0xC5
 #define ILI9341_VMCTR2  0xC7
+#define ILI9341_PWCTRA  0xCB
 
 #define ILI9341_RDID1   0xDA
 #define ILI9341_RDID2   0xDB
@@ -119,39 +121,6 @@
 
 
 #if USE_FSMC
-// Use 1st bank of FSMC
-#define LCD_FSMC_DATA   0x60020000      // for write data
-#define LCD_FSMC_CMD    0x60000000      // for write commands
-
-#define FSMC_SEND_DATA(a)       (*(uint16_t *) (LCD_FSMC_DATA) = a)
-#define FSMC_SEND_CMD(a)       (*(uint16_t *) (LCD_FSMC_CMD) = a)
-
-// 16 bit 8080 pins
-#define FSMC_PIN_D0     GPIO_Pin_14     // PD14
-#define FSMC_PIN_D1     GPIO_Pin_15     // PD15
-#define FSMC_PIN_D2     GPIO_Pin_0      // PD0
-#define FSMC_PIN_D3     GPIO_Pin_1      // PD1
-#define FSMC_PIN_D4     GPIO_Pin_7      // PE7
-#define FSMC_PIN_D5     GPIO_Pin_8      // PE8
-#define FSMC_PIN_D6     GPIO_Pin_9      // PE9
-#define FSMC_PIN_D7     GPIO_Pin_10     // PE10
-#define FSMC_PIN_D8     GPIO_Pin_11     // PE11
-#define FSMC_PIN_D9     GPIO_Pin_12     // PE12
-#define FSMC_PIN_D10    GPIO_Pin_13     // PE13
-#define FSMC_PIN_D11    GPIO_Pin_14     // PE14
-#define FSMC_PIN_D12    GPIO_Pin_15     // PE15
-#define FSMC_PIN_D13    GPIO_Pin_8      // PD8
-#define FSMC_PIN_D14    GPIO_Pin_9      // PD9
-#define FSMC_PIN_D15    GPIO_Pin_10     // PD10
-
-// RD - read; WR - write
-#define FSMC_PIN_RD    GPIO_Pin_4      // PD4 (FSMC_PIN_NOE)
-#define FSMC_PIN_WR    GPIO_Pin_5      // PD5 (FSMC_PIN_NWE)
-
-// CS - chip select; RS - register select
-#define FSMC_PIN_CS    GPIO_Pin_7      // PD7 (FSMC_PIN_NE1)
-#define FSMC_PIN_RS    GPIO_Pin_11     // PD11 (FSMC_PIN_A16)
-
 
 #undef SET_TFT_CS_HI
 #undef SET_TFT_CS_LOW
@@ -172,18 +141,14 @@
 #define SET_TFT_RES_HI          (GPIOE->BSRR = TFT_RES_PIN);
 #define SET_TFT_RES_LOW         (GPIOE->BRR = TFT_RES_PIN)
 
-
-#endif // USE_FSMC
-
-
-#if USE_FSMC
 // just a protection
 #define TFT_CS_ALWAS_ACTIVE 0
+
 #else
 // free MCU from toggling CS GPIO
 // Set this to 0 if not only one TFT is slave on that SPI
 #define TFT_CS_ALWAS_ACTIVE 1
-#endif
+#endif // USE_FSMC
 
 #if TFT_CS_ALWAS_ACTIVE
 #undef SET_TFT_CS_HI
@@ -258,20 +223,39 @@ uint16_t color;
 */
 
 //-------------------------------------------------------------------------------------------//
+#if USE_FSMC
 
-static const uint8_t init_commands[] = {
+static const uint8_t initSequence[] = {
+  2, ILI9341_SWRESET, 0x00,
+  2, ILI9341_DISPOFF, 0x00,
+  2, ILI9341_PWCTR1, 0x23,                      // Power control  (VRH[5:0])
+  2, ILI9341_PWCTR2, 0x10,                      // Power control (SAP[2:0];BT[3:0])
+  3, ILI9341_VMCTR1, 0x2B, 0x2B,                // VCM control (VCOMH = 3.825)
+  2, ILI9341_VMCTR2, 0xC0,                      // VCM control2 (VCOML = -1.375)
+  2, ILI9341_MADCTL, MADCTL_MX|MADCTL_BGR,      // Memory Access Control
+  2, ILI9341_PIXFMT, 0x55,                      // Pixel Format Set (8 bit)
+  3, ILI9341_FRMCTR1, 0x00, 0x18,               // Frame Rate Control (In Normal Mode/Full Colors) == Frame Rate 79Hz
+  2, ILI9341_ENTRYMODE, 0x07,
+  0
+};
+
+
+#else
+
+static const uint8_t initSequence[] = {
   4, 0xEF, 0x03, 0x80, 0x02,                    // Memory to Display Address Mapping
   4, 0xCF, 0x00, 0XC1, 0X30,                    // Power control B
   5, 0xED, 0x64, 0x03, 0X12, 0X81,              // Power on sequence control
   4, 0xE8, 0x85, 0x00, 0x78,                    // Driver timing control A
-  6, 0xCB, 0x39, 0x2C, 0x00, 0x34, 0x02,        // Power control A
+  6, ILI9341_PWCTRA, 0x39, 0x2C, 
+     0x00, 0x34, 0x02,                          // Power control A
   2, 0xF7, 0x20,                                // Pump ratio control 
   3, 0xEA, 0x00, 0x00,                          // Driver timing control B
   2, ILI9341_PWCTR1, 0x23,                      // Power control  (VRH[5:0])
   2, ILI9341_PWCTR2, 0x10,                      // Power control (SAP[2:0];BT[3:0])
   3, ILI9341_VMCTR1, 0x3e, 0x28,                // VCM control
-  2, ILI9341_VMCTR2, 0x86,                      // VCM control2
-  2, ILI9341_MADCTL, 0x48,                      // Memory Access Control
+  2, ILI9341_VMCTR2, 0x86,                      // VCM control2 (VML=58 VMH=58)
+  2, ILI9341_MADCTL, MADCTL_MX|MADCTL_BGR,      // Memory Access Control
   2, ILI9341_PIXFMT, 0x55,                      // Pixel Format Set
   3, ILI9341_FRMCTR1, 0x00, 0x10,               // Frame Rate Control (In Normal Mode/Full Colors)
   3, ILI9341_FRMCTR2, 0x00, 0x1F,               // Frame Rate Control (In Idle Mode/8 colors)
@@ -286,13 +270,13 @@ static const uint8_t init_commands[] = {
   0
 };
 
+#endif /* USE_FSMC */
+
 //-------------------------------------------------------------------------------------------//
 
   void writeCommand(uint8_t c);
   void writeData(uint8_t d);
   void writeWordData(uint16_t c);
-  
-  void commandList(const uint8_t *addr);
   
   void initLCD(void);
   void setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);

@@ -1248,6 +1248,7 @@
           <state>$PROJ_DIR$\..\..\Drivers\usart\</state>
           <state>$PROJ_DIR$\..\..\Drivers\gfx_tft\</state>
           <state>$PROJ_DIR$\..\..\Drivers\ILI9341\</state>
+          <state>$PROJ_DIR$\..\..\Drivers\fsmc\</state>
           <state>$PROJ_DIR$\..\..\Drivers\FatFS\</state>
           <state>$PROJ_DIR$\..\..\Drivers\memory\</state>
         </option>
@@ -1897,6 +1898,15 @@
     </settings>
   </configuration>
   <group>
+    <name>common</name>
+    <file>
+      <name>$PROJ_DIR$\..\..\Drivers\memory\memHelper.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\..\Drivers\memory\memHelper.h</name>
+    </file>
+  </group>
+  <group>
     <name>Drivers</name>
     <group>
       <name>FatFS</name>
@@ -1923,6 +1933,15 @@
       </file>
       <file>
         <name>$PROJ_DIR$\..\..\Drivers\FatFS\sdcard_spi.h</name>
+      </file>
+    </group>
+    <group>
+      <name>FSMC</name>
+      <file>
+        <name>$PROJ_DIR$\..\..\Drivers\fsmc\fsmcdrv.c</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\..\Drivers\fsmc\fsmcdrv.h</name>
       </file>
     </group>
     <group>
@@ -1983,6 +2002,51 @@
   <group>
     <name>GPU</name>
     <group>
+      <name>common</name>
+      <file>
+        <name>$PROJ_DIR$\..\nesPalette_ext.h</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\stm_gpu_nes_tiles2.h</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\stm_gpu_nes_tilesMap.h</name>
+      </file>
+    </group>
+    <group>
+      <name>gui</name>
+      <excluded>
+        <configuration>Release</configuration>
+      </excluded>
+      <file>
+        <name>$PROJ_DIR$\..\gui.c</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\gui.h</name>
+      </file>
+    </group>
+    <group>
+      <name>main</name>
+      <file>
+        <name>$PROJ_DIR$\..\gpuMain.c</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\gpuMain.h</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\initGPU.c</name>
+      </file>
+    </group>
+    <group>
+      <name>SD card</name>
+      <file>
+        <name>$PROJ_DIR$\..\sdLoader.c</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\sdLoader.h</name>
+      </file>
+    </group>
+    <group>
       <name>sprites</name>
       <file>
         <name>$PROJ_DIR$\..\sprites.c</name>
@@ -1999,31 +2063,7 @@
       <file>
         <name>$PROJ_DIR$\..\gpuTiles.h</name>
       </file>
-      <file>
-        <name>$PROJ_DIR$\..\sdWorker.c</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$\..\sdWorker.h</name>
-      </file>
     </group>
-    <file>
-      <name>$PROJ_DIR$\..\gpuWorker.c</name>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\gpuWorker.h</name>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\initGPU.c</name>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\nesPalette_ext.h</name>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\stm_gpu_nes_tiles2.h</name>
-    </file>
-    <file>
-      <name>$PROJ_DIR$\..\stm_gpu_nes_tilesMap.h</name>
-    </file>
   </group>
   <group>
     <name>STM32_SPL_Core</name>
@@ -2040,9 +2080,6 @@
       </file>
       <file>
         <name>$PROJ_DIR$\..\..\Drivers\STM32F10x_StdPeriph_Driver\inc\stm32f10x_fsmc.h</name>
-        <excluded>
-          <configuration>Release</configuration>
-        </excluded>
       </file>
       <file>
         <name>$PROJ_DIR$\..\..\Drivers\STM32F10x_StdPeriph_Driver\inc\stm32f10x_gpio.h</name>
@@ -2076,9 +2113,6 @@
       </file>
       <file>
         <name>$PROJ_DIR$\..\..\Drivers\STM32F10x_StdPeriph_Driver\src\stm32f10x_fsmc.c</name>
-        <excluded>
-          <configuration>Release</configuration>
-        </excluded>
       </file>
       <file>
         <name>$PROJ_DIR$\..\..\Drivers\STM32F10x_StdPeriph_Driver\src\stm32f10x_gpio.c</name>
@@ -2129,12 +2163,6 @@
   </group>
   <file>
     <name>$PROJ_DIR$\..\main.c</name>
-  </file>
-  <file>
-    <name>$PROJ_DIR$\..\..\Drivers\memory\memHelper.c</name>
-  </file>
-  <file>
-    <name>$PROJ_DIR$\..\..\Drivers\memory\memHelper.h</name>
   </file>
 </project>
 
