@@ -22,10 +22,7 @@ void setup() {
 
 void loop() {
   // sGPU add *.bmp extension automatically
-  gpu.printBMP(0, 20, F("vice24")); // draw bmp picture at position
-  gpu.printBMP(F("circuit"));   // \ 
-  gpu.printBMP(F("tiger"));     //  \__ draw pic at 0,0 position
-  gpu.printBMP(F("house"));     // /
-
-  gpu.fillScreen(COLOR_BLACK);
+  gpu.printBMP(0, 0, F("tree1")); // draw bmp picture at position
+  gpu.printBMP(F("tree2"));  // \__ draw pic at 0,0 position
+  gpu.printBMP(F("tree3"));  // /
 }
