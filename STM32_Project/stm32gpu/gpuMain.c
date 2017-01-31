@@ -19,6 +19,7 @@
 #include "sdLoader.h"
 #include "gpuTiles.h"
 #include "sprites.h"
+#include "gui.h"
 
 //===========================================================================//
 
@@ -308,6 +309,8 @@ __noreturn void run_GPU(void)
       
       // ------------------- Tile ----------------- //
       
+      // ---- tile 8x8 ---- //
+      
       case LDD_TLE_8: {
         // get size of file name, tileset width, ram tile number, tile number in tileset
         waitCutBuf_USART1(cmdBuffer.data, 4);
@@ -333,12 +336,69 @@ __noreturn void run_GPU(void)
       
       case DRW_TLE_8: {
         waitCutBuf_USART1(cmdBuffer.data, 5);
-        
+
         drawTile8x8(cmdBuffer.data);
       } break;
       
+      // ---- tile 16x16 ---- //
+      
+      case LDD_TLE_16: {
+        // get size of file name, tileset width, ram tile number, tile number in tileset
+        waitCutBuf_USART1(cmdBuffer.data, 4);
+        // get file name
+        waitCutBuf_USART1(cmdBufferStr, cmdBuffer.data[0]);
+        
+        setBusyStatus(1);
+        SDLoadTile16x16(cmdBufferStr, &cmdBuffer.data[1]);
+        memset(cmdBufferStr, 0x00, MAX_TEXT_SIZE);
+      } break;
+      
+      case LDD_TLES_16: {
+        // get size of file name, tileset width, ram tile number,
+        // base tile number in tileset, max number of tiles to load
+        waitCutBuf_USART1(cmdBuffer.data, 5);
+        // get file name
+        waitCutBuf_USART1(cmdBufferStr, cmdBuffer.data[0]);
+        
+        setBusyStatus(1);
+        SDLoadTileSet16x16(cmdBufferStr, &cmdBuffer.data[1]);
+        memset(cmdBufferStr, 0x00, MAX_TEXT_SIZE);
+      } break;
+      
+      case DRW_TLE_16: {
+        waitCutBuf_USART1(cmdBuffer.data, 5);
+        
+        drawTile16x16(cmdBuffer.data);
+      } break;
+      
+      // ---- tile 32x32 ---- //
+#ifdef STM32F10X_HD
+      case LDD_TLE_32: {
+        // get size of file name, tileset width, ram tile number, tile number in tileset
+        waitCutBuf_USART1(cmdBuffer.data, 4);
+        // get file name
+        waitCutBuf_USART1(cmdBufferStr, cmdBuffer.data[0]);
+        
+        setBusyStatus(1);
+        SDLoadTile32x32(cmdBufferStr, &cmdBuffer.data[1]);
+        memset(cmdBufferStr, 0x00, MAX_TEXT_SIZE);
+      } break;
+      
+      case LDD_TLES_32: {
+        // get size of file name, tileset width, ram tile number,
+        // base tile number in tileset, max number of tiles to load
+        waitCutBuf_USART1(cmdBuffer.data, 5);
+        // get file name
+        waitCutBuf_USART1(cmdBufferStr, cmdBuffer.data[0]);
+        
+        setBusyStatus(1);
+        SDLoadTileSet32x32(cmdBufferStr, &cmdBuffer.data[1]);
+        memset(cmdBufferStr, 0x00, MAX_TEXT_SIZE);
+      } break;
+#endif /* STM32F10X_HD */
+      
       case LDD_TLE_MAP: {
-        // get file name and it`s
+        // get file name and it`s size
         waitCutBuf_USART1(cmdBufferStr, waitCutByte_USART1());
         
         setBusyStatus(1);
@@ -349,13 +409,7 @@ __noreturn void run_GPU(void)
       case DRW_TLE_MAP: {
         drawBackgroundMap();
       } break;
-      
-      case DRW_TLE_16: {
-        waitCutBuf_USART1(cmdBuffer.data, 5);
-        
-        drawTile16x16(cmdBuffer.par1, cmdBuffer.par2, cmdBuffer.data[4]);
-      } break;
-      
+
       
       // ----------------- Sprite ----------------- //
       
@@ -422,10 +476,37 @@ __noreturn void run_GPU(void)
       
       
       // --------------- GUI commands -------------- //
-      
+
       case SET_WND_CR: {
+        waitCutBuf_USART1(cmdBuffer.data, 4);
         
+        setColorWindowGUI(cmdBuffer.par1, cmdBuffer.par2);
+      } break;
+      
+       case SET_WND_CR_TXT: {
+        waitCutBuf_USART1(cmdBuffer.data, 4);
         
+        setTextBGColorGUI(cmdBuffer.par1, cmdBuffer.par2);
+      } break;
+      
+       case SET_WND_TXT_SZ: {
+        
+        setGUITextSize(waitCutByte_USART1());
+      } break;
+      
+       case DRW_WND_AT: {
+        waitCutBuf_USART1(cmdBuffer.data, 8);
+        
+        drawWindowGUI(cmdBuffer.par1, cmdBuffer.par2, cmdBuffer.par3, cmdBuffer.par4);
+      } break;
+      
+       case DRW_WND_TXT: {
+        waitCutBuf_USART1(cmdBuffer.data, 9);
+        // get text for window
+        waitCutBuf_USART1(cmdBufferStr, cmdBuffer.data[8]);
+        
+        drawTextWindowGUI(cmdBuffer.par1, cmdBuffer.par2, cmdBuffer.par3, cmdBuffer.par4, cmdBufferStr);
+        memset(cmdBufferStr, 0x00, MAX_TEXT_SIZE);
       } break;
       
       // -------------  TO DO: ---------- //

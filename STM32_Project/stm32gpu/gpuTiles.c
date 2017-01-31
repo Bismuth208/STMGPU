@@ -1,6 +1,5 @@
-#include <stm32f10x.h>
-
 #include <string.h>
+#include <stm32f10x.h>
 
 #include <gfx.h>
 #include <gfxDMA.h>
@@ -10,6 +9,7 @@
 #else
  #include <spi.h>
 #endif
+#include <memHelper.h>
 
 #include "gpuTiles.h"
 #include "nesPalette_ext.h"
@@ -20,57 +20,55 @@
 uint8_t tileArr8x8[TILES_NUM_8x8][TILE_ARR_8X8_SIZE] = {0, 0};
 uint8_t tileArr16x16[TILES_NUM_16x16][TILE_ARR_16X16_SIZE] = {0, 0};
 
-#ifdef STM32F10X_HD
-uint8_t tileArr32x32[TILES_NUM_32x32][TILE_ARR_32X32_SIZE] = {0, 0};
-#endif
-
 // total: 640
 uint16_t lastTile8x8[TILE_ARR_8X8_SIZE];       // 128
 uint16_t lastTile16x16[TILE_ARR_16X16_SIZE];   // 512
+
+// last tile id in tileArrYxY
+uint8_t lastTileNum8x8 = 0xFF;
+uint8_t lastTileNum16x16 = 0xFF;
+
 #ifdef STM32F10X_HD
+uint8_t tileArr32x32[TILES_NUM_32x32][TILE_ARR_32X32_SIZE] = {0, 0};
 uint16_t lastTile32x32[TILE_ARR_32X32_SIZE];   // 2048
-#endif
+uint8_t lastTileNum32x32 = 0xFF;
+#endif  /* STM32F10X_HD */
 
-uint8_t  lastTileNum8x8 = 0xFF;          // last tile id in tileArrYxY
-
-lastTile_t lastTileStruct16x16 = {0, 0};
 
 // on screen tile map background
 // total: 1200 ( if 40x30 )
 uint8_t mainBackGround[BACKGROUND_SIZE] = {0};
-//uint8_t middleBackGround[BACKGROUND_SIZE_W][BACKGROUND_SIZE_H] = {0, 0};
-//uint8_t frontBackGround[BACKGROUND_SIZE_W][BACKGROUND_SIZE_H] = {0, 0};
 
 // total: 512
 uint16_t currentPaletteArr[USER_PALETTE_SIZE]; // user can specify max 256 colors
 
-uint8_t palChanged =0; // status flag, need to redraw tiles
+uint8_t palChanged =0; // status flag; force to redraw tiles
 
 // -------------------------------------------------------- //
 
+// load to RAM built-in palette
 void loadDefaultPalette(void)
 {
-  for(uint8_t count=0; count <80; count++) { // 80 colors
-    currentPaletteArr[count] = nesPalette_ext[count]; // extended NES palette
-  }   
+  // 80 colors and each 2 byte in size
+  memcpy32(currentPaletteArr, nesPalette_ext, 160);
 }
 
 #if 0
-void loadLogoTileSet(uint8_t tileSetSize, uint8_t tileSetW, const uint8_t *pTileSet)
+void loadInternalTileSet(uint8_t tileSetSize, uint8_t tileSetW, const uint8_t *pTileSet)
 {
   uint8_t count =0;
   uint8_t tileNum=0;
   uint8_t tileYcnt, tileXcnt;
   
-  uint16_t tileNumOffsetX = (tileNum % tileSetW)*TILE_BASE_SIZE;     // start position
-  uint16_t tileNewLineOffsetY = tileSetW*TILE_BASE_SIZE;       // offset for new scanline
+  uint16_t tileNumOffsetX = (tileNum % tileSetW)*TILE_8_BASE_SIZE;     // start position
+  uint16_t tileNewLineOffsetY = tileSetW*TILE_8_BASE_SIZE;       // offset for new scanline
   
   uint16_t offset = ((tileNum)  / (tileSetW)) * (tileSetW * TILE_ARR_8X8_SIZE);
   
   for(; tileNum <= tileSetSize; tileNum++) {
     
-    for(tileYcnt = 0; tileYcnt < TILE_BASE_SIZE; tileYcnt++) { // Y
-      for(tileXcnt =0; tileXcnt < TILE_BASE_SIZE; tileXcnt++) { // X
+    for(tileYcnt = 0; tileYcnt < TILE_8_BASE_SIZE; tileYcnt++) { // Y
+      for(tileXcnt =0; tileXcnt < TILE_8_BASE_SIZE; tileXcnt++) { // X
         tileArr8x8[tileNum][count] = pTileSet[tileNumOffsetX + tileXcnt + offset]; // read single line in X pos
         ++count;
       }
@@ -79,13 +77,13 @@ void loadLogoTileSet(uint8_t tileSetSize, uint8_t tileSetW, const uint8_t *pTile
     
     count =0;
     offset = ((tileNum)  / (tileSetW)) * (tileSetW * TILE_ARR_8X8_SIZE);
-    tileNumOffsetX = (tileNum % tileSetW)*TILE_BASE_SIZE;     // start position
+    tileNumOffsetX = (tileNum % tileSetW)*TILE_8_BASE_SIZE;     // start position
     
   }
 }
 #else
 
-void loadLogoTileSet(uint8_t tileSetSize, uint8_t tileSetW, const uint8_t *pTileSet)
+void loadInternalTileSet(uint8_t tileSetSize, uint8_t tileSetW, const uint8_t *pTileSet)
 {
   for(uint8_t tileNum=0; tileNum <= tileSetSize; tileNum++) {
     loadTile8x8(tileNum, tileSetW, tileArr8x8[tileNum], pTileSet);
@@ -100,13 +98,13 @@ void loadTile8x8(uint8_t tileNum, uint8_t tileSetW, uint8_t *pTile, const uint8_
   uint8_t count =0;
   uint8_t tileYcnt, tileXcnt;
   
-  uint16_t tileNumOffsetX = (tileNum % tileSetW)*TILE_BASE_SIZE;     // start position
-  uint16_t tileNewLineOffsetY = tileSetW*TILE_BASE_SIZE;       // offset for new scanline
+  uint16_t tileNumOffsetX = (tileNum % tileSetW)*TILE_8_BASE_SIZE;     // start position
+  uint16_t tileNewLineOffsetY = tileSetW*TILE_8_BASE_SIZE;       // offset for new scanline
   
   uint16_t offset = ((tileNum)  / (tileSetW)) * (tileSetW * TILE_ARR_8X8_SIZE);
 
-  for(tileYcnt = 0; tileYcnt < TILE_BASE_SIZE; tileYcnt++) { // Y
-    for(tileXcnt =0; tileXcnt < TILE_BASE_SIZE; tileXcnt++) { // X
+  for(tileYcnt = 0; tileYcnt < TILE_8_BASE_SIZE; tileYcnt++) { // Y
+    for(tileXcnt =0; tileXcnt < TILE_8_BASE_SIZE; tileXcnt++) { // X
       pTile[count] = pTileSet[tileNumOffsetX + tileXcnt + offset]; // read single line in X pos
       ++count;
     }
@@ -126,6 +124,12 @@ uint8_t *getArrTilePointer16x16(uint8_t tileNum)
 {
   return tileArr16x16[tileNum];
 }
+#ifdef STM32F10X_HD
+uint8_t *getArrTilePointer32x32(uint8_t tileNum)
+{
+  return tileArr32x32[tileNum];
+}
+#endif /* STM32F10X_HD */
 
 uint8_t *getMapArrPointer(void)
 {
@@ -138,21 +142,22 @@ void drawTile8x8(void *tile)
   
   int16_t posX = *pTile++;
   int16_t posY = *pTile++;
-  uint8_t tileNum = *pTile++;
+  uint8_t tileNum = *pTile;
   
   // little trick, if tile same, just redraw it
-  if(lastTileNum8x8 != tileNum) {
+  if(lastTileNum8x8 != tileNum) { // same tile number?
     
-    uint8_t *pTileArr = &tileArr8x8[tileNum][0];
-    lastTileNum8x8 = tileNum;
+    uint8_t *pTileArr = &tileArr8x8[tileNum][0]; // get pointer by *pTile tile number
+    lastTileNum8x8 = tileNum; // apply last tile number
     
+    // convert colors from indexes in current palette to RGB565 color space
     for(uint16_t count =0; count < TILE_ARR_8X8_SIZE; count++) {
-      // convert colors from current palette to RGB565 color space
       lastTile8x8[count] = currentPaletteArr[*pTileArr++];
     }
   }
   
-  setSqAddrWindow(posX, posY, 7); // on oscilloscope this one remove few uS
+  // on oscilloscope this one reduce few uS
+  setSqAddrWindow(posX, posY, TILE_8x8_WINDOW_SIZE);
 #if USE_FSMC
   sendData16_Arr_FSMC(lastTile8x8, TILE_ARR_8X8_SIZE);
 #else
@@ -160,60 +165,66 @@ void drawTile8x8(void *tile)
 #endif
 }
 
-void drawTile16x16(int16_t posX, int16_t posY, uint8_t tileNum)
+void drawTile16x16(void *tile)
 {
+  uint16_t *pTile = (uint16_t *)tile;
+  
+  int16_t posX = *pTile++;
+  int16_t posY = *pTile++;
+  uint8_t tileNum = *pTile++;
+  
   // little trick, if tile same, just redraw it
-  if((lastTileStruct16x16.drawed == 0) || (lastTileStruct16x16.lasttileNum != tileNum)) {
+  if(lastTileNum16x16 != tileNum) {
     
-    uint8_t colorTileIdx;
+    uint8_t *pTileArr = &tileArr16x16[tileNum][0];
+    lastTileNum16x16 = tileNum;
     
-    lastTileStruct16x16.drawed = 1;
-    lastTileStruct16x16.lasttileNum = tileNum;
-    
+    // convert colors from indexes in current palette to RGB565 color space
     for(uint16_t count =0; count < TILE_ARR_16X16_SIZE; count++) {
-      // convert colors from current palette to RGB565 color space
-      colorTileIdx = tileArr16x16[tileNum][count];
-      lastTile16x16[count] = currentPaletteArr[colorTileIdx];
+      lastTile16x16[count] = currentPaletteArr[*pTileArr++];
     }
   }
   
-  setSqAddrWindow(posX, posY, 15);
+  // on oscilloscope this one reduce few uS
+  setSqAddrWindow(posX, posY, TILE_16x16_WINDOW_SIZE);
 #if USE_FSMC
   sendData16_Arr_FSMC(lastTile16x16, TILE_ARR_16X16_SIZE);
 #else
-  sendData16_DMA1_SPI1(lastTile16x16, TILE_ARR_16X16_SIZE);
+  sendData16_Fast_DMA1_SPI1(lastTile16x16, TILE_ARR_16X16_SIZE);
 #endif
 }
 
 
 #ifdef STM32F10X_HD
-#if 0
-void drawTile32x32(int16_t posX, int16_t posY, uint8_t tileNum)
+void drawTile32x32(void *tile)
 {
+  uint16_t *pTile = (uint16_t *)tile;
+  
+  int16_t posX = *pTile++;
+  int16_t posY = *pTile++;
+  uint8_t tileNum = *pTile++;
+  
   // little trick, if tile same, just redraw it
-  if((lastTileStruct32x32.drawed == 0) || (lastTileStruct32x32.lasttileNum != tileNum)) {
+  if(lastTileNum32x32 != tileNum) {
     
-    uint8_t colorTileIdx;
+    uint8_t *pTileArr = &tileArr32x32[tileNum][0];
+    lastTileNum32x32 = tileNum;
     
-    lastTileStruct32x32.drawed = 1;
-    lastTileStruct32x32.lasttileNum = tileNum;
-    
+    // convert colors from indexes in current palette to RGB565 color space
     for(uint16_t count =0; count < TILE_ARR_32X32_SIZE; count++) {
-      // convert colors from current palette to RGB565 color space
-      colorTileIdx = tileArr32x32[tileNum][count];
-      lastTileStruct32x32.pLastTileArr[count] = currentPaletteArr[colorTileIdx];
+      lastTile32x32[count] = currentPaletteArr[*pTileArr++];
     }
   }
   
-  setSqAddrWindow(posX, posY, 31);
+  // on oscilloscope this one reduce few uS
+  setSqAddrWindow(posX, posY, TILE_32x32_WINDOW_SIZE);
 #if USE_FSMC
-  sendData16_Arr_FSMC(lastTileStruct32x32.pLastTileArr, TILE_ARR_32X32_SIZE);
+  sendData16_Arr_FSMC(lastTile32x32, TILE_ARR_32X32_SIZE);
 #else
-  sendData16_DMA1_SPI1(lastTileStruct32x32.pLastTileArr, TILE_ARR_32X32_SIZE);
+  sendData16_Fast_DMA1_SPI1(lastTile32x32, TILE_ARR_32X32_SIZE);
 #endif
 }
-#endif
-#endif
+#endif /* STM32F10X_HD */
 
 // -------------------------------------------------------- //
 
@@ -231,17 +242,14 @@ void drawBackgroundMap(void)
   for(tileY=0; tileY < BACKGROUND_SIZE_H; tileY++) {
     for(tileX=0; tileX < BACKGROUND_SIZE_W; tileX++) {
       
-      tile.posX = ( tileX * TILE_BASE_SIZE );
-      tile.posY = ( tileY * TILE_BASE_SIZE );
-      
+      tile.posX = ( tileX * TILE_8_BASE_SIZE );
+      tile.posY = ( tileY * TILE_8_BASE_SIZE );
       tile.tileNum = mainBackGround[tileMapCount];
       
-      //printChar(tileNum+48);
-      
       drawTile8x8(&tile);
+      //printChar(tile.tileNum+48);
       ++tileMapCount;
     }
   }
-  
   //setCursor(0,0);
 }

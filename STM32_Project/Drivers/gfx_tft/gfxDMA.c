@@ -13,7 +13,7 @@
 #define MAX_DMA_REQUEST 0xFFFF
 #define CCR_CLEAR_Mask  ((uint32_t)0xFFFF800F)
 
-__IO uint32_t pixels_left = 0;
+__IO uint32_t data_left = 0;
 __IO uint16_t dataBuffer;                   // for single storage
 
 __IO uint16_t CR1_backup = 0;
@@ -40,9 +40,7 @@ void init_DMA1_SPI1(void)
   DMA1_Channel3->CPAR = (uint32_t)&(SPI1->DR);  // set DMA_PeripheralBaseAddr
   
   SPI1->CR2 |= SPI_I2S_DMAReq_Tx;               // enable DMA IRQ on Tx SPI1
- 
   CR1_backup = SPI1->CR1;       // save current settings
-  
   SPI1->CR1 |= SPI_DataSize_16b;        // set dataSize halfword (16 bit)
   /* DMA works propertly with higier speed,
   * that is why we can use max speed.
@@ -80,7 +78,7 @@ void fillColor_DMA1_SPI1(uint16_t color, uint32_t transferSize)
   
   if(transferSize > MAX_DMA_REQUEST) {
     DMA1_Channel3->CNDTR = MAX_DMA_REQUEST;        // DMA_SetCurrDataCounter
-    pixels_left = (transferSize - MAX_DMA_REQUEST);
+    data_left = (transferSize - MAX_DMA_REQUEST);
   } else {
     DMA1_Channel3->CNDTR = transferSize;        // set how much data to transfer
   }
@@ -105,11 +103,11 @@ void sendData16_DMA1_SPI1(void *data, uint32_t transferSize)
   
   if(transferSize > MAX_DMA_REQUEST) {
     DMA1_Channel3->CNDTR = MAX_DMA_REQUEST;        // DMA_SetCurrDataCounter
-    pixels_left = (transferSize - MAX_DMA_REQUEST);
+    data_left = (transferSize - MAX_DMA_REQUEST);
       
   } else {
     DMA1_Channel3->CNDTR = transferSize;        // set how much data to transfer
-    pixels_left = 0;
+    //data_left = 0;
   }
   
   // shot DMA to transer; enable memory increment
@@ -134,16 +132,16 @@ void sendData16_Fast_DMA1_SPI1(void *data, uint16_t transferSize)
 void DMA1_Channel3_IRQHandler(void) 
 {
   if((DMA1->ISR & DMA1_IT_TC3)) {    // is it our IRQ? // != (uint32_t)RESET
-    if(pixels_left > 0) {               // all pixels transfered?
+    if(data_left) {               // all pixels transfered?
       
       CLEAR_BIT(DMA1_Channel3->CCR, DMA_CCR1_EN);
       
-      if(pixels_left > MAX_DMA_REQUEST) {      // left something?
+      if(data_left > MAX_DMA_REQUEST) {      // left something?
         DMA1_Channel3->CNDTR = MAX_DMA_REQUEST; // DMA_SetCurrDataCounter
-        pixels_left -= MAX_DMA_REQUEST;
+        data_left -= MAX_DMA_REQUEST;
       } else {                                  // nope, this is last shoot
-        DMA1_Channel3->CNDTR = pixels_left;     // DMA_SetCurrDataCounter
-        pixels_left = 0;
+        DMA1_Channel3->CNDTR = data_left;     // DMA_SetCurrDataCounter
+        data_left = 0;
       }
       DMA1_Channel3->CCR |= DMA_CCR1_EN;          // shot DMA to transer;
     

@@ -64,15 +64,17 @@
 #define T_HARD_BSY      "Hardware "
 #define T_BSY_STATE     "BSY is set by default.\n"
 
-#define T_BAUD_SPEED            "UART speed: "
-#define T_BAUD_9600             "9600 Bd/s\n"
-#define T_BAUD_57K              "57600 Bd/s\n"
-#define T_BAUD_115K             "115200 Bd/s\n"
-#define T_BAUD_1M               "1M Bd/s\n"
-#define T_DAUD_DEFAULT          "Default (57600)\n"
+#define T_BAUD_SPEED    "UART speed: "
+#define T_BAUD_9600     "9600 Bd/s\n"
+#define T_BAUD_57K      "57600 Bd/s\n"
+#define T_BAUD_115K     "115200 Bd/s\n"
+#define T_BAUD_1M       "1M Bd/s\n"
+#define T_DAUD_DEFAULT  "Default (57600)\n"
 
 #define T_OK            "ok.\n"
 #define T_FAIL          "fail.\n"
+
+#define T_AUTHOR_ME     "Powered by Bismuth208"
 
 //===========================================================================//
 
@@ -175,8 +177,8 @@
 #define LDD_TLE_MAP     0x3C    // load background tile map 8x8 from SD
 #define DRW_TLE_MAP     0x3D    // draw background tile map 8x8 on TFT screen
 
-#define LDD_TLE_U       0x3E    // load specified tile size from SD
-#define DRW_TLE_U       0x3F    // draw specified tile size on TFT screen
+//#define LDD_TLE_U       0x3E    // load specified tile size from SD
+//#define DRW_TLE_U       0x3F    // draw specified tile size on TFT screen
 
 // ----------------- Sprite ----------------- //
 #define SET_SPR_POS     0x40    // set sprite position
@@ -206,7 +208,7 @@
 //#define NOT_USED        0x55
 //#define NOT_USED        0x56
 //#define NOT_USED        0x57
-//#define NOT_USED        0x58
+//#define NOT_USED        0x58 // make screenshot to SD card
 //#define NOT_USED        0x59
 //#define NOT_USED        0x5A
 //#define NOT_USED        0x5B
@@ -218,11 +220,11 @@
 
 // --------------- GUI commands -------------- //
 #define SET_WND_CR      0x60    // Set window colors
-#define DRW_WND_AT      0x61    // draw window at position
-#define DRW_WND_TXT     0x62    // draw window whith text
-#define DRW_BTN_NUM     0x63    // draw numerated buttons
-#define SET_CL_WND_TXT  0x64    // set colors for GUI text
-//#define NOT_USED        0x65
+#define SET_WND_CR_TXT  0x61    // set colors for GUI text
+#define SET_WND_TXT_SZ  0x62    // set GUI text size
+#define DRW_WND_AT      0x63    // draw window at position
+#define DRW_WND_TXT     0x64    // draw window whith text
+//#define DRW_BTN_NUM     0x65    // draw numerated buttons
 //#define NOT_USED        0x66
 //#define NOT_USED        0x67
 //#define NOT_USED        0x68
@@ -263,6 +265,10 @@ void init_GPU(void);
 void sync_CPU(void);
 __noreturn void run_GPU(void);
 
+
+void initRand(void);
+uint32_t randNum(void);
+void drawBootLogo(void);
 
 
 /*
