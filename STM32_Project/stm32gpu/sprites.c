@@ -4,6 +4,7 @@
 #include <gfx.h>
 #include <gfxDMA.h>
 #include <spi.h>
+#include <memhelper.h>
 
 #include "gpuTiles.h"
 #include "sprites.h"
@@ -12,7 +13,10 @@
 
 sprite_t spriteArr[MAX_SPRITE_NUM];
 
+uint8_t lastSpriteNum = 0xFF;
 uint16_t lastSprite[LAST_SPRITE_SIZE]; // 4*2*maxSprSize
+
+uint8_t spriteAutoUpdFlag = 0;
 
 //===========================================================================//
 
@@ -51,7 +55,7 @@ void convertSprite(uint8_t sprNum, uint8_t size)
     
     for(uint16_t count =0; count < TILE_ARR_8X8_SIZE; count++) {
       // convert colors from current palette to RGB565 color space
-      lastSprite[count + tleOffset] = currentPaletteArr[(uint8_t)*pTileArr++];
+      lastSprite[count + tleOffset] = currentPaletteArr[*pTileArr++];
     }
     
     tleOffset += TILE_ARR_8X8_SIZE;
@@ -106,16 +110,31 @@ void getSpriteData(uint8_t sprNum, spriteData_t *pSprData)
   default: return;
   }
   
-  memcpy(&pSprData->sprBase, &sprBase, sizeof(object_t));
+  memcpy32(&pSprData->sprBase, &sprBase, sizeof(object_t));
 }
 
 void drawSprite(uint8_t sprNum)
 {
   if(spriteArr[sprNum].visible) {
-    
+    /*
+    if(sprNum < SPR_1X1_16) {
+      pConvSprite = convertSprite8x8;
+      pGetSpriteData = getSpriteData8x8;
+      
+    } else if(() && ()) {
+      pConvSprite = convertSprite16x16;
+      pGetSpriteData = getSpriteData16x16;
+    } else {
+      pConvSprite = convertSprite32x32;
+      pGetSpriteData = getSpriteData32x32;
+    }
+    */
     spriteData_t spriteData;
     getSpriteData(sprNum, &spriteData);
-    convertSprite(sprNum, spriteData.tleNum);
+    
+    if(lastSpriteNum != sprNum) {
+      convertSprite(sprNum, spriteData.tleNum);
+    }
     
     setAddrWindow(spriteData.sprBase.posX, spriteData.sprBase.posY, 
                   spriteData.posOffsetX, spriteData.posOffsetY);
@@ -125,8 +144,7 @@ void drawSprite(uint8_t sprNum)
 
 void setSpritesAutoRedraw(uint8_t state)
 {
-  
-  
+  spriteAutoUpdFlag = state;
 }
 
 

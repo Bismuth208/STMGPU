@@ -73,6 +73,7 @@ inline void sendData8_SPI1(uint8_t data)
   
   WAIT_FREE_TX;
   WAIT_FOR_BSY;
+  //WAIT_FOR_END;
 }
 
 inline void sendData16_SPI1(uint16_t data)
@@ -85,6 +86,7 @@ inline void sendData16_SPI1(uint16_t data)
   
   WAIT_FREE_TX;
   WAIT_FOR_BSY;
+  //WAIT_FOR_END;
 }
 
 inline void sendData32_SPI1(uint16_t data0, uint16_t data1)
@@ -97,6 +99,7 @@ inline void sendData32_SPI1(uint16_t data0, uint16_t data1)
 
   WAIT_FREE_TX;
   WAIT_FOR_BSY;
+  //WAIT_FOR_END;
   CLEAR_BIT(SPI1->CR1, SPI_DataSize_16b);
 }
 

@@ -4,9 +4,6 @@ fix 1x2, 2x2 sprites;
 
 draw *.bmp 16bit files;
 
-draw, load, tiles 16x16;
-draw, load, tiles 32x32;
-
 load, draw sprites for tiles 16px and 32px;
 
 reduce ROM usage for Arduino lib version (almost done);
@@ -19,12 +16,15 @@ rotate tiles (matrix transformation);
 
 /* in nearly future */
 
-add GUI commands:
+fix GUI commands:
  - draw GUI window;
  - draw GUI window with text;
+ - set GUI colors;
+
+add GUI commands:
  - draw GUI button;
  - draw GUI buttons;
- - set GUI colors;
+
 
 add FSMC;
 

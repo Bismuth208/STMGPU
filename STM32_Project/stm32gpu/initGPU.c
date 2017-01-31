@@ -30,15 +30,15 @@ void sync_CPU(void)
           
           fflush_USART1();
           syncEstablished = true;
-          sendData8_USART1(SYNC_OK);  // sequence right, answer to CPU
-          
+         
           print(T_OK T_TFT_SIZE);
           
           // return screen size to CPU
-          cmdBuffer.par1 = width();
-          cmdBuffer.par2 = height();
+          cmdBuffer.par1 = _width;
+          cmdBuffer.par2 = _height;
           
-          sendArrData8_USART1(cmdBuffer.data, 4);
+          sendData8_USART1(SYNC_OK);  // sequence right, answer to CPU
+          sendArrData8_USART1(cmdBuffer.data, 4); // send resolution
           
           print(T_OK T_GPU_START);
         }
@@ -99,7 +99,7 @@ void init_GPU_USART(void)
     print(T_BAUD_1M);
   } break;
   /* 
-  * params 0x05-0x07 : reserved
+  * params 0x05-0x07 and 0x00 : reserved
   *
   */
   default: {

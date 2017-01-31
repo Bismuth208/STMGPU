@@ -2004,6 +2004,12 @@
     <group>
       <name>common</name>
       <file>
+        <name>$PROJ_DIR$\..\landscapeTileMap.h</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\landscapeTileset.h</name>
+      </file>
+      <file>
         <name>$PROJ_DIR$\..\nesPalette_ext.h</name>
       </file>
       <file>
@@ -2014,19 +2020,7 @@
       </file>
     </group>
     <group>
-      <name>gui</name>
-      <excluded>
-        <configuration>Release</configuration>
-      </excluded>
-      <file>
-        <name>$PROJ_DIR$\..\gui.c</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$\..\gui.h</name>
-      </file>
-    </group>
-    <group>
-      <name>main</name>
+      <name>core GPU</name>
       <file>
         <name>$PROJ_DIR$\..\gpuMain.c</name>
       </file>
@@ -2035,6 +2029,18 @@
       </file>
       <file>
         <name>$PROJ_DIR$\..\initGPU.c</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\logoGPU.c</name>
+      </file>
+    </group>
+    <group>
+      <name>gui</name>
+      <file>
+        <name>$PROJ_DIR$\..\gui.c</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\gui.h</name>
       </file>
     </group>
     <group>

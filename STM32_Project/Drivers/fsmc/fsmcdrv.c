@@ -4,6 +4,7 @@
 
 
 // Use 1st bank of FSMC
+// adreses for 8 bit mode, in 16 bit mode addr will be: 0x60020000 !
 #define LCD_FSMC_DATA   0x60020000      // for write data
 #define LCD_FSMC_CMD    0x60000000      // for write commands
 
@@ -19,7 +20,7 @@
 #define FSMC_PIN_D5     GPIO_Pin_8      // PE8
 #define FSMC_PIN_D6     GPIO_Pin_9      // PE9
 #define FSMC_PIN_D7     GPIO_Pin_10     // PE10
-#if 0 // for 16 bit 8080 pins
+#if 1 // for 16 bit 8080 pins
 #define FSMC_PIN_D8     GPIO_Pin_11     // PE11
 #define FSMC_PIN_D9     GPIO_Pin_12     // PE12
 #define FSMC_PIN_D10    GPIO_Pin_13     // PE13
@@ -37,8 +38,6 @@
 // CS - chip select; RS - register select (D/C line)
 #define FSMC_PIN_CS    GPIO_Pin_7      // PD7 (FSMC_PIN_NE1)
 #define FSMC_PIN_RS    GPIO_Pin_11     // PD11 (FSMC_PIN_A16)
-
-#define TFT_RES_PIN     GPIO_Pin_1      //RES
 
 
 void sendCMD8_FSMC(uint8_t c)
@@ -60,7 +59,6 @@ void sendData8_Arr_FSMC(uint8_t *arr, uint16_t size)
 
 void sendData16_FSMC(uint16_t data)
 {
-  FSMC_SEND_DATA(data>>8);
   FSMC_SEND_DATA(data);
 }
 
@@ -70,25 +68,20 @@ void sendData16_Arr_FSMC(uint16_t *arr, uint16_t size)
   
   for(uint16_t count =0; count < size; count++) {
     tmp = arr[count];
-    FSMC_SEND_DATA(tmp>>8);
     FSMC_SEND_DATA(tmp);
   }
 }
 
-void repeatData16_Arr_FSMC(uint16_t data, uint16_t size)
+void repeatData16_Arr_FSMC(uint16_t data, uint32_t size)
 {
   for(uint16_t count =0; count < size; count++) {
-    FSMC_SEND_DATA(data>>8);
     FSMC_SEND_DATA(data);
   }
 }
 
 void sendData32_FSMC(uint16_t data1, uint16_t data2)
 {
-  FSMC_SEND_DATA(data1>>8);
   FSMC_SEND_DATA(data1);
-  
-  FSMC_SEND_DATA(data2>>8);
   FSMC_SEND_DATA(data2);
 }
 
@@ -109,24 +102,17 @@ void initFSMC_GPIO(void)
   GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
   GPIO_Init(GPIOE, &GPIO_InitStruct);
   
-  // Reset
-  //GPIO_InitStruct.GPIO_Pin = TFT_RES_PIN;
-  //GPIO_Init(GPIOE, &GPIO_InitStruct);
-  
   
   /////////////////////////////////
-  // CS -> 1
-  // Reset -> 0
+  // CS -> 0
   // RD -> 1
   // WR -> 1
   
-  //GPIO_SET_PIN(GPIOD, FSMC_PIN_CS);
-  //GPIO_SET_PIN(GPIOE, TFT_RES_PIN);
+  //GPIO_RESET_PIN(GPIOD, FSMC_PIN_CS);
   //GPIO_SET_PIN(GPIOD, FSMC_PIN_RD);
   //GPIO_SET_PIN(GPIOD, FSMC_PIN_WR);
   
-  GPIO_SetBits(GPIOD, FSMC_PIN_CS);
-  //GPIO_ResetBits(GPIOE, TFT_RES_PIN);
+  GPIO_ResetBits(GPIOD, FSMC_PIN_CS);
   GPIO_SetBits(GPIOD, FSMC_PIN_RD);
   GPIO_SetBits(GPIOD, FSMC_PIN_WR);
 }
@@ -139,19 +125,19 @@ void initFSMC(void)
   RCC_AHBPeriphClockCmd(RCC_AHBPeriph_FSMC, ENABLE);
   
   // setup FSMC
-  fsmcTiming.FSMC_AddressSetupTime = 0x02;
-  fsmcTiming.FSMC_AddressHoldTime = 0x00;
-  fsmcTiming.FSMC_DataSetupTime = 0x05;
-  fsmcTiming.FSMC_BusTurnAroundDuration = 0x00;
-  fsmcTiming.FSMC_CLKDivision = 0x00;
-  fsmcTiming.FSMC_DataLatency = 0x00;
+  fsmcTiming.FSMC_AddressSetupTime = 10;
+  fsmcTiming.FSMC_AddressHoldTime = 10;
+  fsmcTiming.FSMC_DataSetupTime = 10;
+  fsmcTiming.FSMC_BusTurnAroundDuration = 10;
+  fsmcTiming.FSMC_CLKDivision = 8;
+  fsmcTiming.FSMC_DataLatency = 10;
   fsmcTiming.FSMC_AccessMode = FSMC_AccessMode_B;
   
   
   fsmc.FSMC_Bank = FSMC_Bank1_NORSRAM1;
   fsmc.FSMC_DataAddressMux = FSMC_DataAddressMux_Disable;
-  fsmc.FSMC_MemoryType = FSMC_MemoryType_NOR; // FSMC_MemoryType_SRAM
-  fsmc.FSMC_MemoryDataWidth = FSMC_MemoryDataWidth_8b;
+  fsmc.FSMC_MemoryType = FSMC_MemoryType_SRAM;
+  fsmc.FSMC_MemoryDataWidth = FSMC_MemoryDataWidth_16b;
   fsmc.FSMC_BurstAccessMode = FSMC_BurstAccessMode_Disable;
   fsmc.FSMC_WaitSignalPolarity = FSMC_WaitSignalPolarity_Low;
   fsmc.FSMC_WrapMode = FSMC_WrapMode_Disable;

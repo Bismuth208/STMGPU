@@ -5,10 +5,6 @@
 #ifndef _SDCARD_SPI_H
 #define _SDCARD_SPI_H
 
-#ifdef __cplusplus
-extern "C" {
-#endif
-
 #include "stm32f10x_conf.h"
 #include "integer.h"
   
@@ -41,8 +37,11 @@ extern "C" {
 #define SPI_BaudRatePrescaler_SPI_SD  SPI_BaudRatePrescaler_2
 
 
-#define spi_cs_low() do { GPIO_SPI_SD_CS->BRR = GPIO_Pin_SPI_SD_CS; } while (0)
-#define spi_cs_high() do { GPIO_SPI_SD_CS->BSRR = GPIO_Pin_SPI_SD_CS; } while (0)
+//#define spi_cs_low() do { GPIO_SPI_SD_CS->BRR = GPIO_Pin_SPI_SD_CS; } while (0)
+//#define spi_cs_high() do { GPIO_SPI_SD_CS->BSRR = GPIO_Pin_SPI_SD_CS; } while (0)
+  
+#define spi_cs_low() (GPIO_SPI_SD_CS->BRR = GPIO_Pin_SPI_SD_CS);
+#define spi_cs_high() (GPIO_SPI_SD_CS->BSRR = GPIO_Pin_SPI_SD_CS);
     
 #define WAIT_FOR_RX while ((SPI_SD->SR & SPI_I2S_FLAG_RXNE) == 0)
   
@@ -95,9 +94,5 @@ int hwif_init(hwif* hw);
 int sd_read(hwif* hw, u32 address, u8 *buf);
 int sd_write(hwif* hw, u32 address,const u8 *buf);
 
-
-#ifdef __cplusplus
-}
-#endif
 
 #endif /* _SDCARD_SPI_H */

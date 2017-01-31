@@ -83,96 +83,64 @@
 #define MADCTL_MH       0x04
 
 //-------------------------------------------------------------------------------------------//
-
-#define DELAY           0x80  // delay marker
-
+// definitions for screen scrolling
 #define TFT_BOT_FIXED_AREA 0  // Number of lines in bottom fixed area (lines counted from bottom of screen)
 #define TFT_TOP_FIXED_AREA 0 // Number of lines in top fixed area (lines counted from top of screen)
-
-#define WIDTH  ILI9341_TFTWIDTH
-#define HEIGHT ILI9341_TFTHEIGHT
 
 //-------------------------------------------------------------------------------------------//
 //nss - pb10; dc - pb11; res - pb1
 #define TFT_SS_PIN      GPIO_Pin_10     //CS
 #define TFT_DC_PIN      GPIO_Pin_11     //DC
-#define TFT_RES_PIN     GPIO_Pin_1      //RES
+#define TFT_RES_PIN     GPIO_Pin_1      //RES on PB1 (pro and mini)
 
 #define GPIO_SET_PIN(GPIOx, GPIO_Pin)     GPIOx->BSRR = GPIO_Pin;
 #define GPIO_RESET_PIN(GPIOx, GPIO_Pin)   GPIOx->BRR = GPIO_Pin;
 
-#define SET_TFT_RES_HI    (GPIOB->BSRR = TFT_RES_PIN);
-#define SET_TFT_RES_LOW   (GPIOB->BRR = TFT_RES_PIN);
 
-#define SET_TFT_DC_HI     (GPIOB->BSRR = TFT_DC_PIN);
-#define SET_TFT_DC_LOW    (GPIOB->BRR = TFT_DC_PIN);
-
-#define SET_TFT_CS_HI     (GPIOB->BSRR = TFT_SS_PIN);
-#define SET_TFT_CS_LOW    (GPIOB->BRR = TFT_SS_PIN);
-
-//#define SET_TFT_RES_HI    GPIO_SetBits(GPIOB,     TFT_RES_PIN);
-//#define SET_TFT_RES_LOW   GPIO_ResetBits(GPIOB,   TFT_RES_PIN);
-//#define SET_TFT_DC_HI     GPIO_SetBits(GPIOB,     TFT_DC_PIN);
-//#define SET_TFT_DC_LOW    GPIO_ResetBits(GPIOB,   TFT_DC_PIN);
-//#define SET_TFT_CS_HI     GPIO_SetBits(GPIOB,     TFT_SS_PIN);
-//#define SET_TFT_CS_LOW    GPIO_ResetBits(GPIOB,   TFT_SS_PIN);
-
-#define USE_FSMC      0
-
+#define USE_FSMC      1
 
 #if USE_FSMC
+ #define SET_TFT_CS_HI
+ #define SET_TFT_CS_LOW
 
-#undef SET_TFT_CS_HI
-#undef SET_TFT_CS_LOW
-#define SET_TFT_CS_HI
-#define SET_TFT_CS_LOW
-
-#undef SET_TFT_DC_HI
-#undef SET_TFT_DC_LOW
-#define SET_TFT_DC_HI
-#define SET_TFT_DC_LOW
-
-
-#undef TFT_RES_PIN   
-#undef SET_TFT_RES_HI
-#undef SET_TFT_RES_LOW
-
-#define TFT_RES_PIN             GPIO_Pin_1      //RES On PE1
-#define SET_TFT_RES_HI          (GPIOE->BSRR = TFT_RES_PIN);
-#define SET_TFT_RES_LOW         (GPIOE->BRR = TFT_RES_PIN)
+ #define SET_TFT_DC_HI
+ #define SET_TFT_DC_LOW
 
 // just a protection
-#define TFT_CS_ALWAS_ACTIVE 0
+ #define TFT_CS_ALWAS_ACTIVE 0
 
 #else
 // free MCU from toggling CS GPIO
 // Set this to 0 if not only one TFT is slave on that SPI
-#define TFT_CS_ALWAS_ACTIVE 1
+ #define TFT_CS_ALWAS_ACTIVE 1
+
+ #define SET_TFT_DC_HI    GPIO_SET_PIN(GPIOB, TFT_DC_PIN)
+ #define SET_TFT_DC_LOW   GPIO_RESET_PIN(GPIOB, TFT_DC_PIN)
+
+ //#define SET_TFT_CS_HI    GPIO_SET_PIN(GPIOB, TFT_SS_PIN)
+ //#define SET_TFT_CS_LOW   GPIO_RESET_PIN(GPIOB, TFT_SS_PIN)
 #endif // USE_FSMC
 
+#define SET_TFT_RES_HI     GPIO_SET_PIN(GPIOB, TFT_RES_PIN)
+#define SET_TFT_RES_LOW    GPIO_RESET_PIN(GPIOB, TFT_RES_PIN)
+
+
 #if TFT_CS_ALWAS_ACTIVE
-#undef SET_TFT_CS_HI
-#undef SET_TFT_CS_LOW
-#define SET_TFT_CS_HI
-#define SET_TFT_CS_LOW
+ //#undef SET_TFT_CS_HI
+ //#undef SET_TFT_CS_LOW
+ #define SET_TFT_CS_HI
+ #define SET_TFT_CS_LOW
 // make SET_TFT_CS_LOW; always active
-#define GRAB_TFT_CS     (GPIOB->BRR = TFT_SS_PIN)
+ #define GRAB_TFT_CS     GPIO_RESET_PIN(GPIOB, TFT_SS_PIN)
+#else
+ #define GRAB_TFT_CS
 #endif // TFT_CS_ALWAS_ACTIVE
 
 
-#define ENABLE_CMD()  SET_TFT_DC_LOW  \
-SET_TFT_CS_LOW
-
-#define ENABLE_DATA() SET_TFT_DC_HI   \
-SET_TFT_CS_LOW
-
-#define RELEASE_TFT() SET_TFT_CS_HI
-
-#define DISABLE_DATA() SET_TFT_CS_HI
+#define SET_CMD()  SET_TFT_DC_LOW
+#define SET_DATA() SET_TFT_DC_HI
 
 
-
-extern int16_t _width, _height;
 
 /*
 typedef union {
@@ -223,6 +191,9 @@ uint16_t color;
 */
 
 //-------------------------------------------------------------------------------------------//
+extern int16_t _width, _height;
+
+
 #if USE_FSMC
 
 static const uint8_t initSequence[] = {
@@ -233,7 +204,7 @@ static const uint8_t initSequence[] = {
   3, ILI9341_VMCTR1, 0x2B, 0x2B,                // VCM control (VCOMH = 3.825)
   2, ILI9341_VMCTR2, 0xC0,                      // VCM control2 (VCOML = -1.375)
   2, ILI9341_MADCTL, MADCTL_MX|MADCTL_BGR,      // Memory Access Control
-  2, ILI9341_PIXFMT, 0x55,                      // Pixel Format Set (8 bit)
+  2, ILI9341_PIXFMT, 0x55,                      // Pixel Format Set (16 bit)
   3, ILI9341_FRMCTR1, 0x00, 0x18,               // Frame Rate Control (In Normal Mode/Full Colors) == Frame Rate 79Hz
   2, ILI9341_ENTRYMODE, 0x07,
   0
@@ -256,7 +227,7 @@ static const uint8_t initSequence[] = {
   3, ILI9341_VMCTR1, 0x3e, 0x28,                // VCM control
   2, ILI9341_VMCTR2, 0x86,                      // VCM control2 (VML=58 VMH=58)
   2, ILI9341_MADCTL, MADCTL_MX|MADCTL_BGR,      // Memory Access Control
-  2, ILI9341_PIXFMT, 0x55,                      // Pixel Format Set
+  2, ILI9341_PIXFMT, 0x55,                      // Pixel Format Set (16 bit)
   3, ILI9341_FRMCTR1, 0x00, 0x10,               // Frame Rate Control (In Normal Mode/Full Colors)
   3, ILI9341_FRMCTR2, 0x00, 0x1F,               // Frame Rate Control (In Idle Mode/8 colors)
   3, ILI9341_FRMCTR2, 0x00, 0x10,               // Frame Rate control (In Partial Mode/Full Colors)

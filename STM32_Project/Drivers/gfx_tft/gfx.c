@@ -87,9 +87,9 @@ static bool _cp437 = false; // If set, use correct CP437 charset (default is off
 uint16_t charBuffer[192]; // size == 5
 
 
-//const unsigned char *pFontArr[] ={font5x7EnDOS, font5x7RUS};
+const unsigned char *pFontArr[] ={font5x7EnDOS, font5x7RUS};
 unsigned char *pCurrentFont;
-uint8_t currentFontNum =0;
+uint8_t currentFontNum =1;
 
 //-------------------------------------------------------------------------------------------//
 

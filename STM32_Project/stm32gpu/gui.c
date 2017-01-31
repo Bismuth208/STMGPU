@@ -1,5 +1,8 @@
-#include "gui.h"
+#include <string.h>
+
 #include <gfx.h>
+
+#include "gui.h"
 
 #define GUI_TEXT_OFFSET_X 8
 #define GUI_TEXT_OFFSET_Y 8
@@ -26,19 +29,19 @@ void setCursorGUI(int16_t x, int16_t y);
 // ------------------ //
 
 
-void drawWindowGUI(int16_t posX, int16_t posY, int16_t w int16_t h)
+void drawWindowGUI(int16_t posX, int16_t posY, int16_t w, int16_t h)
 {
   fillRect(posX, posY, w, h, innerColorGUI);
-  drawRect(posX+2, posY+2, w-2, h-2, borderColorGUI);
+  drawRect(posX+2, posY+2, w-4, h-4, borderColorGUI);
 }
 
-void drawTextWindowGUI(int16_t posX, int16_t posY, int16_t w int16_t h, void *text)
+void drawTextWindowGUI(int16_t posX, int16_t posY, int16_t w, int16_t h, void *text)
 {  
   fillRect(posX, posY, w, h, innerColorGUI);
-  drawRect(posX+2, posY+2, w-2, h-2, borderColorGUI);
+  drawRect(posX+2, posY+2, w-4, h-4, borderColorGUI);
   
   setCursorGUI(posX+GUI_TEXT_OFFSET_X, posY+GUI_TEXT_OFFSET_Y);
-  printStrGUI(int16_t w, int16_t h, (const char *)text);
+  printStrGUI(w, h, (const char *)text);
 }
 
 void setColorWindowGUI(uint16_t frame, uint16_t border)
@@ -79,13 +82,13 @@ void printCharGUI(uint8_t c)
   } else if (c == '\r') {
     // skip em
   } else {
-    drawChar(cursorGUI_x, cursorGUI_y, textcolor, textbgcolor, c, textSizeGUI);
+    drawChar(cursorGUI_x, cursorGUI_y, textColorGUI, textBGColorGUI, c, textSizeGUI);
     cursorGUI_x += textSizeGUI*6;
-    if (cursorGUI_y > (_height - textSizeGUI*8)) {
+    if (cursorGUI_y > (_heightGUI - textSizeGUI*8)) {
       cursorGUI_y = 0;
       cursorGUI_x += textSizeGUI*5;
     }
-    if (cursorGUI_x > (_width - textSizeGUI*6)) {
+    if (cursorGUI_x > (_widthGUI - textSizeGUI*6)) {
       cursorGUI_y += textSizeGUI*8;
       cursorGUI_x = 0;
     }
