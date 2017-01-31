@@ -57,6 +57,7 @@ STMGPU::STMGPU():_useHardwareBsy(false) {}
 void STMGPU::begin(uint32_t baudRate)
 {
   bool syncEstablished = false;
+  uint8_t syncData[] = {0x42, 0xDD};
   
 #if defined(__AVR_ATtiny24__) || defined(__AVR_ATtiny44__) || defined(__AVR_ATtiny84__) \
  || defined(__AVR_ATtiny25__) || defined(__AVR_ATtiny45__) || defined(__AVR_ATtiny85__)
@@ -77,7 +78,7 @@ void STMGPU::begin(uint32_t baudRate)
 
   while(!syncEstablished) {
     while(_Serial->available()==0) {
-      _Serial->write((uint8_t*)SYNC_SEQUENCE, 0x02); // two bytes
+      _Serial->write(syncData, 0x02); // two bytes
       delay(1000); // one transfer per second
     }
 

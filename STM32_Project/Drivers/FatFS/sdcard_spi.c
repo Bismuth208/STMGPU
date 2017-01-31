@@ -515,9 +515,9 @@ int sd_get_data(hwif *hw, u8 *buf, int len)
     return -1;
   
   spi_txrxArr(buf, len, 0xff);
-  
+ 
   _crc16 = spi_txrx16(0xffff);
-  
+
   calc_crc = crc16(buf, len);
   if (_crc16 != calc_crc) {
     return -1;

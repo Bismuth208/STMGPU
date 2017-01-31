@@ -757,14 +757,15 @@ void gpuDrawPGRTextWindowGUI(int16_t posX, int16_t posY,
 // low 4 nibbles is how much params
 void gpuSDLoadTile(const char *fileName, uint8_t fnNum, ...)
 {
-  va_list argptr;
-  va_start (argptr, fnNum);
-  
   uint8_t params[4];
   
+  va_list argptr;
+  va_start (argptr, fnNum);
+
   for(uint8_t count =0; count < (fnNum&0x0F); count++) {
     params[count] = va_arg (argptr,  uint8_t);
   }
+  va_end(argptr);
   
   switch (fnNum & 0xF0)
   {
@@ -776,8 +777,6 @@ void gpuSDLoadTile(const char *fileName, uint8_t fnNum, ...)
     } break;
     default: break;
   }
-  
-  va_end(argptr);
 }
 #endif
 

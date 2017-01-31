@@ -97,7 +97,7 @@
 #define GPIO_RESET_PIN(GPIOx, GPIO_Pin)   GPIOx->BRR = GPIO_Pin;
 
 
-#define USE_FSMC      1
+#define USE_FSMC      0
 
 #if USE_FSMC
  #define SET_TFT_CS_HI
