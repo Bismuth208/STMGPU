@@ -30,8 +30,12 @@
 #define MAX_TEXT_SIZE   30
 
 // ------------------------------------------------------------------------------------ //
-
-
+#if defined(__AVR_ATtiny24__) || defined(__AVR_ATtiny44__) || defined(__AVR_ATtiny84__) \
+ || defined(__AVR_ATtiny25__) || defined(__AVR_ATtiny45__) || defined(__AVR_ATtiny85__)
+#define rxPin 3
+#define txPin 4
+ SoftwareSerial gpuSoftwareSerial(rxPin, txPin); // this is physical pin 2 and 3
+#endif
 
 // ------------------------------------------------------------------------------------ //
 
@@ -48,130 +52,78 @@ STMGPU::STMGPU(int8_t bsyPin):_bsyPin(bsyPin)
 STMGPU::STMGPU():_useHardwareBsy(false) {}
 // ------------------------------------------- //
 
-#if defined (__AVR__)
+
 // this one make sync whith GPU
 void STMGPU::begin(uint32_t baudRate)
 {
-  uint8_t syncData[2] = { 0x42, 0xDD};
-
   bool syncEstablished = false;
   
-
-  Serial.begin(baudRate);
-  
-  if(_useHardwareBsy) {
-    // setup GPU bsy pin
-    pinMode(_bsyPin, INPUT);   // set as input
-    digitalWrite(_bsyPin, HIGH); // pull-up
-  }
-
-  while(!syncEstablished) {
-    while(Serial.available()==0){
-      Serial.write(syncData, 0x02); // two bytes
-      delay(1000); // one transfer per second
-    }
-
-    if(Serial.read() == SYNC_OK) {
-      syncEstablished = true;
-      
-      while(Serial.available() < 3); // wait for resolution
-      // get _width
-      cmdBuffer.data[1] = Serial.read();
-      cmdBuffer.data[2] = Serial.read();
-      // get _height
-      cmdBuffer.data[3] = Serial.read();
-      cmdBuffer.data[4] = Serial.read();
-      
-      _width  = cmdBuffer.par1;
-      _height = cmdBuffer.par2;
-      
-      Serial.flush();
-    }
-  }
-}
-#elif defined (__STM32F1__)
-// this one make sync whith GPU
-void STMGPU::begin(uint32_t baudRate)
-{
-  uint8_t syncData[2] = { 0x42, 0xDD};
-  
-  bool syncEstablished = false;
-  
-  
-  Serial1.begin(baudRate);
-  
-  if(_useHardwareBsy) {
-    // setup GPU bsy pin
-    pinMode(_bsyPin, INPUT);   // set as input
-    digitalWrite(_bsyPin, HIGH); // pull-up
-  }
-  
-  while(!syncEstablished) {
-    while(Serial1.available()==0){
-      Serial1.write(syncData, 0x02); // two bytes
-      delay(1000); // one transfer per second
-    }
-    
-    if(Serial1.read() == SYNC_OK) {
-      syncEstablished = true;
-      
-      while(Serial1.available() < 3); // wait for resolution
-      // get _width
-      cmdBuffer.data[1] = Serial1.read();
-      cmdBuffer.data[2] = Serial1.read();
-      // get _height
-      cmdBuffer.data[3] = Serial1.read();
-      cmdBuffer.data[4] = Serial1.read();
-      
-      _width  = cmdBuffer.par1;
-      _height = cmdBuffer.par2;
-      
-      Serial1.flush();
-    }
-  }
-}
+#if defined(__AVR_ATtiny24__) || defined(__AVR_ATtiny44__) || defined(__AVR_ATtiny84__) \
+ || defined(__AVR_ATtiny25__) || defined(__AVR_ATtiny45__) || defined(__AVR_ATtiny85__)
+  _Serial = &gpuSoftwareSerial;
+#elif defined (__STM32F1__) || defined (__STM32F3__) || defined (__STM32F4__)
+  _Serial = &Serial1; // PA9 and PA10
+#elif defined (__AVR__)
+  _Serial = &Serial;
 #endif
+  
+  _Serial->begin(baudRate);
+  
+  if(_useHardwareBsy) {
+    // setup GPU bsy pin
+    pinMode(_bsyPin, INPUT);   // set as input
+    digitalWrite(_bsyPin, HIGH); // pull-up; does it really need? or left HI-z?
+  }
+
+  while(!syncEstablished) {
+    while(_Serial->available()==0) {
+      _Serial->write((uint8_t*)SYNC_SEQUENCE, 0x02); // two bytes
+      delay(1000); // one transfer per second
+    }
+
+    if(_Serial->read() == SYNC_OK) {
+      syncEstablished = true;
+      
+      while(_Serial->available() < 3); // wait for resolution
+      // get _width
+      cmdBuffer.data[1] = _Serial->read();
+      cmdBuffer.data[2] = _Serial->read();
+      // get _height
+      cmdBuffer.data[3] = _Serial->read();
+      cmdBuffer.data[4] = _Serial->read();
+      
+      _width  = cmdBuffer.par1;
+      _height = cmdBuffer.par2;
+      
+      _Serial->flush();
+    }
+  }
+}
 
 // ------------------------------------------------------------------------------------ //
-#if defined (__AVR__)
-// this function is abstruction layer
-// this allow to simply change the interface
+/* this function is abstruction layer
+ * this allow to simply change the interface
+ * and have some protection rules
+ */
 void STMGPU::sendCommand(void *buf, uint8_t size)
 {
   // wait untill GPU buffer will ready
   if(_useHardwareBsy) { // harware protection
     
+    // yep, stop to doing everything and watch only for this pin!
     while(digitalRead(_bsyPin));
     
   } else { // software protection
     
-    if(Serial.read() == BSY_MSG_CODE_WAIT) {
-      while (Serial.read() != BSY_MSG_CODE_READY);
+    if(_Serial->read() == BSY_MSG_CODE_WAIT) {
+      // same story as previous, all power of MCU will be concentrated for this
+      while(_Serial->read() != BSY_MSG_CODE_READY);
     }
   }
   
-  Serial.write((uint8_t*)buf, size);
+  // finally, send data to sGPU
+  _Serial->write((uint8_t*)buf, size);
 }
-#elif defined (__STM32F1__)
-// this function is abstruction layer
-// this allow to simply change the interface
-void STMGPU::sendCommand(void *buf, uint8_t size)
-{
-  // wait untill GPU buffer will ready
-  if(_useHardwareBsy) { // harware protection
-    
-    while(digitalRead(_bsyPin));
-    
-  } else { // software protection
-    
-    if(Serial1.read() == BSY_MSG_CODE_WAIT) {
-      while (Serial1.read() != BSY_MSG_CODE_READY);
-    }
-  }
-  
-  Serial1.write((uint8_t*)buf, size);
-}
-#endif
 
 // ------------------------------------------------------------------------------------ //
 
@@ -332,41 +284,22 @@ void STMGPU::fillTriangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_
   sendCommand(cmdBuffer.data, 15);
 }
 
-#if defined (__AVR__)
 void STMGPU::getResolution(void)
 {
-  Serial.flush();
-  Serial.print(GET_RESOLUTION);
+  _Serial->flush();
+  _Serial->print(GET_RESOLUTION);
   
-  while(Serial.available() < 3); // wait for resolution
+  while(_Serial->available() < 3); // wait for resolution
   // get _width
-  cmdBuffer.data[1] = Serial.read();
-  cmdBuffer.data[2] = Serial.read();
+  cmdBuffer.data[1] = _Serial->read();
+  cmdBuffer.data[2] = _Serial->read();
   // get _height
-  cmdBuffer.data[3] = Serial.read();
-  cmdBuffer.data[4] = Serial.read();
+  cmdBuffer.data[3] = _Serial->read();
+  cmdBuffer.data[4] = _Serial->read();
   
   _width  = cmdBuffer.par1;
   _height = cmdBuffer.par2;
 }
-#elif defined (__STM32F1__)
-void STMGPU::getResolution(void)
-{
-  Serial1.flush();
-  Serial1.print(GET_RESOLUTION);
-  
-  while(Serial1.available() < 3); // wait for resolution
-  // get _width
-  cmdBuffer.data[1] = Serial1.read();
-  cmdBuffer.data[2] = Serial1.read();
-  // get _height
-  cmdBuffer.data[3] = Serial1.read();
-  cmdBuffer.data[4] = Serial1.read();
-  
-  _width  = cmdBuffer.par1;
-  _height = cmdBuffer.par2;
-}
-#endif
 
 int16_t STMGPU::height(void)
 {
@@ -388,6 +321,9 @@ size_t STMGPU::write(uint8_t c) {
     cmdBuffer.cmd = DRW_PRNT_C;
     cmdBuffer.data[1] = c;
     
+    // DO NOT CHAHNGE TO: _Serial->write(cmdBuffer.data, 2); !
+    // ONLY sendCommand(cmdBuffer.data, 2); FUNCTION ALLOWED!
+    // OTHERWISE sGPU WILL BE VEEERY UNSTABLE!
     sendCommand(cmdBuffer.data, 2);
 #if ARDUINO >= 100
     return 1;
@@ -458,6 +394,7 @@ void STMGPU::cp437(bool cp)
 }
   
 #if 0
+// this is much faster, but now ways to add this...
 size_t STMGPU::print(const char *str)
 {
   cmdBuffer.cmd = DRW_PRNT;
@@ -625,6 +562,7 @@ void STMGPU::writeWordData(uint16_t c)
 }
   
 // ------------------- Tile ----------------- //
+  // ---- tile 8x8 ---- //
 void STMGPU::loadTile8x8(const char *tileSetArrName, uint8_t tileSetW,
                                   uint8_t ramTileNum, uint8_t tileNum)
 {
@@ -641,7 +579,7 @@ void STMGPU::loadTile8x8(const char *tileSetArrName, uint8_t tileSetW,
 void STMGPU::loadTileSet8x8(const char *tileSetArrName, uint8_t tileSetW,
                                       uint8_t ramTileBase, uint8_t tileMin, uint8_t tileMax)
 {
-  cmdBuffer.cmd = LDD_TLES_RG_8;
+  cmdBuffer.cmd = LDD_TLES_8;
   cmdBuffer.data[1] = strlen(tileSetArrName);
   cmdBuffer.data[2] = tileSetW;
   cmdBuffer.data[3] = ramTileBase;
@@ -661,6 +599,97 @@ void STMGPU::drawTile8x8(int16_t posX, int16_t posY, uint8_t tileNum)
     
   sendCommand(cmdBuffer.data, 6);
 }
+  
+  // ---- tile 16x16 ---- //
+void STMGPU::loadTile16x16(const char *tileSetArrName, uint8_t tileSetW,
+                                  uint8_t ramTileNum, uint8_t tileNum)
+{
+  cmdBuffer.cmd = LDD_TLE_16;
+  cmdBuffer.data[1] = strlen(tileSetArrName);
+  cmdBuffer.data[2] = tileSetW;
+  cmdBuffer.data[3] = ramTileNum;
+  cmdBuffer.data[4] = tileNum;
+    
+  sendCommand(cmdBuffer.data, 5);
+  sendCommand((void*)tileSetArrName, cmdBuffer.data[1]); // send name of file
+}
+  
+void STMGPU::loadTileSet16x16(const char *tileSetArrName, uint8_t tileSetW,
+                                      uint8_t ramTileBase, uint8_t tileMin, uint8_t tileMax)
+{
+  cmdBuffer.cmd = LDD_TLES_16;
+  cmdBuffer.data[1] = strlen(tileSetArrName);
+  cmdBuffer.data[2] = tileSetW;
+  cmdBuffer.data[3] = ramTileBase;
+  cmdBuffer.data[4] = tileMin;
+  cmdBuffer.data[5] = tileMax;
+    
+  sendCommand(cmdBuffer.data, 6);
+  sendCommand((void*)tileSetArrName, cmdBuffer.data[1]); // send name of file
+}
+
+void STMGPU::drawTile16x16(int16_t posX, int16_t posY, uint8_t tileNum)
+{
+  cmdBuffer.cmd = DRW_TLE_16;
+  cmdBuffer.par1 = posX;
+  cmdBuffer.par2 = posY;
+  cmdBuffer.data[5] = tileNum;
+    
+  sendCommand(cmdBuffer.data, 6);
+}
+  
+  // ---- tile 32x32 ---- //
+  void STMGPU::loadTile32x32(const char *tileSetArrName, uint8_t tileSetW,
+                                  uint8_t ramTileNum, uint8_t tileNum)
+{
+  cmdBuffer.cmd = LDD_TLE_32;
+  cmdBuffer.data[1] = strlen(tileSetArrName);
+  cmdBuffer.data[2] = tileSetW;
+  cmdBuffer.data[3] = ramTileNum;
+  cmdBuffer.data[4] = tileNum;
+    
+  sendCommand(cmdBuffer.data, 5);
+  sendCommand((void*)tileSetArrName, cmdBuffer.data[1]); // send name of file
+}
+  
+void STMGPU::loadTileSet32x32(const char *tileSetArrName, uint8_t tileSetW,
+                                      uint8_t ramTileBase, uint8_t tileMin, uint8_t tileMax)
+{
+  cmdBuffer.cmd = LDD_TLES_32;
+  cmdBuffer.data[1] = strlen(tileSetArrName);
+  cmdBuffer.data[2] = tileSetW;
+  cmdBuffer.data[3] = ramTileBase;
+  cmdBuffer.data[4] = tileMin;
+  cmdBuffer.data[5] = tileMax;
+    
+  sendCommand(cmdBuffer.data, 6);
+  sendCommand((void*)tileSetArrName, cmdBuffer.data[1]); // send name of file
+}
+
+void STMGPU::drawTile32x32(int16_t posX, int16_t posY, uint8_t tileNum)
+{
+  cmdBuffer.cmd = DRW_TLE_32;
+  cmdBuffer.par1 = posX;
+  cmdBuffer.par2 = posY;
+  cmdBuffer.data[5] = tileNum;
+    
+  sendCommand(cmdBuffer.data, 6);
+}
+
+// universal tile draw 8, 16, 32
+  /*
+void STMGPU::drawTile(int16_t posX, int16_t posY, uint8_t tileType, uint8_t tileNum)
+{
+  cmdBuffer.cmd = DRW_TLE_U;
+  cmdBuffer.par1 = posX;
+  cmdBuffer.par2 = posY;
+  cmdBuffer.data[5] = tileType;
+  cmdBuffer.data[6] = tileNum;
+  
+  sendCommand(cmdBuffer.data, 7);
+}
+   */
+  
 
 void STMGPU::loadTileMap(const char *fileName)
 {
@@ -754,9 +783,9 @@ bool STMGPU::getSpriteCollision(uint8_t sprNum1, uint8_t sprNum2)
   
   sendCommand(cmdBuffer.data, 3);
   
-  while(!Serial.available() ); // wait for state
+  while(!_Serial->available() ); // wait for state
   
-  return Serial.read();
+  return _Serial->read();
 }
 
 // ----------------- SD card ---------------- //
@@ -784,7 +813,7 @@ void STMGPU::printBMP(const __FlashStringHelper* str)
   sendCommand(cmdBuffer.data, 6);
     
   while ((c = pgm_read_byte(p)) != 0) {
-    Serial.write(c);
+    _Serial->write(c);
     p++;
   }
 }
@@ -799,7 +828,7 @@ void STMGPU::printBMP(uint16_t x, uint16_t y, const String &str)
   sendCommand(cmdBuffer.data, 6);
   
   for (uint16_t i = 0; i < str.length(); i++) {
-    Serial.write(str[i]);
+    _Serial->write(str[i]);
   }
 }
   
@@ -827,10 +856,94 @@ void STMGPU::printBMP(uint16_t x, uint16_t y, const __FlashStringHelper* str)
   sendCommand(cmdBuffer.data, 6);
   
   while ((c = pgm_read_byte(p)) != 0) {
-    Serial.write(c);
+    _Serial->write(c);
     p++;
   }
 }
+  
+// --------------- GUI commands -------------- //
+void STMGPU::setTextSizeGUI(uint8_t size)
+{
+  cmdBuffer.cmd = SET_WND_TXT_SZ;
+  cmdBuffer.data[1] = size;
+  
+  sendCommand(cmdBuffer.data, 2);
+}
+
+void STMGPU::setTextColorGUI(uint16_t text, uint16_t bg)
+{
+  cmdBuffer.cmd = SET_WND_CR_TXT;
+  cmdBuffer.par1 = text;
+  cmdBuffer.par2 = bg;
+  
+  sendCommand(cmdBuffer.data, 5);
+}
+  
+/*
+void STMGPU::setTextColorGUI(uint16_t text)
+{
+  cmdBuffer.cmd = SET_WND_CR_TXT;
+  cmdBuffer.par1 = text;
+    
+  sendCommand(cmdBuffer.data, 3);
+}
+*/
+
+void STMGPU::setColorWindowGUI(uint16_t frame, uint16_t border)
+{
+  cmdBuffer.cmd = SET_WND_CR;
+  cmdBuffer.par1 = frame;
+  cmdBuffer.par2 = border;
+  
+  sendCommand(cmdBuffer.data, 5);
+}
+  
+void STMGPU::drawWindowGUI(int16_t posX, int16_t posY, int16_t w, int16_t h)
+{
+  cmdBuffer.cmd = DRW_WND_AT;
+  cmdBuffer.par1 = posX;
+  cmdBuffer.par2 = posY;
+  cmdBuffer.par3 = w;
+  cmdBuffer.par4 = h;
+  
+  sendCommand(cmdBuffer.data, 9);
+}
+
+void STMGPU::drawWindowGUI(int16_t posX, int16_t posY,
+                               int16_t w, int16_t h, const char *text)
+{
+  cmdBuffer.cmd = DRW_WND_TXT;
+  cmdBuffer.par1 = posX;
+  cmdBuffer.par2 = posY;
+  cmdBuffer.par3 = w;
+  cmdBuffer.par4 = h;
+  cmdBuffer.data[9] = strlen(text);
+  
+  sendCommand(cmdBuffer.data, 10);
+  sendCommand((void*)text, cmdBuffer.par5);
+}
+  
+void STMGPU::drawWindowGUI(int16_t posX, int16_t posY,
+                               int16_t w, int16_t h, const __FlashStringHelper* str)
+{
+  uint8_t c;
+  PGM_P p = reinterpret_cast<PGM_P>(str);
+  
+  cmdBuffer.cmd = DRW_WND_TXT;
+  cmdBuffer.par1 = posX;
+  cmdBuffer.par2 = posY;
+  cmdBuffer.par3 = w;
+  cmdBuffer.par4 = h;
+  cmdBuffer.data[9] = strlen_P(p);
+  
+  sendCommand(cmdBuffer.data, 10);
+  
+  for (uint8_t count=0; count < cmdBuffer.data[9]; count++) {
+    sendCommand(pgm_read_byte(p + count), 1);
+  }
+}
+  
+  
   
 // -------------------- ___ ---------------------- //
 

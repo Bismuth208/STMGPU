@@ -46,7 +46,7 @@ static int16_t _height = 0;
 
 // ------------------------------------------------------------------------------------ //
 
-void sync_gpu(void)
+void sync_gpu(uint32_t baud)
 {
   uint8_t syncData[2] = { 0x42, 0xDD};
 
@@ -57,6 +57,8 @@ void sync_gpu(void)
   CHK_GPU_BSY_DDRX &=~ (1 << CHK_GPU_BSY_PXY); // set as input
   CHK_GPU_BSY_PORTX |= (1 << CHK_GPU_BSY_PXY); // pull-up
 #endif
+  
+  uartSetup(baud);
 
   while(!syncEstablished) {
     while(serialAvailable()==0){
@@ -84,8 +86,10 @@ void sync_gpu(void)
 }
 
 // ------------------------------------------------------------------------------------ //
-// this function is abstruction layer
-// this allow to simply change the interface
+/* this function is abstruction layer
+ * this allow to simply change the interface
+ * and have some protection rules
+ */
 void sendCommand(void *buf, uint8_t size)
 {
 #if USE_BSY_PIN // harware protection
@@ -104,7 +108,7 @@ void sendCommand(void *buf, uint8_t size)
 
 // ------------------ Base ------------------ //
 
-void tftDrawPixel(int16_t x, int16_t y, uint16_t color)
+void gpuDrawPixel(int16_t x, int16_t y, uint16_t color)
 {
   cmdBuffer.cmd = DRW_PIXEL;
   cmdBuffer.par1 = x;
@@ -114,7 +118,7 @@ void tftDrawPixel(int16_t x, int16_t y, uint16_t color)
   sendCommand(cmdBuffer.data, 7);
 }
 
-void tftFillScreen(uint16_t color)
+void gpuFillScreen(uint16_t color)
 {
   cmdBuffer.cmd = FLL_SCR;
   cmdBuffer.par1 = color;
@@ -124,7 +128,7 @@ void tftFillScreen(uint16_t color)
 
 // ------------- Primitives/GFX ------------- //
 
-void tftFillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color)
+void gpuFillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color)
 {
   cmdBuffer.cmd = FLL_RECT;
   cmdBuffer.par1 = x;
@@ -136,7 +140,7 @@ void tftFillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color)
   sendCommand(cmdBuffer.data, 11);
 }
 
-void tftDrawRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color)
+void gpuDrawRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color)
 {
   cmdBuffer.cmd = DRW_RECT;
   cmdBuffer.par1 = x;
@@ -148,7 +152,7 @@ void tftDrawRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color)
   sendCommand(cmdBuffer.data, 11);
 }
 
-void drawRoundRect(int16_t x, int16_t y, int16_t w, int16_t h, int16_t radius, uint16_t color)
+void gpuDrawRoundRect(int16_t x, int16_t y, int16_t w, int16_t h, int16_t radius, uint16_t color)
 {
   cmdBuffer.cmd = DRW_ROUND_RECT;
   cmdBuffer.par1 = x;
@@ -161,7 +165,7 @@ void drawRoundRect(int16_t x, int16_t y, int16_t w, int16_t h, int16_t radius, u
   sendCommand(cmdBuffer.data, 13);
 }
 
-void fillRoundRect(int16_t x, int16_t y, int16_t w, int16_t h, int16_t radius, uint16_t color)
+void gpuFillRoundRect(int16_t x, int16_t y, int16_t w, int16_t h, int16_t radius, uint16_t color)
 {
   cmdBuffer.cmd = FLL_ROUND_RECT;
   cmdBuffer.par1 = x;
@@ -174,7 +178,7 @@ void fillRoundRect(int16_t x, int16_t y, int16_t w, int16_t h, int16_t radius, u
   sendCommand(cmdBuffer.data, 13);
 }
 
-void tftDrawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint16_t color)
+void gpuDrawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint16_t color)
 {
   cmdBuffer.cmd = DRW_LINE;
   cmdBuffer.par1 = x0;
@@ -186,7 +190,7 @@ void tftDrawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint16_t color)
   sendCommand(cmdBuffer.data, 11);
 }
 
-void tftDrawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color)
+void gpuDrawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color)
 {
   cmdBuffer.cmd = DRW_V_LINE;
   cmdBuffer.par1 = x;
@@ -197,7 +201,7 @@ void tftDrawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color)
   sendCommand(cmdBuffer.data, 9);
 }
 
-void tftDrawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color)
+void gpuDrawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color)
 {
   cmdBuffer.cmd = DRW_H_LINE;
   cmdBuffer.par1 = x;
@@ -208,7 +212,7 @@ void tftDrawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color)
   sendCommand(cmdBuffer.data, 9);
 }
 
-void drawCircle(int16_t x, int16_t y, int16_t r, uint16_t color)
+void gpuDrawCircle(int16_t x, int16_t y, int16_t r, uint16_t color)
 {
   cmdBuffer.cmd = DRW_CIRCLE;
   cmdBuffer.par1 = x;
@@ -219,7 +223,7 @@ void drawCircle(int16_t x, int16_t y, int16_t r, uint16_t color)
   sendCommand(cmdBuffer.data, 9);
 }
 
-void fillCircle(int16_t x, int16_t y, int16_t r, uint16_t color)
+void gpuFillCircle(int16_t x, int16_t y, int16_t r, uint16_t color)
 {
   cmdBuffer.cmd = FLL_CIRCLE;
   cmdBuffer.par1 = x;
@@ -230,7 +234,7 @@ void fillCircle(int16_t x, int16_t y, int16_t r, uint16_t color)
   sendCommand(cmdBuffer.data, 9);
 }
 
-void drawTriangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t color)
+void gpuDrawTriangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t color)
 {
   cmdBuffer.cmd = DRW_TRINGLE;
   cmdBuffer.par1 = x0;
@@ -244,7 +248,7 @@ void drawTriangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2, in
   sendCommand(cmdBuffer.data, 15);
 }
 
-void fillTriangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t color)
+void gpuFillTriangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t color)
 {
   cmdBuffer.cmd = FLL_TRINGLE;
   cmdBuffer.par1 = x0;
@@ -258,7 +262,7 @@ void fillTriangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2, in
   sendCommand(cmdBuffer.data, 15);
 }
 
-void getResolution(void)
+void gpuGetResolution(void)
 {
   serialClear();
   uartSendByte(GET_RESOLUTION);
@@ -275,19 +279,19 @@ void getResolution(void)
   _height = cmdBuffer.par2;
 }
 
-int16_t tftHeight(void)
+int16_t gpuHeight(void)
 {
   return _height;
 }
 
-int16_t tftWidth(void)
+int16_t gpuWidth(void)
 {
   return _width;
 }
 
 // --------------- Font/Print --------------- //
 
-void drawChar(int16_t x, int16_t y, uint8_t c, uint16_t color, uint16_t bg, uint8_t size)
+void gpuDrawChar(int16_t x, int16_t y, uint8_t c, uint16_t color, uint16_t bg, uint8_t size)
 {
   cmdBuffer.cmd = DRW_CHAR;
   cmdBuffer.par1 = x;
@@ -300,7 +304,7 @@ void drawChar(int16_t x, int16_t y, uint8_t c, uint16_t color, uint16_t bg, uint
   sendCommand(cmdBuffer.data, 11);
 }
 
-void setCursor(int16_t x, int16_t y)
+void gpuSetCursor(int16_t x, int16_t y)
 {
   cmdBuffer.cmd = SET_CURSOR;
   cmdBuffer.par1 = x;
@@ -309,7 +313,7 @@ void setCursor(int16_t x, int16_t y)
   sendCommand(cmdBuffer.data, 5);
 }
 
-void setTextColor(uint16_t color)
+void gpuSetTextColor(uint16_t color)
 {
   cmdBuffer.cmd = SET_TXT_CR;
   cmdBuffer.par1 = color;
@@ -317,7 +321,7 @@ void setTextColor(uint16_t color)
   sendCommand(cmdBuffer.data, 3);
 }
 
-void setTextColorBG(uint16_t color, uint16_t bg)
+void gpuSetTextColorBG(uint16_t color, uint16_t bg)
 {
   cmdBuffer.cmd = SET_TXT_CR_BG;
   cmdBuffer.par1 = color;
@@ -326,7 +330,7 @@ void setTextColorBG(uint16_t color, uint16_t bg)
   sendCommand(cmdBuffer.data, 5);
 }
 
-void setTextSize(uint8_t size)
+void gpuSetTextSize(uint8_t size)
 {
   cmdBuffer.cmd = SET_TXT_SIZE;
   cmdBuffer.data[1] = size;
@@ -334,7 +338,7 @@ void setTextSize(uint8_t size)
   sendCommand(cmdBuffer.data, 2);
 }
 
-void setTextWrap(bool wrap)
+void gpuSetTextWrap(bool wrap)
 {
   cmdBuffer.cmd = SET_TXT_WRAP;
   cmdBuffer.data[1] = wrap;
@@ -342,7 +346,7 @@ void setTextWrap(bool wrap)
   sendCommand(cmdBuffer.data, 2);
 }
 
-void cp437(bool cp)
+void gpuSetCp437(bool cp)
 {
   cmdBuffer.cmd = SET_TXT_437;
   cmdBuffer.data[1] = cp;
@@ -350,7 +354,7 @@ void cp437(bool cp)
   sendCommand(cmdBuffer.data, 2);
 }
 
-void print(const char *str)
+void gpuPrint(const char *str)
 {
   cmdBuffer.cmd = DRW_PRNT;
   cmdBuffer.data[1] = strlen(str);
@@ -360,7 +364,7 @@ void print(const char *str)
 }
 
 // make a DDoS to GPU's buffer...
-void tftPrintPGR(const char *str)
+void gpuPrintPGR(const char *str)
 {
   uint16_t strSize = strlen_P(str);
   
@@ -372,7 +376,7 @@ void tftPrintPGR(const char *str)
   }
 }
 
-void printChar(uint8_t c)
+void gpuPrintChar(uint8_t c)
 {
   cmdBuffer.cmd = DRW_PRNT_C;
   cmdBuffer.data[1] = c;
@@ -380,7 +384,7 @@ void printChar(uint8_t c)
   sendCommand(cmdBuffer.data, 2);
 }
 
-void printCharPos(int16_t x, int16_t y, uint8_t c)
+void gpuPrintCharPos(int16_t x, int16_t y, uint8_t c)
 {
   cmdBuffer.cmd = DRW_PRNT_POS_C;
   cmdBuffer.par1 = x;
@@ -392,7 +396,7 @@ void printCharPos(int16_t x, int16_t y, uint8_t c)
 
 
 // ---------------- Low Level --------------- //
-void tftSetAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1)
+void gpuSetAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1)
 {
   cmdBuffer.cmd = SET_ADR_WIN;
   cmdBuffer.par1 = x0;
@@ -403,7 +407,7 @@ void tftSetAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1)
   sendCommand(cmdBuffer.data, 9);
 }
 
-void tftSetRotation(uint8_t m)
+void gpuSetRotation(uint8_t m)
 {
   cmdBuffer.cmd = SET_ROTATION;
   cmdBuffer.data[1] = m;
@@ -411,7 +415,7 @@ void tftSetRotation(uint8_t m)
   sendCommand(cmdBuffer.data, 2);
 }
 
-void tftSetScrollArea(uint16_t TFA, uint16_t BFA)
+void gpuSetScrollArea(uint16_t TFA, uint16_t BFA)
 {
   cmdBuffer.cmd = SET_SCRL_AREA;
   cmdBuffer.par1 = TFA;
@@ -420,7 +424,7 @@ void tftSetScrollArea(uint16_t TFA, uint16_t BFA)
   sendCommand(cmdBuffer.data, 5);
 }
 
-void tftScrollAddress(uint16_t VSP)
+void gpuScrollAddress(uint16_t VSP)
 {
   cmdBuffer.cmd = SET_V_SCRL_ADR;
   cmdBuffer.par1 = VSP;
@@ -428,7 +432,7 @@ void tftScrollAddress(uint16_t VSP)
   sendCommand(cmdBuffer.data, 3);
 }
 
-void tftScroll(uint16_t lines, uint16_t yStart)
+void gpuScroll(uint16_t lines, uint16_t yStart)
 {
   //uint16_t newYstart;
   
@@ -440,7 +444,7 @@ void tftScroll(uint16_t lines, uint16_t yStart)
   //return newYstart;
 }
 /*
-void tftScrollSmooth(uint16_t lines, uint16_t yStart, uint8_t wait)
+void gpuScrollSmooth(uint16_t lines, uint16_t yStart, uint8_t wait)
 {
   //uint16_t newYstart;
   
@@ -454,7 +458,7 @@ void tftScrollSmooth(uint16_t lines, uint16_t yStart, uint8_t wait)
 }
 */
 
-void tftSetSleep(bool enable)
+void gpuSetSleep(bool enable)
 {
   cmdBuffer.cmd = SET_SLEEP;
   cmdBuffer.data[1] = enable;
@@ -462,7 +466,7 @@ void tftSetSleep(bool enable)
   sendCommand(cmdBuffer.data, 2);
 }
 
-void tftSetIdleMode(bool mode)
+void gpuSetIdleMode(bool mode)
 {
   cmdBuffer.cmd = SET_IDLE;
   cmdBuffer.data[1] = mode;
@@ -470,7 +474,7 @@ void tftSetIdleMode(bool mode)
   sendCommand(cmdBuffer.data, 2);
 }
 
-void tftSetDispBrightness(uint8_t brightness)
+void gpuSetDispBrightness(uint8_t brightness)
 {
   cmdBuffer.cmd = SET_BRIGHTNES;
   cmdBuffer.data[1] = brightness;
@@ -478,7 +482,7 @@ void tftSetDispBrightness(uint8_t brightness)
   sendCommand(cmdBuffer.data, 2);
 }
 
-void tftSetInvertion(bool i)
+void gpuSetInvertion(bool i)
 {
   cmdBuffer.cmd = SET_INVERTION;
   cmdBuffer.data[1] = i;
@@ -486,10 +490,10 @@ void tftSetInvertion(bool i)
   sendCommand(cmdBuffer.data, 2);
 }
 
-//void setGamma(uint8_t gamma);
+//void gpuSetGamma(uint8_t gamma);
 // SET_GAMMA
 
-void tftPushColor(uint16_t color)
+void gpuPushColor(uint16_t color)
 {
   cmdBuffer.cmd = PSH_CR;
   cmdBuffer.par1 = color;
@@ -497,7 +501,7 @@ void tftPushColor(uint16_t color)
   sendCommand(cmdBuffer.data, 3);
 }
 
-void writeCommand(uint8_t c)
+void gpuWriteCommand(uint8_t c)
 {
   cmdBuffer.cmd = WRT_CMD;
   cmdBuffer.data[1] = c;
@@ -505,7 +509,7 @@ void writeCommand(uint8_t c)
   sendCommand(cmdBuffer.data, 2);
 }
 
-void writeData(uint8_t d)
+void gpuWriteData(uint8_t d)
 {
   cmdBuffer.cmd = WRT_DATA;
   cmdBuffer.data[1] = d;
@@ -513,7 +517,7 @@ void writeData(uint8_t d)
   sendCommand(cmdBuffer.data, 2);
 }
 
-void writeWordData(uint16_t c)
+void gpuWriteWordData(uint16_t c)
 {
   cmdBuffer.cmd = WRT_DATA_U16;
   cmdBuffer.par1 = c;
@@ -522,7 +526,7 @@ void writeWordData(uint16_t c)
 }
 
 // ------------------- Tile ----------------- //
-void SDLoadTile8x8(const char *tileSetArrName, uint8_t tileSetW, uint8_t ramTileNum, uint8_t tileNum)
+void gpuSDLoadTile8x8(const char *tileSetArrName, uint8_t tileSetW, uint8_t ramTileNum, uint8_t tileNum)
 {
   cmdBuffer.cmd = LDD_TLE_8;
   cmdBuffer.data[1] = strlen(tileSetArrName);
@@ -534,7 +538,7 @@ void SDLoadTile8x8(const char *tileSetArrName, uint8_t tileSetW, uint8_t ramTile
   sendCommand((void*)tileSetArrName, cmdBuffer.data[1]); // send name of file
 }
 
-void SDLoadTileSet8x8(const char *tileSetArrName, uint8_t tileSetW, uint8_t ramTileBase, uint8_t tileMin, uint8_t tileMax)
+void gpuSDLoadTileSet8x8(const char *tileSetArrName, uint8_t tileSetW, uint8_t ramTileBase, uint8_t tileMin, uint8_t tileMax)
 {
   cmdBuffer.cmd = LDD_TLES_8;
   cmdBuffer.data[1] = strlen(tileSetArrName);
@@ -547,7 +551,7 @@ void SDLoadTileSet8x8(const char *tileSetArrName, uint8_t tileSetW, uint8_t ramT
   sendCommand((void*)tileSetArrName, cmdBuffer.data[1]); // send name of file
 }
 
-void drawTile8x8(int16_t posX, int16_t posY, uint8_t tileNum)
+void gpuDrawTile8x8(int16_t posX, int16_t posY, uint8_t tileNum)
 {
   cmdBuffer.cmd = DRW_TLE_8;
   cmdBuffer.par1 = posX;
@@ -557,7 +561,7 @@ void drawTile8x8(int16_t posX, int16_t posY, uint8_t tileNum)
   sendCommand(cmdBuffer.data, 6);
 }
 
-void SDLoadTileMap(const char *fileName)
+void gpuSDLoadTileMap(const char *fileName)
 {
   cmdBuffer.cmd = LDD_TLE_MAP;
   cmdBuffer.data[1] = strlen(fileName);
@@ -566,7 +570,7 @@ void SDLoadTileMap(const char *fileName)
   sendCommand((void*)fileName, cmdBuffer.data[1]); // send name of file
 }
 
-void drawBackgroundMap(void)
+void gpuDrawBackgroundMap(void)
 {
   cmdBuffer.cmd = DRW_TLE_MAP;
   
@@ -574,7 +578,7 @@ void drawBackgroundMap(void)
 }
 
 // ----------------- Sprite ----------------- //
-void setSpritePosition(uint8_t sprNum, uint16_t posX, uint16_t posY)
+void gpuSetSpritePosition(uint8_t sprNum, uint16_t posX, uint16_t posY)
 {
   cmdBuffer.cmd = SET_SPR_POS;
   cmdBuffer.par1 = (uint16_t)sprNum;
@@ -584,7 +588,7 @@ void setSpritePosition(uint8_t sprNum, uint16_t posX, uint16_t posY)
   sendCommand(cmdBuffer.data, 7);
 }
 
-void setSpriteType(uint8_t sprNum, uint8_t type)
+void gpuSetSpriteType(uint8_t sprNum, uint8_t type)
 {
   cmdBuffer.cmd = SET_SPR_TYPE;
   cmdBuffer.data[1] = sprNum;
@@ -593,7 +597,7 @@ void setSpriteType(uint8_t sprNum, uint8_t type)
   sendCommand(cmdBuffer.data, 3);
 }
 
-void setSpriteVisible(uint8_t sprNum, uint8_t state)
+void gpuSetSpriteVisible(uint8_t sprNum, uint8_t state)
 {
   cmdBuffer.cmd = SET_SPR_VISBL;
   cmdBuffer.data[1] = sprNum;
@@ -602,7 +606,7 @@ void setSpriteVisible(uint8_t sprNum, uint8_t state)
   sendCommand(cmdBuffer.data, 3);
 }
 
-void setSpriteTiles(uint8_t sprNum, uint8_t tle1, uint8_t tle2, uint8_t tle3, uint8_t tle4)
+void gpuSetSpriteTiles(uint8_t sprNum, uint8_t tle1, uint8_t tle2, uint8_t tle3, uint8_t tle4)
 {
   cmdBuffer.cmd = SET_SPR_TLE;
   cmdBuffer.data[1] = sprNum;
@@ -614,7 +618,7 @@ void setSpriteTiles(uint8_t sprNum, uint8_t tle1, uint8_t tle2, uint8_t tle3, ui
   sendCommand(cmdBuffer.data, 6);
 }
 
-void setSpritesAutoRedraw(uint8_t state)
+void gpuSetSpritesAutoRedraw(uint8_t state)
 {
   cmdBuffer.cmd = SET_SPR_AUT_R;
   cmdBuffer.data[1] = state;
@@ -622,7 +626,7 @@ void setSpritesAutoRedraw(uint8_t state)
   sendCommand(cmdBuffer.data, 2);
 }
 
-void drawSprite(uint8_t sprNum)
+void gpuDrawSprite(uint8_t sprNum)
 {
   cmdBuffer.cmd = DRW_SPR;
   cmdBuffer.data[1] = sprNum;
@@ -630,7 +634,7 @@ void drawSprite(uint8_t sprNum)
   sendCommand(cmdBuffer.data, 2);
 }
 
-bool getSpriteCollision(uint8_t sprNum1, uint8_t sprNum2)
+bool gpuGetSpriteCollision(uint8_t sprNum1, uint8_t sprNum2)
 {
   cmdBuffer.cmd = GET_SRP_COLISN;
   cmdBuffer.data[1] = sprNum1;
@@ -645,7 +649,7 @@ bool getSpriteCollision(uint8_t sprNum1, uint8_t sprNum2)
 
 
 // ---------------- SD card ----------------- //
-void SDLoadPalette(const char *palleteArrName)
+void gpuSDLoadPalette(const char *palleteArrName)
 {
   cmdBuffer.cmd = LDD_USR_PAL;
   cmdBuffer.data[1] = strlen(palleteArrName);
@@ -654,9 +658,20 @@ void SDLoadPalette(const char *palleteArrName)
   sendCommand((void*)palleteArrName, cmdBuffer.data[1]); // send name of file
 }
 
-void SDPrintBMP(uint16_t x, uint16_t y, const char *fileName)
+void gpuSDPrintBMP(const char *fileName)
 {
-  cmdBuffer.cmd = DRW_MBP_FIL;
+  cmdBuffer.cmd = DRW_BMP_FIL;
+  cmdBuffer.par1 = 0;
+  cmdBuffer.par2 = 0;
+  cmdBuffer.data[5] = strlen(fileName);
+  
+  sendCommand(cmdBuffer.data, 6);
+  sendCommand((void*)fileName, cmdBuffer.data[5]); // send name of file
+}
+
+void gpuSDPrintBMPat(uint16_t x, uint16_t y, const char *fileName)
+{
+  cmdBuffer.cmd = DRW_BMP_FIL;
   cmdBuffer.par1 = x;
   cmdBuffer.par2 = y;
   cmdBuffer.data[5] = strlen(fileName);
@@ -665,6 +680,74 @@ void SDPrintBMP(uint16_t x, uint16_t y, const char *fileName)
   sendCommand((void*)fileName, cmdBuffer.data[5]); // send name of file
 }
 
+// --------------- GUI commands -------------- //
+void gpuSetTextSizeGUI(uint8_t size)
+{
+  cmdBuffer.cmd = SET_WND_TXT_SZ;
+  cmdBuffer.data[1] = size;
+  
+  sendCommand(cmdBuffer.data, 2);
+}
+
+void gpuSetTextColorGUI(uint16_t text, uint16_t bg)
+{
+  cmdBuffer.cmd = SET_WND_CR_TXT;
+  cmdBuffer.par1 = text;
+  cmdBuffer.par2 = bg;
+  
+  sendCommand(cmdBuffer.data, 5);
+}
+
+void gpuSetColorWindowGUI(uint16_t frame, uint16_t border)
+{
+  cmdBuffer.cmd = SET_WND_CR;
+  cmdBuffer.par1 = frame;
+  cmdBuffer.par2 = border;
+  
+  sendCommand(cmdBuffer.data, 5);
+}
+
+void gpuDrawWindowGUI(int16_t posX, int16_t posY, int16_t w, int16_t h)
+{
+  cmdBuffer.cmd = DRW_WND_AT;
+  cmdBuffer.par1 = posX;
+  cmdBuffer.par2 = posY;
+  cmdBuffer.par3 = w;
+  cmdBuffer.par4 = h;
+  
+  sendCommand(cmdBuffer.data, 9);
+}
+
+void gpuDrawTextWindowGUI(int16_t posX, int16_t posY,
+                          int16_t w, int16_t h, const char *text)
+{
+  cmdBuffer.cmd = DRW_WND_TXT;
+  cmdBuffer.par1 = posX;
+  cmdBuffer.par2 = posY;
+  cmdBuffer.par3 = w;
+  cmdBuffer.par4 = h;
+  cmdBuffer.data[9] = strlen(text);
+  
+  sendCommand(cmdBuffer.data, 10);
+  sendCommand((void*)text, cmdBuffer.par5);
+}
+
+void gpuDrawPGRTextWindowGUI(int16_t posX, int16_t posY,
+                             int16_t w, int16_t h, const char *text)
+{
+  cmdBuffer.cmd = DRW_WND_TXT;
+  cmdBuffer.par1 = posX;
+  cmdBuffer.par2 = posY;
+  cmdBuffer.par3 = w;
+  cmdBuffer.par4 = h;
+  cmdBuffer.data[9] = strlen_P(text);
+  
+  sendCommand(cmdBuffer.data, 10);
+  
+  for (uint8_t count=0; count < cmdBuffer.data[9]; count++) {
+    sendCommand(pgm_read_byte(text + count), 1);
+  }
+}
 
 // -------------------- ___ ---------------------- //
 
@@ -672,7 +755,7 @@ void SDPrintBMP(uint16_t x, uint16_t y, const char *fileName)
 // some type of overdrive in C
 // hi 4 nibles is type of func
 // low 4 nibbles is how much params
-void SDLoadTile(const char *fileName, uint8_t fnNum, ...)
+void gpuSDLoadTile(const char *fileName, uint8_t fnNum, ...)
 {
   va_list argptr;
   va_start (argptr, fnNum);
@@ -686,13 +769,10 @@ void SDLoadTile(const char *fileName, uint8_t fnNum, ...)
   switch (fnNum & 0xF0)
   {
     case 1:{
-      SDLoadTileFromSet8x8(fileName, params[0], params[1], params[2]);
+      gpuSDLoadTileFromSet8x8(fileName, params[0], params[1], params[2]);
     } break;
     case 2:{
-      SDLoadTileSet8x8(fileName, params[0], params[1], params[2]);
-    } break;
-    case 3:{
-      SDLoadRegionOfTileSet8x8(fileName, params[0],  params[1], params[2], params[3]);
+      gpuSDLoadTileSet8x8(fileName, params[0],  params[1], params[2], params[3]);
     } break;
     default: break;
   }
@@ -709,14 +789,14 @@ uint16_t color565(uint8_t r, uint8_t g, uint8_t b)
 
 //void drawBitmap(int16_t x, int16_t y, const uint8_t *bitmap, int16_t w, int16_t h, uint16_t color);
 //void drawBitmapBG(int16_t x, int16_t y, const uint8_t *bitmap, int16_t w, int16_t h, uint16_t color, uint16_t bg);
-void drawXBitmap(int16_t x, int16_t y, const uint8_t *bitmap, int16_t w, int16_t h, uint16_t color)
+void gpuDrawXBitmap(int16_t x, int16_t y, const uint8_t *bitmap, int16_t w, int16_t h, uint16_t color)
 {
   int16_t i, j, byteWidth = (w + 7) / 8;
   
   for(j=0; j<h; j++) {
     for(i=0; i<w; i++ ) {
       if(pgm_read_byte(bitmap + j * byteWidth + i / 8) & (1 << (i % 8))) {
-        tftDrawPixel(x+i, y+j, color);
+        gpuDrawPixel(x+i, y+j, color);
       }
     }
   }

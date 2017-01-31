@@ -27,14 +27,6 @@ typedef struct {
   uint8_t tail;
 } ringBuffer_t;
 
-typedef enum {
-  USART_BAUD_9600 = 9600,
-  USART_BAUD_57600 = 57600,
-  USART_BAUD_115200 = 115200,
-  USART_BAUD_1M = 1000000
-} baudSpeed_t;
-
-
 #ifdef __cplusplus
 extern "C" {
 #endif

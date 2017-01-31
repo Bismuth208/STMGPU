@@ -2,7 +2,6 @@
 #include <string.h>
 
 #include <systicktimer.h>
-
 #include <uart.h>
 #include <STMsGPU_c.h>
 
@@ -10,15 +9,15 @@
 
 // --------------------------------------------------------- //
 
-#define TFT_W tftWidth()
-#define TFT_H tftHeight()
+#define TFT_W gpuWidth()
+#define TFT_H gpuHeight()
 
 #define TEST_SAMPLE_SIZE    12000
 #define TEST_SAMPLE_SCREENS 80 // this is equal to 24000 tiles
 
 // --------------------------------------------------------- //
 
-static uint16_t nextInt = 9;
+static uint16_t nextInt = 9; // absolutely randomised value
 
 void (*pArrExecGFXFunc[])(void) = {
     testDrawTiles,
@@ -42,15 +41,14 @@ uint16_t randNum(void)
 void gpuLoadTiles(void)
 {
   /* load MAX_TILES tiles to GPU's RAM at RAM_BASE position in it's RAM,
-  *  from tileFileName,
-  *  located on SD card attached to STM32 GPU
-  *  9 - is width of tileSet in tiles ( 9 tiles width == 72 pixels)
-  *  TLE_START - nunber of tile in tileset from which tiles will be loaded
-  *  file name must respond to 8.3 name system
-  *  8 chars max for filename, 3 chars max for file extension
-  *  sGPU add *.tle extension automatically
+  *  from tileFileName, located on SD card attached to STM32 GPU;
+  *  TILE_SET_W - is width of tileSet in tiles;
+  *  TLE_START - nunber of tile in tileset from which tiles will be loaded;
+  *  File name must respond to 8.3 name system,
+  *  8 chars max for filename, 3 chars max for file extension.
+  *  sGPU add *.tle extension automatically.
   */
-  SDLoadTileSet8x8((const char*)tileFileName, TILE_SET_W-1, RAM_BASE, TLE_START, MAX_TILES);
+  gpuSDLoadTileSet8x8(tileFileName, TILE_SET_W-1, RAM_BASE, TLE_START, MAX_TILES);
 }
 
 // --------------------------------------------------------- //
@@ -65,7 +63,7 @@ void testDrawTiles(void)
     rndPosY = randNum() % TFT_H;
     
     // draw random tile form 0 to MAX_TILES, at random position
-    drawTile8x8(rndPosX, rndPosY, randNum()%MAX_TILES);
+    gpuDrawTile8x8(rndPosX, rndPosY, randNum()%MAX_TILES);
   }
 }
 
@@ -84,7 +82,7 @@ void drawRamTileSet8x8(void)
       posX = (50 + ( countX * TLE_8X8_SIZE ));
       posY = (50 + ( countY * TLE_8X8_SIZE ));
       
-      drawTile8x8(posX, posY, count);
+      gpuDrawTile8x8(posX, posY, count);
       
       ++count;
     }
@@ -105,7 +103,7 @@ void fillScreenByTiles(void)
       for (xStep = 0; xStep < maxXSize; xStep++) {
 
         // draw random tile form 0 to MAX_TILES
-        drawTile8x8(xStep*TLE_8X8_SIZE, yStep*TLE_8X8_SIZE, randNum()%MAX_TILES);
+        gpuDrawTile8x8(xStep*TLE_8X8_SIZE, yStep*TLE_8X8_SIZE, randNum()%MAX_TILES);
       }
     } 
   }
@@ -114,25 +112,27 @@ void fillScreenByTiles(void)
 // ---------------------------------------------------------- //
 int main(void)
 {
-  initSysTickTimer(); //it`s enable timer0 on atmega328p;
+  // it`s enable timer0 on atmega328p;
+  // need for delays;
+  initSysTickTimer();
 
-  uartSetup(USART_BAUD_1M);
-  sync_gpu();
+  //BAUD_SPEED_9600 = 9600
+  //BAUD_SPEED_57600 = 57600
+  //BAUD_SPEED_115200 = 115200
+  //BAUD_SPEED_1M = 1000000
+  sync_gpu(BAUD_SPEED_1M);  // establish connection
 
   gpuLoadTiles();
 
-  uint32_t timerCount =0;
-
-  uint8_t count =0;
   uint8_t testsCount = FUNC_TO_TEST_COUNT;
 
   for(;;) {
 
-    for (count = 0; count < testsCount; count++) {
+    for (uint8_t count = 0; count < testsCount; count++) {
       pArrExecGFXFunc[count]();  // exec test function
 
        _delayMS(1000);  // actual 500 // little delay to see what happend on screen
-      tftFillScreen(COLOR_BLACK);  // clear screen by black color
+      gpuFillScreen(COLOR_BLACK);  // clear screen by black color
     }
   }
 

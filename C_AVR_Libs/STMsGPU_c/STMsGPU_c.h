@@ -3,13 +3,6 @@
 #ifndef _STMSGPU_C_H
 #define _STMSGPU_C_H
 
-#include "tiles.h"
-#include "sprites.h"
-#include "lowlevel.h"
-#include "text.h"
-#include "primitives.h"
-#include "sdcard.h"
-
 
 // Check busy GPU`s pin before every transfer
 // Protect GPU`s buffer from overflow
@@ -47,7 +40,7 @@
 //#define NOT_USED          0x02
 #define DRW_PIXEL       0x03
 
-// ------------- Primitives/GFX ------------- ///
+// ------------- Primitives/GFX ------------- //
 #define FLL_RECT        0x04
 #define DRW_RECT        0x05
 #define DRW_ROUND_RECT  0x06
@@ -59,13 +52,13 @@
 #define FLL_CIRCLE      0x0C
 #define DRW_TRINGLE     0x0D
 #define FLL_TRINGLE     0x0E
-#define GET_RESOLUTION  0x0F
+#define GET_RESOLUTION  0x0F  //
 
 // --------------- Font/Print --------------- //
 #define DRW_CHAR        0x10    // drawChar()
 #define DRW_PRNT        0x11    // print()
 #define DRW_PRNT_C      0x12    // printChar()
-#define DRW_PRNT_POS_C  0x13    // printCharPos()
+#define DRW_PRNT_POS_C  0x13    // printCharAt()
 #define SET_CURSOR      0x14    // setCursor()
 #define SET_TXT_CR      0x15    // setTextColor()
 #define SET_TXT_CR_BG   0x16    // setTextColorBG()
@@ -87,16 +80,18 @@
 #define WRT_CMD         0x23    // writeCommand()
 #define WRT_DATA        0x24    // writeData()
 #define WRT_DATA_U16    0x25    // writeWordData()
-#define SET_V_SCRL_ADR  0x26    // tftScrollAddress()
-#define SET_SLEEP       0x27    // tftSetSleep()
-#define SET_IDLE        0x28    // tftSetIdleMode()
-#define SET_BRIGHTNES   0x29    // tftSetDispBrightness()
-#define SET_INVERTION   0x2A    // tftSetInvertion()
+#define SET_V_SCRL_ADR  0x26    // scrollAddress()
+#define SET_SLEEP       0x27    // setSleep()
+#define SET_IDLE        0x28    // setIdleMode()
+#define SET_BRIGHTNES   0x29    // setDispBrightness()
+#define SET_INVERTION   0x2A    // setInvertion()
 #define SET_GAMMA       0x2B    // setGamma()
-#define MAK_SCRL        0x2C    // tftScroll()
-#define MAK_SCRL_SMTH   0x2D    // tftScrollSmooth()
+#define MAK_SCRL        0x2C    // scrollScreen()
+#define MAK_SCRL_SMTH   0x2D    // scrollScreenSmooth()
 #define PSH_CR          0x2E
-//#define NOT_USED        0x2F
+
+// ------- BSY protect selection ------------ //
+#define BSY_SELECT      0x2F
 
 
 // ------------------- Tile ----------------- //
@@ -118,8 +113,8 @@
 #define LDD_TLE_MAP     0x3C    // load background tile map 8x8 from SD
 #define DRW_TLE_MAP     0x3D    // draw background tile map 8x8 on TFT screen
 
-#define LDD_TLE_U       0x3E    // load specified tile size from SD
-#define DRW_TLE_U       0x3F    // draw specified tile size on TFT screen
+//#define LDD_TLE_U       0x3E    // load specified tile size from SD
+//#define DRW_TLE_U       0x3F    // draw specified tile size on TFT screen
 
 // ----------------- Sprite ----------------- //
 #define SET_SPR_POS     0x40    // set sprite position
@@ -142,7 +137,7 @@
 
 // ----------------- SD card ---------------- //
 #define LDD_USR_PAL     0x50    // load user palette from SD card
-#define DRW_MBP_FIL     0x51    // draw bmp file located on SD card
+#define DRW_BMP_FIL     0x51    // draw bmp file located on SD card
 //#define NOT_USED        0x52
 //#define NOT_USED        0x53
 //#define NOT_USED        0x54
@@ -158,6 +153,24 @@
 //#define NOT_USED        0x5E
 //#define NOT_USED        0x5F
 
+
+// --------------- GUI commands -------------- //
+#define SET_WND_CR      0x60    // Set window colors
+#define SET_WND_CR_TXT  0x61    // set colors for GUI text
+#define SET_WND_TXT_SZ  0x62    // set GUI text size
+#define DRW_WND_AT      0x63    // draw window at position
+#define DRW_WND_TXT     0x64    // draw window whith text
+//#define DRW_BTN_NUM     0x65    // draw numerated buttons
+//#define NOT_USED        0x66
+//#define NOT_USED        0x67
+//#define NOT_USED        0x68
+//#define NOT_USED        0x69
+//#define NOT_USED        0x6A
+//#define NOT_USED        0x6B
+//#define NOT_USED        0x6C
+//#define NOT_USED        0x6D
+//#define NOT_USED        0x6E
+//#define NOT_USED        0x6F
 
 // ---------------- NOT_USED ---------------- //
 // -------------- 0x60 - 0xFF --------------- //
@@ -209,7 +222,7 @@
 extern "C" {
 #endif
   
-  //#pragma pack(push, 1)
+#pragma pack(push, 1)
   typedef union {
     uint8_t data[15];
     struct {
@@ -223,39 +236,133 @@ extern "C" {
       uint16_t par7;
     };
   } cmdBuffer_t;
-  //#pragma pack(pop)
+#pragma pack(pop)
+  
+  typedef enum {
+    BAUD_SPEED_9600 = 9600,
+    BAUD_SPEED_57600 = 57600,
+    BAUD_SPEED_115200 = 115200,
+    BAUD_SPEED_1M = 1000000
+  } baudSpeed_t;
   
   // ------------------------------------------------------------------- //
   
-  void sync_gpu(void);
+  void sync_gpu(uint32_t baud);
   void sendCommand(void *buf, uint8_t size);
   
   // ------------------ Base ------------------ //
-  void tftDrawPixel(int16_t x, int16_t y, uint16_t color);
-  void tftFillScreen(uint16_t color);
+  void gpuDrawPixel(int16_t x, int16_t y, uint16_t color);
+  void gpuFillScreen(uint16_t color);
   
+  // ------------- Primitives/GFX ------------- //
+  void gpuFillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
+  void gpuDrawRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
+  void gpuDrawRoundRect(int16_t x, int16_t y, int16_t w, int16_t h, int16_t radius, uint16_t color);
+  void gpuFillRoundRect(int16_t x, int16_t y, int16_t w, int16_t h, int16_t radius, uint16_t color);
+  void gpuDrawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint16_t color);
+  void gpuDrawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color);
+  void gpuDrawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color);
   
-  // ------------------------------------------------------------------- //
+  void gpuDrawCircle(int16_t x, int16_t y, int16_t r, uint16_t color);
+  void gpuFillCircle(int16_t x, int16_t y0, int16_t r, uint16_t color);
+  void gpuDrawTriangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t color);
+  void gpuFillTriangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t color);
   
-  void tftScroll(uint16_t lines, uint16_t yStart);
-  void tftScrollSmooth(uint16_t lines, uint16_t yStart, uint8_t wait);
+  void gpuScroll(uint16_t lines, uint16_t yStart);
+  void gpuScrollSmooth(uint16_t lines, uint16_t yStart, uint8_t wait);
   
   //void drawBitmap(int16_t x, int16_t y, const uint8_t *bitmap, int16_t w, int16_t h, uint16_t color);
   //void drawBitmapBG(int16_t x, int16_t y, const uint8_t *bitmap, int16_t w, int16_t h, uint16_t color, uint16_t bg);
-  void drawXBitmap(int16_t x, int16_t y, const uint8_t *bitmap, int16_t w, int16_t h, uint16_t color);
+  void gpuDrawXBitmap(int16_t x, int16_t y, const uint8_t *bitmap, int16_t w, int16_t h, uint16_t color);
   
   uint16_t color565(uint8_t r, uint8_t g, uint8_t b);
   uint16_t conv8to16(uint8_t x);
+  
+  // --------------- Font/Print --------------- //
+  
+  // get current cursor position (get rotation safe maximum values, using: width() for x, height() for y)
+  //int16_t getCursorX(void);
+  //int16_t getCursorY(void);
+  
+  //void setTextFont(unsigned char* f);
+  void gpuDrawChar(int16_t x, int16_t y, uint8_t c, uint16_t color, uint16_t bg, uint8_t size);
+  void gpuSetCursor(int16_t x, int16_t y);
+  void gpuSetTextColor(uint16_t color);
+  void gpuSetTextColorBG(uint16_t color, uint16_t bg);
+  void gpuSetTextSize(uint8_t size);
+  void gpuSetTextWrap(bool wrap);
+  void gpuSetCp437(bool cp);
+  
+  void gpuPrint(const char *str);
+  void gpuPrintPGR(const char *str);
+  void gpuPrintChar(uint8_t c);
+  void gpuPrintCharPos(int16_t x, int16_t y, uint8_t c);
+  
+  // ---------------- Low Level --------------- //
+  void gpuSetAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
+  void gpuSetRotation(uint8_t m);
+  void gpuSetScrollArea(uint16_t TFA, uint16_t BFA);
+  void gpuScrollAddress(uint16_t VSP);
+  void gpuSetSleep(bool enable);
+  void gpuSetIdleMode(bool mode);
+  void gpuSetDispBrightness(uint8_t brightness);
+  void gpuSetInvertion(bool i);
+  //void gpuSetGamma(uint8_t gamma);
+  void gpuPushColor(uint16_t color);
+  
+  void gpuWriteCommand(uint8_t c);
+  void gpuWriteData(uint8_t d);
+  void gpuWriteWordData(uint16_t c);
+  
+  // ------------------- Tile ----------------- //
+  void gpuSDLoadTile8x8(const char *tileSetArrName, uint8_t tileSetW,
+                     uint8_t ramTileNum, uint8_t tileNum);
+  void gpuSDLoadTileSet8x8(const char *tileSetArrName, uint8_t tileSetW,
+                        uint8_t ramTileBase, uint8_t tileMin, uint8_t tileMax);
+  void gpuDrawTile8x8(int16_t posX, int16_t posY, uint8_t tileNum);
+  
+  //void SDLoadTile(const char *fileName, uint8_t fnNum, ...);
+  
+  void gpuSDLoadTileMap(const char *fileName);
+  void gpuDrawBackgroundMap(void);
+  
+  // ----------------- Sprite ----------------- //
+  void gpuSetSpritePosition(uint8_t sprNum, uint16_t posX, uint16_t posY);
+  void gpuSetSpriteType(uint8_t sprNum, uint8_t type);
+  void gpuSetSpriteVisible(uint8_t sprNum, uint8_t state);
+  void gpuSetSpriteTiles(uint8_t sprNum, uint8_t tle1, uint8_t tle2, uint8_t tle3, uint8_t tle4);
+  void gpuSetSpritesAutoRedraw(uint8_t state);
+  void gpuDrawSprite(uint8_t sprNum);
+  
+  bool gpuGetSpriteCollision(uint8_t sprNum1, uint8_t sprNum2);
+  
+  // ---------------- SD card ----------------- //
+  void gpuSDLoadPalette(const char *palleteArrName);
+  void gpuSDPrintBMP(const char* fileName);
+  void gpuSDPrintBMPat(uint16_t x, uint16_t y, const char* fileName);
+  
+  // --------------- GUI commands -------------- //
+  void gpuSetTextSizeGUI(uint8_t size);
+  void gpuSetTextColorGUI(uint16_t text, uint16_t bg);
+  void gpuSetColorWindowGUI(uint16_t frame, uint16_t border);
+  
+  void gpuDrawWindowGUI(int16_t posX, int16_t posY, int16_t w, int16_t h);
+  void gpuDrawTextWindowGUI(int16_t posX, int16_t posY,
+                     int16_t w, int16_t h, const char *text);
+  void gpuDrawPGRTextWindowGUI(int16_t posX, int16_t posY,
+                     int16_t w, int16_t h, const char *text);
+  
+  
+  // ------------------------------------------------------------------- //
   
   //uint16_t columns(void);
   //uint16_t rows(void);
   
   //uint8_t getRotation(void);
   
-  void getResolution(void);
-  int16_t tftHeight(void);
-  int16_t tftWidth(void);
-  
+  void gpuGetResolution(void);
+  int16_t gpuHeight(void);
+  int16_t gpuWidth(void);
   
 #ifdef __cplusplus
 }

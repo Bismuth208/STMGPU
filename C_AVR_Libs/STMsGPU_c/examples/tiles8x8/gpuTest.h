@@ -5,8 +5,8 @@
 #define MAX_TILES 70
 #define RAM_BASE 0
 #define TLE_START 0
-#define TILE_SET_W 10 // real number (1-10)
-#define TILE_SET_H 7  // real number (1-8)
+#define TILE_SET_W 10 // ( 9 tiles width == 72 pixels)
+#define TILE_SET_H 7 
 
 #define TLE_8X8_SIZE 8 // this is single tile size, each tile 8x8 in px
 

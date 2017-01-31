@@ -13,18 +13,23 @@ const uint8_t bmpFileName4[] = "house";
 // ---------------------------------------------------------- //
 int main(void)
 {
-  initSysTickTimer(); //it`s enable timer0 on atmega328p;
+  // it`s enable timer0 on atmega328p;
+  // need for delays;
+  initSysTickTimer();
 
-  uartSetup(USART_BAUD_1M);
-  sync_gpu();
+  //BAUD_SPEED_9600 = 9600
+  //BAUD_SPEED_57600 = 57600
+  //BAUD_SPEED_115200 = 115200
+  //BAUD_SPEED_1M = 1000000
+  sync_gpu(BAUD_SPEED_1M);  // establish connection
 
   for(;;) {
-  	SDPrintBMP(0, 20, (const char*)bmpFileName1);
-    SDPrintBMP(0, 0, (const char*)bmpFileName2);
-    SDPrintBMP(0, 0, (const char*)bmpFileName3);
-    SDPrintBMP(0, 0, (const char*)bmpFileName4);
+  	gpuSDPrintBMPat(0, 20, bmpFileName1);
+    gpuSDPrintBMP(bmpFileName2);
+    gpuSDPrintBMP(bmpFileName3);
+    gpuSDPrintBMP(bmpFileName4);
 
-    tftfillScreen(COLOR_BLACK);
+    gpuFillScreen(COLOR_BLACK);
   }
 
   return 0;

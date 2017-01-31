@@ -9,12 +9,33 @@
 #else
 #include "WProgram.h"
 #endif
-//#include <Adafruit_GFX.h>
 #ifdef __AVR
 #include <avr/pgmspace.h>
 #elif defined(ESP8266)
 #include <pgmspace.h>
 #endif
+
+#if defined(__AVR_ATtiny24__) || defined(__AVR_ATtiny44__) || defined(__AVR_ATtiny84__) \
+  || defined(__AVR_ATtiny25__) || defined(__AVR_ATtiny45__) || defined(__AVR_ATtiny85__)
+ #include <SoftwareSerial.h>
+#endif
+
+// -------------------------- Command list --------------------------- //
+// CLR  - CLEAR
+// FLL  - FILL
+// DRW  - DRAW
+// PSH  - PUSH
+// CR   - COLOR
+// PRNT - PRINT
+// POS  - POSITION
+// WRT  - WRITE
+// LDD  - LOAD
+// UPD  - UPDATE
+// SCR  - SCREEN
+// MAK  - MAKE
+// TLE  - TILE
+// SCRL - SCROLL
+// SMTH - SMOOTH
 
 // ------------------ Base ------------------ //
 //#define NOT_USED         0x00
@@ -78,24 +99,24 @@
 
 // ------------------- Tile ----------------- //
 #define LDD_TLE_8       0x30    // load tile 8x8 size from SD
-#define LDD_TLES_8      0x31    // load tiles 8x8 size from SD
-#define LDD_TLES_RG_8   0x32    // load region of tiles 8x8 size from SD
+//#define NOT_USED        0x31
+#define LDD_TLES_8      0x32    // load region of tiles 8x8 size from SD
 #define DRW_TLE_8       0x33    // draw tile 8x8 size on TFT screen
 
 #define LDD_TLE_16      0x34    // load tile 16x16 size from SD
-#define LDD_TLES_16     0x35    // load tiles 16x16 size from SD
-#define LDD_TLES_RG_16  0x36    // load region of tiles 16x16 size from SD
+//#define NOT_USED        0x35
+#define LDD_TLES_16     0x36    // load region of tiles 16x16 size from SD
 #define DRW_TLE_16      0x37    // draw tile 16x16 size on TFT screen
 
 #define LDD_TLE_32      0x38    // load tile 32x32 size from SD
-#define LDD_TLES_32     0x39    // load tiles 32x32 size from SD
-#define LDD_TLES_RG_32  0x3A    // load region of tiles 32x32 size from SD
+//#define NOT_USED        0x39
+#define LDD_TLES_32     0x3A    // load region of tiles 32x32 size from SD
 #define DRW_TLE_32      0x3B    // draw tile 32x32 size on TFT screen
 
 #define LDD_TLE_MAP     0x3C    // load background tile map 8x8 from SD
 #define DRW_TLE_MAP     0x3D    // draw background tile map 8x8 on TFT screen
 
-#define LDD_TLE_U       0x3E    // load specified tile size from SD
+//#define LDD_TLE_U       0x3E    // load specified tile size from SD
 #define DRW_TLE_U       0x3F    // draw specified tile size on TFT screen
 
 // ----------------- Sprite ----------------- //
@@ -138,11 +159,11 @@
 
 // --------------- GUI commands -------------- //
 #define SET_WND_CR      0x60    // Set window colors
-#define DRW_WND         0x61    // draw window
-#define DRW_WND_TXT     0x62    // draw window whith text
-#define DRW_BTN_NUM     0x63    // draw numerated buttons
-//#define NOT_USED        0x64
-//#define NOT_USED        0x65
+#define SET_WND_CR_TXT  0x61    // set colors for GUI text
+#define SET_WND_TXT_SZ  0x62    // set GUI text size
+#define DRW_WND_AT      0x63    // draw window at position
+#define DRW_WND_TXT     0x64    // draw window whith text
+//#define DRW_BTN_NUM     0x65    // draw numerated buttons
 //#define NOT_USED        0x66
 //#define NOT_USED        0x67
 //#define NOT_USED        0x68
@@ -156,7 +177,6 @@
 
 // ---------------- NOT_USED ---------------- //
 // -------------- 0x70 - 0xFF --------------- //
-
 
 
 // Color definitions
@@ -214,29 +234,17 @@ typedef union {
     uint16_t par7;
   };
 } cmdBuffer_t;
-   
-typedef union {
-  uint8_t data[12];
-  struct {
-    uint8_t cmd;
-    uint8_t  par0;
-    uint16_t par1;
-    uint16_t par2;
-    uint16_t par3;
-    uint16_t par4;
-    uint8_t  par5;
-    //uint8_t  align;
-  };
-} cmdBuffer2_t;
 #pragma pack(pop)
 // ------------------------------------------------------------------- //
 
+// Baud rate speeds for serial
 typedef enum {
-  USART_BAUD_9600 = 9600,
-  USART_BAUD_57600 = 57600,
-  USART_BAUD_115200 = 115200,
-  USART_BAUD_1M = 1000000
+  BAUD_SPEED_9600 = 9600,
+  BAUD_SPEED_57600 = 57600,
+  BAUD_SPEED_115200 = 115200,
+  BAUD_SPEED_1M = 1000000
 } baudSpeed_t;
+
    
 class STMGPU : public Print {
   
@@ -270,17 +278,14 @@ public:
             scrollSmooth(uint16_t lines, uint16_t yStart, uint8_t wait);
   
   //void drawBitmap(int16_t x, int16_t y, const uint8_t *bitmap, int16_t w, int16_t h, uint16_t color);
-  //void drawBitmapBG(int16_t x, int16_t y, const uint8_t *bitmap, int16_t w, int16_t h, uint16_t color, uint16_t bg);
+  //void drawBitmap(int16_t x, int16_t y, const uint8_t *bitmap, int16_t w, int16_t h, uint16_t color, uint16_t bg);
   void drawXBitmap(int16_t x, int16_t y, const uint8_t *bitmap, int16_t w, int16_t h, uint16_t color);
   
   uint16_t  color565(uint8_t r, uint8_t g, uint8_t b),
             conv8to16(uint8_t x);
   
-  //uint16_t columns(void);
-  //uint16_t rows(void);
   
   //uint8_t getRotation(void);
-  
   void getResolution(void);
   int16_t width(void);
   int16_t height(void);
@@ -290,6 +295,8 @@ public:
 // get current cursor position (get rotation safe maximum values, using: width() for x, height() for y)
   //int16_t getCursorX(void);
   //int16_t getCursorY(void);
+  //uint16_t columns(void);
+  //uint16_t rows(void);
   
   //void setTextFont(unsigned char* f);
   void  drawChar(int16_t x, int16_t y, uint8_t c, uint16_t color, uint16_t bg, uint8_t size),
@@ -330,11 +337,30 @@ public:
        writeWordData(uint16_t c);
   
 // ------------------- Tile ----------------- //
+  // ---- tile 8x8 ---- //
   void loadTile8x8(const char *tileSetArrName, uint8_t tileSetW,
                             uint8_t ramTileNum, uint8_t tileNum);
   void loadTileSet8x8(const char *tileSetArrName, uint8_t tileSetW,
                                 uint8_t ramTileBase, uint8_t tileMin, uint8_t tileMax);
   void drawTile8x8(int16_t posX, int16_t posY, uint8_t tileNum);
+  
+  // ---- tile 16x16 ---- //
+  void loadTile16x16(const char *tileSetArrName, uint8_t tileSetW,
+                   uint8_t ramTileNum, uint8_t tileNum);
+  void loadTileSet16x16(const char *tileSetArrName, uint8_t tileSetW,
+                      uint8_t ramTileBase, uint8_t tileMin, uint8_t tileMax);
+  void drawTile16x16(int16_t posX, int16_t posY, uint8_t tileNum);
+  // ---- tile 32x32 ---- //
+  void loadTile32x32(const char *tileSetArrName, uint8_t tileSetW,
+                     uint8_t ramTileNum, uint8_t tileNum);
+  void loadTileSet32x32(const char *tileSetArrName, uint8_t tileSetW,
+                        uint8_t ramTileBase, uint8_t tileMin, uint8_t tileMax);
+  void drawTile32x32(int16_t posX, int16_t posY, uint8_t tileNum);
+  
+  // ---- tile universal ---- //
+  //void drawTile(int16_t posX, int16_t posY, uint8_t tileType, uint8_t tileNum);
+  
+  
   void loadTileMap(const char *fileName);
   //void loadTileMap(const String &str);
   //void loadTileMap(const __FlashStringHelper* str);
@@ -359,7 +385,29 @@ public:
   void printBMP(uint16_t x, uint16_t y, const char *fileName);
   void printBMP(uint16_t x, uint16_t y, const __FlashStringHelper* str);
   
+// --------------- GUI commands -------------- //
+  void setTextSizeGUI(uint8_t size);
+  void setTextColorGUI(uint16_t text, uint16_t bg);
+  void setColorWindowGUI(uint16_t frame, uint16_t border);
+  
+  void drawWindowGUI(int16_t posX, int16_t posY, int16_t w, int16_t h);
+  void drawWindowGUI(int16_t posX, int16_t posY,
+                         int16_t w, int16_t h, const char *text);
+  void drawWindowGUI(int16_t posX, int16_t posY,
+                         int16_t w, int16_t h, const __FlashStringHelper* str);
+  
+
+  
 private:
+#if defined(__AVR_ATtiny24__) || defined(__AVR_ATtiny44__) || defined(__AVR_ATtiny84__) \
+  || defined(__AVR_ATtiny25__) || defined(__AVR_ATtiny45__) || defined(__AVR_ATtiny85__)
+  
+  SoftwareSerial *_Serial; // for boards which have no hardware serial port
+#else
+  HardwareSerial *_Serial; // becouse different boards have different serial ports
+  
+#endif
+  
   // more RAM used but little faster, less ROM used and less problems whith stack
   cmdBuffer_t cmdBuffer;
   
