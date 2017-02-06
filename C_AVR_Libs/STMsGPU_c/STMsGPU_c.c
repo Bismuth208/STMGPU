@@ -39,8 +39,8 @@
 static cmdBuffer_t cmdBuffer;
 //static uint8_t cmdBufferStr[MAX_TEXT_SIZE];
 
-// at sync, GPU return it`s LCD resolution,
-// but you can ask GPU once again
+// at sync, sGPU return it`s LCD resolution,
+// but you can ask sGPU once again
 static int16_t _width  = 0;
 static int16_t _height = 0;
 

@@ -38,6 +38,7 @@
 
 
 extern uint16_t currentPaletteArr[USER_PALETTE_SIZE];
+extern uint8_t palChanged;
 
 // -------------------------------------------------------- //
 

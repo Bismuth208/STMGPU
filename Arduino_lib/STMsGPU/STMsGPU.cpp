@@ -61,14 +61,14 @@ void STMGPU::begin(uint32_t baudRate)
   
 #if defined(__AVR_ATtiny24__) || defined(__AVR_ATtiny44__) || defined(__AVR_ATtiny84__) \
  || defined(__AVR_ATtiny25__) || defined(__AVR_ATtiny45__) || defined(__AVR_ATtiny85__)
-  _Serial = &gpuSoftwareSerial;
+  pSerial = &gpuSoftwareSerial;
 #elif defined (__STM32F1__) || defined (__STM32F3__) || defined (__STM32F4__)
-  _Serial = &Serial1; // PA9 and PA10
+  pSerial = &Serial1; // PA9 and PA10
 #elif defined (__AVR__)
-  _Serial = &Serial;
+  pSerial = &Serial;
 #endif
   
-  _Serial->begin(baudRate);
+  pSerial->begin(baudRate);
   
   if(_useHardwareBsy) {
     // setup GPU bsy pin
@@ -77,26 +77,26 @@ void STMGPU::begin(uint32_t baudRate)
   }
 
   while(!syncEstablished) {
-    while(_Serial->available()==0) {
-      _Serial->write(syncData, 0x02); // two bytes
+    while(pSerial->available()==0) {
+      pSerial->write(syncData, 0x02); // two bytes
       delay(1000); // one transfer per second
     }
 
-    if(_Serial->read() == SYNC_OK) {
+    if(pSerial->read() == SYNC_OK) {
       syncEstablished = true;
       
-      while(_Serial->available() < 3); // wait for resolution
+      while(pSerial->available() < 3); // wait for resolution
       // get _width
-      cmdBuffer.data[1] = _Serial->read();
-      cmdBuffer.data[2] = _Serial->read();
+      cmdBuffer.data[1] = pSerial->read();
+      cmdBuffer.data[2] = pSerial->read();
       // get _height
-      cmdBuffer.data[3] = _Serial->read();
-      cmdBuffer.data[4] = _Serial->read();
+      cmdBuffer.data[3] = pSerial->read();
+      cmdBuffer.data[4] = pSerial->read();
       
       _width  = cmdBuffer.par1;
       _height = cmdBuffer.par2;
       
-      _Serial->flush();
+      pSerial->flush();
     }
   }
 }
@@ -116,14 +116,14 @@ void STMGPU::sendCommand(void *buf, uint8_t size)
     
   } else { // software protection
     
-    if(_Serial->read() == BSY_MSG_CODE_WAIT) {
+    if(pSerial->read() == BSY_MSG_CODE_WAIT) {
       // same story as previous, all power of MCU will be concentrated for this
-      while(_Serial->read() != BSY_MSG_CODE_READY);
+      while(pSerial->read() != BSY_MSG_CODE_READY);
     }
   }
   
   // finally, send data to sGPU
-  _Serial->write((uint8_t*)buf, size);
+  pSerial->write((uint8_t*)buf, size);
 }
 
 // ------------------------------------------------------------------------------------ //
@@ -287,16 +287,16 @@ void STMGPU::fillTriangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_
 
 void STMGPU::getResolution(void)
 {
-  _Serial->flush();
-  _Serial->print(GET_RESOLUTION);
+  pSerial->flush();
+  pSerial->print(GET_RESOLUTION);
   
-  while(_Serial->available() < 3); // wait for resolution
+  while(pSerial->available() < 3); // wait for resolution
   // get _width
-  cmdBuffer.data[1] = _Serial->read();
-  cmdBuffer.data[2] = _Serial->read();
+  cmdBuffer.data[1] = pSerial->read();
+  cmdBuffer.data[2] = pSerial->read();
   // get _height
-  cmdBuffer.data[3] = _Serial->read();
-  cmdBuffer.data[4] = _Serial->read();
+  cmdBuffer.data[3] = pSerial->read();
+  cmdBuffer.data[4] = pSerial->read();
   
   _width  = cmdBuffer.par1;
   _height = cmdBuffer.par2;
@@ -322,7 +322,7 @@ size_t STMGPU::write(uint8_t c) {
     cmdBuffer.cmd = DRW_PRNT_C;
     cmdBuffer.data[1] = c;
     
-    // DO NOT CHAHNGE TO: _Serial->write(cmdBuffer.data, 2); !
+    // DO NOT CHAHNGE TO: pSerial->write(cmdBuffer.data, 2); !
     // ONLY sendCommand(cmdBuffer.data, 2); FUNCTION ALLOWED!
     // OTHERWISE sGPU WILL BE VEEERY UNSTABLE!
     sendCommand(cmdBuffer.data, 2);
@@ -784,9 +784,9 @@ bool STMGPU::getSpriteCollision(uint8_t sprNum1, uint8_t sprNum2)
   
   sendCommand(cmdBuffer.data, 3);
   
-  while(!_Serial->available() ); // wait for state
+  while(!pSerial->available() ); // wait for state
   
-  return _Serial->read();
+  return pSerial->read();
 }
 
 // ----------------- SD card ---------------- //
@@ -814,7 +814,7 @@ void STMGPU::printBMP(const __FlashStringHelper* str)
   sendCommand(cmdBuffer.data, 6);
     
   while ((c = pgm_read_byte(p)) != 0) {
-    _Serial->write(c);
+    pSerial->write(c);
     p++;
   }
 }
@@ -829,7 +829,7 @@ void STMGPU::printBMP(uint16_t x, uint16_t y, const String &str)
   sendCommand(cmdBuffer.data, 6);
   
   for (uint16_t i = 0; i < str.length(); i++) {
-    _Serial->write(str[i]);
+    pSerial->write(str[i]);
   }
 }
   
@@ -857,7 +857,7 @@ void STMGPU::printBMP(uint16_t x, uint16_t y, const __FlashStringHelper* str)
   sendCommand(cmdBuffer.data, 6);
   
   while ((c = pgm_read_byte(p)) != 0) {
-    _Serial->write(c);
+    pSerial->write(c);
     p++;
   }
 }

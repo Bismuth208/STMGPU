@@ -45,8 +45,8 @@ void init_DMA_memset(void)
             DMA_Mode_Normal |                  // .DMA_Mode
             DMA_PeripheralInc_Enable |         // .DMA_PeripheralInc
             DMA_MemoryInc_Disable |            // .DMA_MemoryInc
-            DMA_PeripheralDataSize_Word |      // .DMA_PeripheralDataSize
-            DMA_MemoryDataSize_Word |          // .DMA_MemoryDataSize
+            DMA_PeripheralDataSize_Byte |      // .DMA_PeripheralDataSize
+            DMA_MemoryDataSize_Byte |          // .DMA_MemoryDataSize
             DMA_Priority_VeryHigh |            // .DMA_Priority
             DMA_M2M_Enable |                   // .DMA_M2M
             DMA_IT_TC );                       // enable interupt
@@ -66,9 +66,9 @@ void init_DMA_memset(void)
 
 // NOTE: len must be less than 65535!
 // it is max DMA transfer size
-void memset_DMA1(void *dst, void const *data, size_t len)
+void memset_DMA1(void *dst, void const *src, size_t len)
 {
-  dmaDataBuf = (*(uint32_t*)data);   // store data or, you can lost it
+  dmaDataBuf = (*(uint32_t*)src);   // store data or, you can lost it
   
   DMA1_Channel1->CPAR = (uint32_t) dst;          // set DMA_PeripheralBaseAddr
   DMA1_Channel1->CMAR = (uint32_t) &dmaDataBuf;  // apply DMA_MemoryBaseAddr

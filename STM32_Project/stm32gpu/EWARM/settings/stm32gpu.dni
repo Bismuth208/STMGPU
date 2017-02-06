@@ -23,7 +23,7 @@ ShowSource=1
 Freq=10000000
 MultiCoreRunAll=1
 [stlink]
-stlinkserialNo=2798FD0D
+stlinkserialNo=B7AE3E0E
 stlinkfoundProbes=
 [Exceptions]
 StopOnUncaught=_ 0
@@ -46,7 +46,7 @@ ITMportsTermIO=0
 ITMportsLogFile=0
 ITMlogFile=$PROJ_DIR$\ITM.log
 [DebugChecksum]
-Checksum=1295014359
+Checksum=-1370001639
 [CodeCoverage]
 Enabled=_ 0
 [CallStack]

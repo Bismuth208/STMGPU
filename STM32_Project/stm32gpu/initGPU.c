@@ -8,14 +8,14 @@
 #include <stm32f10x.h>
 
 #include <gfx.h>
-#include <usart.h>
+#include <uart.h>
 #include <memHelper.h>
 
 #include "gpuMain.h"
 
 //===========================================================================//
 
-// Make sync whith CPU by read from USART buffer 
+// Make sync whith CPU by read from UART buffer 
 // sync sequence: 0x42DD
 void sync_CPU(void)
 {
@@ -24,11 +24,11 @@ void sync_CPU(void)
   bool syncEstablished = false;
   
   while(!syncEstablished) {
-    if(dataAvailable_USART1() >= 2) {
-      if(readData8_USART1() == 0x42) {
-        if(readData8_USART1() == 0xDD) {
+    if(dataAvailable_UART1() >= 2) {
+      if(readData8_UART1() == 0x42) {
+        if(readData8_UART1() == 0xDD) {
           
-          fflush_USART1();
+          fflush_UART1();
           syncEstablished = true;
          
           print(T_OK T_TFT_SIZE);
@@ -37,8 +37,8 @@ void sync_CPU(void)
           cmdBuffer.par1 = _width;
           cmdBuffer.par2 = _height;
           
-          sendData8_USART1(SYNC_OK);  // sequence right, answer to CPU
-          sendArrData8_USART1(cmdBuffer.data, 4); // send resolution
+          sendData8_UART1(SYNC_OK);  // sequence right, answer to CPU
+          sendArrData8_UART1(cmdBuffer.data, 4); // send resolution
           
           print(T_OK T_GPU_START);
         }
@@ -72,30 +72,30 @@ void init_GPU_GPIO(void)
   GPIO_Init(GPIOA, &GPIO_InitStruct);            // Apply settings
 }
 
-void init_GPU_USART(void)
+void init_GPU_UART(void)
 {
-  print(T_SELECT_WAY T_USART_WAY);
+  print(T_SELECT_WAY T_UART_WAY);
   print(T_BAUD_SPEED);
 
   switch(GPIOA->IDR & 0x07) // get GPIO state
   {
   case 0x01: {
-    init_UART1(USART_BAUD_9600);
+    init_UART1(UART_BAUD_9600);
     print(T_BAUD_9600);
   } break;
   
   case 0x02: {
-    init_UART1(USART_BAUD_57600);
+    init_UART1(UART_BAUD_57600);
     print(T_BAUD_57K);
   } break;
   
   case 0x03: {
-    init_UART1(USART_BAUD_115200);
+    init_UART1(UART_BAUD_115200);
     print(T_BAUD_115K);
   } break;
   
   case 0x04: {
-    init_UART1(USART_BAUD_1M);
+    init_UART1(UART_BAUD_1M);
     print(T_BAUD_1M);
   } break;
   /* 
@@ -103,10 +103,18 @@ void init_GPU_USART(void)
   *
   */
   default: {
-    init_UART1(USART_BAUD_57600);
+    init_UART1(UART_BAUD_57600);
     print(T_DAUD_DEFAULT);
   } break;
   }
+  
+  /* This is REALLY important thing!
+   * set pointer to cmdBuffer.
+   * Almost all data for functions will
+   * placed here from UART1 buffer.
+   * Also reduce registers usage.
+   */
+  setBufferPointer_UART1(cmdBuffer.data);
 }
 
 void init_GPU(void)
@@ -114,7 +122,7 @@ void init_GPU(void)
   print(T_GPU_VERSION);
   
   init_GPU_GPIO();
-  init_GPU_USART();    // setup access to low level interface
+  init_GPU_UART();    // setup access to low level interface
   //init_DMA_memset();
   
   if(bsyState){

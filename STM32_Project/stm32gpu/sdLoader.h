@@ -11,15 +11,11 @@
 #define T_MAP_SET_EXT_NAME      ".map"  // 0x03
 #define T_TLE_SET_EXT_NAME      ".tle"  // 0x02
 
-
-typedef union {
-  uint8_t data[14];
-  struct {
-    uint16_t tileSetW;
-    uint16_t ramTileBase;
-    uint16_t par3;
-    uint16_t par4;
-  };
+typedef struct  {
+  uint8_t tileSetW;
+  uint8_t ramTileBase;
+  uint8_t tileMin;
+  uint8_t tileMax;
 } tileParam_t;
 
 void init_sdCard(void);

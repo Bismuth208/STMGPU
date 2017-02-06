@@ -54,7 +54,7 @@
 #define T_GPU_VERSION   "Build: " __DATE__" " __TIME__ " \n"
 
 #define T_SELECT_WAY    "Selected interface: "
-#define T_USART_WAY     "USART_1\n"
+#define T_UART_WAY      "UART_1\n"
 #define T_INIT          "Init... "
 #define T_WAIT_SYNC     "Waiting for sync... "
 #define T_TFT_SIZE      "Sending TFT size to host... "

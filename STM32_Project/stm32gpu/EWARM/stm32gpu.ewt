@@ -2201,12 +2201,12 @@
       </file>
     </group>
     <group>
-      <name>USART</name>
+      <name>UART</name>
       <file>
-        <name>$PROJ_DIR$\..\..\Drivers\usart\usart.c</name>
+        <name>$PROJ_DIR$\..\..\Drivers\uart\uart.c</name>
       </file>
       <file>
-        <name>$PROJ_DIR$\..\..\Drivers\usart\usart.h</name>
+        <name>$PROJ_DIR$\..\..\Drivers\uart\uart.h</name>
       </file>
     </group>
   </group>

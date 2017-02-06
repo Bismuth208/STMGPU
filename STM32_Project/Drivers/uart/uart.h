@@ -1,5 +1,5 @@
-#ifndef _USART_H
-#define _USART_H
+#ifndef _UART_H
+#define _UART_H
 
 // --------------------------------------------------//
 
@@ -19,25 +19,27 @@ typedef struct {
 
 
 typedef enum {
-  USART_BAUD_9600 = 9600,
-  USART_BAUD_57600 = 57600,
-  USART_BAUD_115200 = 115200,
-  USART_BAUD_1M = 1000000 
+  UART_BAUD_9600 = 9600,
+  UART_BAUD_57600 = 57600,
+  UART_BAUD_115200 = 115200,
+  UART_BAUD_1M = 1000000 
 } baudSpeed_t;
 
 // --------------------------------------------------//
 
 void init_UART1(uint32_t baud);
-void sendData8_USART1(uint8_t data);
-void fflush_USART1(void);
-uint8_t readData8_USART1(void);
-void sendArrData8_USART1(void *src, uint32_t size);
-uint16_t dataAvailable_USART1(void);
+void setBufferPointer_UART1(void *pBuf);
+void sendData8_UART1(uint8_t data);
+void fflush_UART1(void);
+uint8_t readData8_UART1(void);
+void sendArrData8_UART1(void *src, uint32_t size);
+uint16_t dataAvailable_UART1(void);
 
-uint8_t waitCutByte_USART1(void);
-uint16_t waitCutWord_USART1(void);
-void waitCutBuf_USART1(void *dest, uint16_t size);
+uint8_t waitCutByte_UART1(void);
+uint16_t waitCutWord_UART1(void);
+void waitCutpBuf_UART1(uint16_t size);
+void waitCutBuf_UART1(void *dest, uint16_t size);
 
 // --------------------------------------------------//
 
-#endif // _USART_H
+#endif // _UART_H

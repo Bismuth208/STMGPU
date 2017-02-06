@@ -1172,7 +1172,7 @@
         <option>
           <name>CCAllowList</name>
           <version>1</version>
-          <state>11111110</state>
+          <state>10111110</state>
         </option>
         <option>
           <name>CCDebugInfo</name>
@@ -1245,7 +1245,7 @@
           <state>$PROJ_DIR$\..\..\Drivers\CMSIS\</state>
           <state>$PROJ_DIR$\..\..\Drivers\systicktimer\</state>
           <state>$PROJ_DIR$\..\..\Drivers\stmSPI\</state>
-          <state>$PROJ_DIR$\..\..\Drivers\usart\</state>
+          <state>$PROJ_DIR$\..\..\Drivers\uart\</state>
           <state>$PROJ_DIR$\..\..\Drivers\gfx_tft\</state>
           <state>$PROJ_DIR$\..\..\Drivers\ILI9341\</state>
           <state>$PROJ_DIR$\..\..\Drivers\fsmc\</state>
@@ -1990,12 +1990,12 @@
       </file>
     </group>
     <group>
-      <name>USART</name>
+      <name>UART</name>
       <file>
-        <name>$PROJ_DIR$\..\..\Drivers\usart\usart.c</name>
+        <name>$PROJ_DIR$\..\..\Drivers\uart\uart.c</name>
       </file>
       <file>
-        <name>$PROJ_DIR$\..\..\Drivers\usart\usart.h</name>
+        <name>$PROJ_DIR$\..\..\Drivers\uart\uart.h</name>
       </file>
     </group>
   </group>

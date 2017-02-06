@@ -20,6 +20,7 @@
 #endif
 
 #define UART_CALC_BAUDRATE(baudRate) ((uint32_t)((F_CPU) + ((uint32_t)baudRate * 4UL)) / ((uint32_t)(baudRate) * 8UL) - 1)
+//#define CALC_BAUDRATE(baudRate) ((F_CPU / (16UL * baudRate)) - 1)
 
 typedef struct {
 	uint8_t buffer[SERIAL_BUFFER_SIZE];

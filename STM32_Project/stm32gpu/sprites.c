@@ -59,6 +59,10 @@ void convertSprite(uint8_t sprNum, uint8_t size)
     }
     
     tleOffset += TILE_ARR_8X8_SIZE;
+    
+    // while convert new tile, send current
+    //wait_DMA1_SPI1_busy();
+    //sendData16_Fast_DMA1_SPI1(lastSprite[], TILE_ARR_8X8_SIZE);
   }
 }
 

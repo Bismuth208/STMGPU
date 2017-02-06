@@ -402,9 +402,9 @@ private:
 #if defined(__AVR_ATtiny24__) || defined(__AVR_ATtiny44__) || defined(__AVR_ATtiny84__) \
   || defined(__AVR_ATtiny25__) || defined(__AVR_ATtiny45__) || defined(__AVR_ATtiny85__)
   
-  SoftwareSerial *_Serial; // for boards which have no hardware serial port
+  SoftwareSerial *pSerial; // for boards which have no hardware serial port
 #else
-  HardwareSerial *_Serial; // becouse different boards have different serial ports
+  HardwareSerial *pSerial; // becouse different boards have different serial ports
   
 #endif
   
