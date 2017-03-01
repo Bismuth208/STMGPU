@@ -10,7 +10,6 @@
 #include <string.h>
 
 #include <gfx.h>
-#include <gfxDMA.h>
 #if USE_FSMC
  #include <fsmcdrv.h>
 #else
@@ -542,11 +541,7 @@ void drawBMP24(uint16_t w, uint16_t h, uint32_t bmpImageoffset)
         lcdbuffer[p] = convRGBto565(r, g, b);
       }
       // push buffer to TFT
-#if USE_FSMC
-      sendData16_Arr_FSMC(lcdbuffer, BUFFPIXELCOUNT);
-#else
-      sendData16_Fast_DMA1_SPI1(lcdbuffer, BUFFPIXELCOUNT);
-#endif
+      SEND_ARR16_FAST(lcdbuffer, BUFFPIXELCOUNT);
     }
   }
 }
@@ -565,11 +560,7 @@ void drawBMP16(uint16_t w, uint16_t h, uint32_t bmpImageoffset)
       f_read(&File, lcdbuffer, BUFFPIXELCOUNT, &cnt);
       
       // push buffer to TFT
-#if USE_FSMC
-      sendData16_Arr_FSMC(lcdbuffer, BUFFPIXELCOUNT);
-#else
-      sendData16_Fast_DMA1_SPI1(lcdbuffer, BUFFPIXELCOUNT);
-#endif
+      SEND_ARR16_FAST(lcdbuffer, BUFFPIXELCOUNT);
     }
   }
 }

@@ -2,15 +2,6 @@
 #include "fsmcdrv.h"
 
 
-
-// Use 1st bank of FSMC
-// adreses for 8 bit mode, in 16 bit mode addr will be: 0x60020000 !
-#define LCD_FSMC_DATA   0x60020000      // for write data
-#define LCD_FSMC_CMD    0x60000000      // for write commands
-
-#define FSMC_SEND_DATA(a)       (*(uint16_t *) (LCD_FSMC_DATA) = a)
-#define FSMC_SEND_CMD(a)       (*(uint16_t *) (LCD_FSMC_CMD) = a)
-
 // 8 bit 8080 pins
 #define FSMC_PIN_D0     GPIO_Pin_14     // PD14
 #define FSMC_PIN_D1     GPIO_Pin_15     // PD15
@@ -40,12 +31,17 @@
 #define FSMC_PIN_RS    GPIO_Pin_11     // PD11 (FSMC_PIN_A16)
 
 
-void sendCMD8_FSMC(uint8_t c)
+void sendRegData(uint16_t reg, uint16_t data)
+{
+  LCD_WRITE_REGISTER(reg, data);
+}
+
+void sendCMD8_FSMC(uint16_t c)
 {
   FSMC_SEND_CMD(c);
 }
 
-void sendData8_FSMC(uint8_t c)
+void sendData8_FSMC(uint16_t c)
 {
   FSMC_SEND_DATA(c);
 }
@@ -53,7 +49,7 @@ void sendData8_FSMC(uint8_t c)
 void sendData8_Arr_FSMC(uint8_t *arr, uint16_t size)
 {
   for(uint16_t count =0; count < size; count++) {
-    FSMC_SEND_DATA(arr[count]);
+    FSMC_SEND_DATA((uint16_t)((0x00<<8)|arr[count]));
   }
 }
 
@@ -108,10 +104,6 @@ void initFSMC_GPIO(void)
   // RD -> 1
   // WR -> 1
   
-  //GPIO_RESET_PIN(GPIOD, FSMC_PIN_CS);
-  //GPIO_SET_PIN(GPIOD, FSMC_PIN_RD);
-  //GPIO_SET_PIN(GPIOD, FSMC_PIN_WR);
-  
   GPIO_ResetBits(GPIOD, FSMC_PIN_CS);
   GPIO_SetBits(GPIOD, FSMC_PIN_RD);
   GPIO_SetBits(GPIOD, FSMC_PIN_WR);
@@ -119,18 +111,20 @@ void initFSMC_GPIO(void)
 
 void initFSMC(void)
 {
+  initFSMC_GPIO();
+  
   FSMC_NORSRAMInitTypeDef fsmc;
   FSMC_NORSRAMTimingInitTypeDef fsmcTiming;
   
   RCC_AHBPeriphClockCmd(RCC_AHBPeriph_FSMC, ENABLE);
   
   // setup FSMC
-  fsmcTiming.FSMC_AddressSetupTime = 10;
-  fsmcTiming.FSMC_AddressHoldTime = 10;
-  fsmcTiming.FSMC_DataSetupTime = 10;
-  fsmcTiming.FSMC_BusTurnAroundDuration = 10;
-  fsmcTiming.FSMC_CLKDivision = 8;
-  fsmcTiming.FSMC_DataLatency = 10;
+  fsmcTiming.FSMC_AddressSetupTime = 1;
+  fsmcTiming.FSMC_AddressHoldTime = 0;
+  fsmcTiming.FSMC_DataSetupTime = 5;
+  fsmcTiming.FSMC_BusTurnAroundDuration = 0;
+  fsmcTiming.FSMC_CLKDivision = 0;
+  fsmcTiming.FSMC_DataLatency = 0;
   fsmcTiming.FSMC_AccessMode = FSMC_AccessMode_B;
   
   

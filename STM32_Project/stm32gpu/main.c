@@ -15,8 +15,11 @@
 #include <stm32f10x.h>
 
 #include <gfx.h>
-#include <gfxDMA.h>
-#include <spi.h>
+#if USE_FSMC
+ #include <fsmcdrv.h>
+#else
+ #include <spi.h>
+#endif
 #include <sdcard_spi.h>
 #include <systicktimer.h>
 
@@ -60,9 +63,6 @@ void startupInit(void)
   initSysTickTimer();
   
   init_GPIO_RCC();
-#if !USE_FSMC
-  init_SPI1();
-#endif
   initRand();
   initLCD();         /* initialize a ILI9341 chip */
   

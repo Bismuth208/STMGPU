@@ -2,7 +2,6 @@
 #include <stm32f10x.h>
 
 #include <gfx.h>
-#include <gfxDMA.h>
 #include <systicktimer.h>
 
 #include <memHelper.h>

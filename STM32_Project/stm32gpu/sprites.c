@@ -1,9 +1,13 @@
-#include <stm32f10x.h>
 #include <string.h>
 
+#include <stm32f10x.h>
+
 #include <gfx.h>
-#include <gfxDMA.h>
-#include <spi.h>
+#if USE_FSMC
+ #include <fsmcdrv.h>
+#else
+ #include <spi.h>
+#endif
 #include <memhelper.h>
 
 #include "gpuTiles.h"
@@ -62,7 +66,7 @@ void convertSprite(uint8_t sprNum, uint8_t size)
     
     // while convert new tile, send current
     //wait_DMA1_SPI1_busy();
-    //sendData16_Fast_DMA1_SPI1(lastSprite[], TILE_ARR_8X8_SIZE);
+    //SEND_ARR16_FAST(lastSprite[], TILE_ARR_8X8_SIZE);
   }
 }
 
@@ -142,7 +146,7 @@ void drawSprite(uint8_t sprNum)
     
     setAddrWindow(spriteData.sprBase.posX, spriteData.sprBase.posY, 
                   spriteData.posOffsetX, spriteData.posOffsetY);
-    sendData16_Fast_DMA1_SPI1(lastSprite, spriteData.spriteSize);
+    SEND_ARR16_FAST(lastSprite, spriteData.spriteSize);
   }
 }
 

@@ -1,21 +1,18 @@
-#include <stm32f10x.h>
-#include <stm32f10x_dma.h>
-
 #include <string.h>
 #include <stdbool.h>
 #include <stdlib.h>
 
+#include <stm32f10x.h>
+
 #include <systicktimer.h>
-
-#include "ili9341.h"
-
 #if USE_FSMC
  #include <fsmcdrv.h>
 #else
  #include <spi.h>
 #endif
 
-#include <gfxDMA.h>
+#include "ili9341.h"
+
 
 //-------------------------------------------------------------------------------------------//
 
@@ -26,30 +23,18 @@ int16_t _height = ILI9341_TFTHEIGHT;
 
 void writeCommand(uint8_t c)
 {
-#if USE_FSMC
-  sendCMD8_FSMC(c);
-#else
-
-  SET_CMD();
-  sendData8_SPI1(c);
-#endif
+  WRITE_CMD(c);
 }
 
 void writeData(uint8_t c)
 {
-#if USE_FSMC
-  sendData8_FSMC(c);
-#else
-
-  SET_DATA();
-  sendData8_SPI1(c);
-#endif
+  WRITE_DATA(c);
 }
 
 void writeWordData(uint16_t c)
 {
 #if USE_FSMC
-  sendData16_FSMC(c);
+  FSMC_SEND_DATA(c);
 #else
 
   SET_DATA();
@@ -68,224 +53,161 @@ void execCommands(const uint8_t *addr)
       writeData(*addr++);
     }
   }
+  
+  writeCommand(ILI9341_SLPOUT);    // Exit Sleep
+  _delayMS(3);
+  writeCommand(ILI9341_DISPON);    // Display on
+}
+
+void hardRstTFT(void)
+{
+  // toggle RST low to reset
+  SET_TFT_RES_HI;  _delayMS(1);
+  SET_TFT_RES_LOW; _delayMS(5);
+  SET_TFT_RES_HI;  _delayMS(1);
 }
 
 void initTFT_GPIO()
 {
   GPIO_InitTypeDef GPIO_InitStruct;
-  
   GPIO_InitStruct.GPIO_Mode = GPIO_Mode_Out_PP;     // Mode: output "Push-Pull"
-  GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;     // Set speed
+  GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;    // Set speed
 #if USE_FSMC
   GPIO_InitStruct.GPIO_Pin = TFT_RES_PIN;
-  GPIO_Init(GPIOB, &GPIO_InitStruct);        // Aply settings to port B
 #else
   GPIO_InitStruct.GPIO_Pin = TFT_DC_PIN | TFT_RES_PIN | TFT_SS_PIN;
-  GPIO_Init(GPIOB, &GPIO_InitStruct);        // Aply settings to port B
 #endif
+  GPIO_Init(GPIOB, &GPIO_InitStruct);        // Aply settings to port B
 }
 
 void initLCD(void)
 {
 #if USE_FSMC
-  initFSMC_GPIO();
   initFSMC();
+#else
+  init_SPI1();
+  init_DMA1_SPI1();
 #endif
   initTFT_GPIO();
   
   SET_TFT_RES_LOW;
+  GRAB_TFT_CS;   // maybe remove this? And connect CS to Vcc?
+  SET_TFT_DC_HI; // set data
   
-#if TFT_CS_ALWAS_ACTIVE
-  GRAB_TFT_CS; // maybe remove this? And connect CS to Vcc?
-#endif
-  
-  SET_TFT_CS_HI;
-  SET_DATA();
-  
-  // toggle RST low to reset
-  SET_TFT_RES_HI;
-  _delayMS(1);
-  SET_TFT_RES_LOW;
-  _delayMS(1);
-  SET_TFT_RES_HI;
-  _delayMS(1);
-  
+  hardRstTFT();
   execCommands(initSequence);
-  
-  writeCommand(ILI9341_SLPOUT);    //Exit Sleep
-  _delayMS(3);
-  writeCommand(ILI9341_DISPON);    //Display on
-  
-#if !USE_FSMC
-  init_DMA1_SPI1();
-#endif
 }
 
 // blow your mind
 void setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1)
 {    
-#if USE_FSMC
-  sendCMD8_FSMC(ILI9341_CASET);   // Column addr set
-  sendData32_FSMC(x0, x1);        // XSTART, XEND
-
-  sendCMD8_FSMC(ILI9341_RASET);    // Row addr set
-  sendData32_FSMC(y0, y1);        // YSTART, YEND
+  WAIT_DMA_BSY;              // wait untill DMA transfer end
   
-  sendCMD8_FSMC(ILI9341_RAMWR);   // write to RAM
+  SET_CMD();                 // writecommand:
+  SEND_DATA(ILI9341_CASET);  // Column addr set
   
-#else
-  wait_DMA1_SPI1_busy();
+  SET_DATA();                // writeData:
+  SEND_2_DATA(x0, x1);       // XSTART, XEND
   
-  SET_CMD();                      // writecommand:
-  sendData8_SPI1(ILI9341_CASET);  // Column addr set
+  SET_CMD();                 // writecommand:
+  SEND_DATA(ILI9341_RASET);  // Row addr set
   
-  SET_DATA();                     // writeData:
-  sendData32_SPI1(x0, x1);        // XSTART, XEND
+  SET_DATA();                // writeData:
+  SEND_2_DATA(y0, y1);       // YSTART, YEND
   
-  SET_CMD();                      // writecommand:
-  sendData8_SPI1(ILI9341_RASET);  // Row addr set
+  SET_CMD();                 // writecommand:
+  SEND_DATA(ILI9341_RAMWR);  // write to RAM
   
-  SET_DATA();                     // writeData:
-  sendData32_SPI1(y0, y1);        // YSTART, YEND
-  
-  SET_CMD();                      // writecommand:
-  sendData8_SPI1(ILI9341_RAMWR);  // write to RAM
-  
-  SET_DATA();                     // ready accept data
-#endif // USE_FSMC  
+  SET_DATA();                // ready accept data 
 }
 
 // square window
 void setSqAddrWindow(uint16_t x0, uint16_t y0, uint16_t size)
 {
-#if USE_FSMC
-  sendCMD8_FSMC(ILI9341_CASET);   // Column addr set
-  sendData32_FSMC(x0, x0+size);   // XSTART, XEND
+  WAIT_DMA_BSY;              // wait untill DMA transfer end
   
-  sendCMD8_FSMC(ILI9341_RASET);   // Row addr set
-  sendData32_FSMC(y0, y0+size);   // YSTART, YEND
+  SET_CMD();                 // writecommand:
+  SEND_DATA(ILI9341_CASET);  // Column addr set
   
-  sendCMD8_FSMC(ILI9341_RAMWR);   // write to RAM
+  SET_DATA();                // writeData:
+  SEND_2_DATA(x0, x0+size);  // XSTART, XEND
   
-#else
-  wait_DMA1_SPI1_busy();
+  SET_CMD();                 // writecommand:
+  SEND_DATA(ILI9341_RASET);  // Row addr set
   
-  SET_CMD();                      // writecommand:
-  sendData8_SPI1(ILI9341_CASET);  // Column addr set
+  SET_DATA();                // writeData:
+  SEND_2_DATA(y0, y0+size);  // YSTART, YEND
   
-  SET_DATA();                     // writeData:
-  sendData32_SPI1(x0, x0+size);   // XSTART, XEND
+  SET_CMD();                 // writecommand:
+  SEND_DATA(ILI9341_RAMWR);  // write to RAM
   
-  SET_CMD();                      // writecommand:
-  sendData8_SPI1(ILI9341_RASET);  // Row addr set
-  
-  SET_DATA();                     // writeData:
-  sendData32_SPI1(y0, y0+size);   // YSTART, YEND
-  
-  SET_CMD();                      // writecommand:
-  sendData8_SPI1(ILI9341_RAMWR);  // write to RAM
-  
-  SET_DATA();                     // ready accept data
-#endif // USE_FSMC 
+  SET_DATA();                // ready accept data
 }
 
 void setVAddrWindow(uint16_t x0, uint16_t y0, uint16_t y1)
 {
-#if USE_FSMC
-  sendCMD8_FSMC(ILI9341_CASET);   // Column addr set
-  sendData32_FSMC(x0, x0);        // XSTART, XEND
+  WAIT_DMA_BSY;              // wait untill DMA transfer end
   
-  sendCMD8_FSMC(ILI9341_RASET);   // Row addr set
-  sendData32_FSMC(y0, y1);        // YSTART, YEND
+  SET_CMD();                 // writecommand:
+  SEND_DATA(ILI9341_CASET);  // Column addr set
   
-  sendCMD8_FSMC(ILI9341_RAMWR);   // write to RAM  
+  SET_DATA();                // writeData:
+  SEND_2_DATA(x0, x0);       // XSTART, XEND
   
-#else
-  wait_DMA1_SPI1_busy();
+  SET_CMD();                 // writecommand:
+  SEND_DATA(ILI9341_RASET);  // Row addr set
   
-  SET_CMD();                      // writecommand:
-  sendData8_SPI1(ILI9341_CASET);  // Column addr set
+  SET_DATA();                // writeData:
+  SEND_2_DATA(y0, y1);       // YSTART, YEND
   
-  SET_DATA();                     // writeData:
-  sendData32_SPI1(x0, x0);        // XSTART, XEND
+  SET_CMD();                 // writecommand:
+  SEND_DATA(ILI9341_RAMWR);  // write to RAM
   
-  SET_CMD();                      // writecommand:
-  sendData8_SPI1(ILI9341_RASET);  // Row addr set
-  
-  SET_DATA();                     // writeData:
-  sendData32_SPI1(y0, y1);        // YSTART, YEND
-  
-  SET_CMD();                      // writecommand:
-  sendData8_SPI1(ILI9341_RAMWR);  // write to RAM
-  
-  SET_DATA();                     // ready accept data
-#endif // USE_FSMC
+  SET_DATA();                // ready accept data
 }
 
 void setHAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1)
 {
-#if USE_FSMC
-  sendCMD8_FSMC(ILI9341_CASET);   // Column addr set
-  sendData32_FSMC(x0, x1);        // XSTART, XEND
+  WAIT_DMA_BSY;              // wait untill DMA transfer end
   
-  sendCMD8_FSMC(ILI9341_RASET);   // Row addr set
-  sendData32_FSMC(y0, y0);        // YSTART, YEND
+  SET_CMD();                 // writecommand:
+  SEND_DATA(ILI9341_CASET);  // Column addr set
   
-  sendCMD8_FSMC(ILI9341_RAMWR);   // write to RAM
+  SET_DATA();                // writeData:
+  SEND_2_DATA(x0, x1);       // XSTART, XEND
   
-#else
-  wait_DMA1_SPI1_busy();
+  SET_CMD();                 // writecommand:
+  SEND_DATA(ILI9341_RASET);  // Row addr set
   
-  SET_CMD();                      // writecommand:
-  sendData8_SPI1(ILI9341_CASET);  // Column addr set
+  SET_DATA();                // writeData:
+  SEND_2_DATA(y0, y0);       // YSTART, YEND
   
-  SET_DATA();                     // writeData:
-  sendData32_SPI1(x0, x1);        // XSTART, XEND
+  SET_CMD();                 // writecommand:
+  SEND_DATA(ILI9341_RAMWR);  // write to RAM
   
-  SET_CMD();                      // writecommand:
-  sendData8_SPI1(ILI9341_RASET);  // Row addr set
-  
-  SET_DATA();                     // writeData:
-  sendData32_SPI1(y0, y0);        // YSTART, YEND
-  
-  SET_CMD();                      // writecommand:
-  sendData8_SPI1(ILI9341_RAMWR);  // write to RAM
-  
-  SET_DATA();                     // ready accept data
-#endif // USE_FSMC
+  SET_DATA();                // ready accept data
 }
 
 void setAddrPixel(uint16_t x0, uint16_t y0)
 { 
-#if USE_FSMC
-  sendCMD8_FSMC(ILI9341_CASET);   // Column addr set
-  sendData32_FSMC(x0, x0);        // XSTART, XEND
+  WAIT_DMA_BSY;              // wait untill DMA transfer end
   
-  sendCMD8_FSMC(ILI9341_RASET);   // Row addr set
-  sendData32_FSMC(y0, y0);        // YSTART, YEND
+  SET_CMD();                 // writecommand:
+  SEND_DATA(ILI9341_CASET);  // Column addr set
   
-  sendCMD8_FSMC(ILI9341_RAMWR);   // write to RAM
+  SET_DATA();                // writeData:
+  SEND_2_DATA(x0, x0);       // XSTART, XEND
   
-#else
-  wait_DMA1_SPI1_busy();
+  SET_CMD();                 // writecommand:
+  SEND_DATA(ILI9341_RASET);  // Row addr set
   
-  SET_CMD();                      // writecommand:
-  sendData8_SPI1(ILI9341_CASET);  // Column addr set
+  SET_DATA();                // writeData:
+  SEND_2_DATA(y0, y0);       // YSTART, YEND
   
-  SET_DATA();                     // writeData:
-  sendData32_SPI1(x0, x0);        // XSTART, XEND
+  SET_CMD();                 // writecommand:
+  SEND_DATA(ILI9341_RAMWR);  // write to RAM
   
-  SET_CMD();                      // writecommand:
-  sendData8_SPI1(ILI9341_RASET);  // Row addr set
-  
-  SET_DATA();                     // writeData:
-  sendData32_SPI1(y0, y0);        // YSTART, YEND
-  
-  SET_CMD();                      // writecommand:
-  sendData8_SPI1(ILI9341_RAMWR);  // write to RAM
-  
-  SET_DATA();                     // ready accept data
-#endif // USE_FSMC
+  SET_DATA();                // ready accept data
 }
 
 void setRotation(uint8_t m)
@@ -394,7 +316,7 @@ void setAdaptiveBrightness(uint8_t value)
   */
   writeCommand(ILI9341_WRCABC);
 #if USE_FSMC
-  sendData8_FSMC(value);
+  FSMC_SEND_DATA((uint16_t)((0x00<<8)|value));
 #else
   sendData8_SPI1(value);
 #endif

@@ -33,17 +33,14 @@ POSSIBILITY OF SUCH DAMAGE.
 
 #define pgm_read_byte(addr) (*(const unsigned char *)(addr))
 
-#include <stm32f10x.h>
-#include <stm32f10x_dma.h>
-
 #include <string.h>
 #include <stdbool.h>
 #include <stdlib.h>
 
-#include <systicktimer.h>
+#include <stm32f10x.h>
 
+#include <systicktimer.h>
 #include <gfx.h>
-#include <gfxDMA.h>
 #include <fonts.h>
 
 #if USE_FSMC
@@ -336,7 +333,7 @@ void fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color)
 #if USE_FSMC
   repeatData16_Arr_FSMC(color, w*h);
 #else
-  fillColor_DMA1_SPI1(color, w*h);
+  repeatData16_DMA1_SPI1(color, w*h);
 #endif // USE_FSMC
 }
 
@@ -693,11 +690,7 @@ void drawChar(int16_t x, int16_t y, uint16_t fgcolor, uint16_t bgcolor, uint8_t 
     
     bufCount++;
     
-#if USE_FSMC
-    sendData16_Arr_FSMC(charBuffer, bufCount);
-#else
-    sendData16_Fast_DMA1_SPI1(charBuffer, bufCount);
-#endif /* USE_FSMC */
+    SEND_ARR16_FAST(charBuffer, bufCount);
   }
 }
 
@@ -808,7 +801,7 @@ void drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color)
 #if USE_FSMC
   repeatData16_Arr_FSMC(color, h);
 #else
-  fillColor_DMA1_SPI1(color, h);
+  repeatData16_DMA1_SPI1(color, h);
 #endif /* USE_FSMC */
 }
 
@@ -823,7 +816,7 @@ void drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color)
 #if USE_FSMC
   repeatData16_Arr_FSMC(color, w);
 #else
-  fillColor_DMA1_SPI1(color, w);
+  repeatData16_DMA1_SPI1(color, w);
 #endif /* USE_FSMC */
 }
 
@@ -834,7 +827,7 @@ void fillScreen(uint16_t color)
 #if USE_FSMC
   repeatData16_Arr_FSMC(color, _width * _height);
 #else
-  fillColor_DMA1_SPI1(color, _width * _height);
+  repeatData16_DMA1_SPI1(color, _width * _height);
 #endif
 }
 

@@ -1,5 +1,5 @@
-#ifndef SPRITES_H
-#define SPRITES_H
+#ifndef _SPRITES_H
+#define _SPRITES_H
 
 // -------------------------------------------------------- //
 #ifdef STM32F10X_MD
@@ -78,4 +78,4 @@ void drawSprite(uint8_t sprNum);
 
 uint8_t getSpriteCollision(uint8_t sprNum1, uint8_t sprNum2);
 
-#endif /* SPRITES_H */
+#endif /* _SPRITES_H */
