@@ -152,8 +152,11 @@
 //#define NOT_USED        0x5A
 //#define NOT_USED        0x5B
 //#define NOT_USED        0x5C
+
+
+// ------------------ Sound ----------------- //
 //#define NOT_USED        0x5D
-//#define NOT_USED        0x5E
+#define SND_PLAY_TONE   0x5E
 //#define NOT_USED        0x5F
 
 
@@ -379,11 +382,17 @@ public:
   
   
 // ----------------- SD card ---------------- //
+  void sendBaseBMP(uint16_t x, uint16_t y, uint16_t size); // Little help
   void printBMP(const char *fileName);
   void printBMP(const __FlashStringHelper* str);
   void printBMP(uint16_t x, uint16_t y, const String &str);
   void printBMP(uint16_t x, uint16_t y, const char *fileName);
   void printBMP(uint16_t x, uint16_t y, const __FlashStringHelper* str);
+  
+  
+// ------------------ Sound ----------------- //
+  void playNote(uint16_t freq, uint16_t duration);
+  
   
 // --------------- GUI commands -------------- //
   void setTextSizeGUI(uint8_t size);

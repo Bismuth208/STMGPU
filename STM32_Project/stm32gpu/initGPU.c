@@ -10,6 +10,7 @@
 #include <gfx.h>
 #include <uart.h>
 #include <memHelper.h>
+#include <tone.h>
 
 #include "gpuMain.h"
 
@@ -120,6 +121,9 @@ void init_GPU_UART(void)
 void init_GPU(void)
 {
   print(T_GPU_VERSION);
+  
+  init_Sound();
+  playNotes_Sound(startupSound);
   
   init_GPU_GPIO();
   init_GPU_UART();    // setup access to low level interface
