@@ -155,7 +155,6 @@ void init_UART1(uint32_t baud)
   SET_BIT(RCC->APB2ENR, RCC_APB2Periph_USART1);
   
   GPIO_InitTypeDef GPIO_InitStruct;
-  USART_InitTypeDef USART_InitStruct;
   
   // set PA10 as input UART (RxD)
   GPIO_InitStruct.GPIO_Pin   = GPIO_Pin_10;
@@ -169,7 +168,8 @@ void init_UART1(uint32_t baud)
   GPIO_InitStruct.GPIO_Mode  = GPIO_Mode_AF_PP;
   GPIO_Init(GPIOA, &GPIO_InitStruct);
   
-  
+  // setup UART1
+  USART_InitTypeDef USART_InitStruct;
   USART_InitStruct.USART_BaudRate            = baud;
   USART_InitStruct.USART_WordLength          = USART_WordLength_8b;
   USART_InitStruct.USART_StopBits            = USART_StopBits_1;
@@ -177,12 +177,12 @@ void init_UART1(uint32_t baud)
   USART_InitStruct.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
   USART_InitStruct.USART_Mode                = (USART_Mode_Rx | USART_Mode_Tx);
   
-  USART_Init(USART1, &USART_InitStruct);
-  USART_ITConfig(USART1, USART_IT_RXNE, ENABLE);
-  USART_Cmd(USART1, ENABLE);
+  USART_Init(USART1, &USART_InitStruct);        // apply settings
+  USART_ITConfig(USART1, USART_IT_RXNE, ENABLE);// eneble IRQ
+  USART_Cmd(USART1, ENABLE);                    // no comment
   
+  //setup NVIC for USART IRQ Channel
   NVIC_InitTypeDef NVIC_InitStructure;
-  //Enable USART IRQ Channel
   NVIC_InitStructure.NVIC_IRQChannel = USART1_IRQn;
   NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
   NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;

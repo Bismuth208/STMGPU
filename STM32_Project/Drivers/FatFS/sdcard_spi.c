@@ -27,7 +27,6 @@ hwif hw;
 
 //===========================================================================//
 
-
 void sd_spi_init(void)
 {
   GPIO_InitTypeDef GPIO_InitStructure;
@@ -50,7 +49,6 @@ void sd_spi_init(void)
   GPIO_InitStructure.GPIO_Pin   = GPIO_Pin_SPI_SD_MISO;
   GPIO_InitStructure.GPIO_Mode  = GPIO_Mode_IPU;
   GPIO_Init(GPIO_SPI_SD, &GPIO_InitStructure);
-  
   
   /* SPI configuration */
   SPI_InitStructure.SPI_Direction = SPI_Direction_2Lines_FullDuplex;
@@ -152,11 +150,11 @@ u32 spi_txrx32(uint32_t data)
 
 void spi_txrxArr(u8 *buf, u16 len, u8 data)
 {
-  for (u16 i=0; i<len; i++) {
+  while(len--) {
     SPI_SD->DR = data;
     WAIT_FOR_RX;
     
-    buf[i] = SPI_SD->DR;
+    *buf++ = SPI_SD->DR;
   }
 }
 
@@ -199,12 +197,10 @@ u16 crc16_ccitt(u16 crc, u8 ser_data)
 
 u16 crc16(const u8 *p, int len)
 {
-  int i;
   u16 crc = 0;
-  
-  for (i=0; i<len; i++)
-    crc = crc16_ccitt(crc, p[i]);
-  
+  while(len--) {
+    crc = crc16_ccitt(crc, *p++);
+  }
   return crc;
 }
 
@@ -504,8 +500,9 @@ int sd_get_data(hwif *hw, u8 *buf, int len)
   int tries = 20000;
   u8 r;
   u16 _crc16;
+#if CALC_CRC16CCITT
   u16 calc_crc;
-  
+#endif
   while (tries--) {
     r = spi_txrx(0xff);
     if (r == 0xfe)
@@ -518,10 +515,12 @@ int sd_get_data(hwif *hw, u8 *buf, int len)
  
   _crc16 = spi_txrx16(0xffff);
 
+#if CALC_CRC16CCITT
   calc_crc = crc16(buf, len);
   if (_crc16 != calc_crc) {
     return -1;
   }
+#endif
   
   return 0;
 }
@@ -660,14 +659,9 @@ int sd_readsector(hwif *hw, u32 address, u8 *buf)
     sd_cmd(17, address*512); /* read single block */
   
   r = sd_get_r1();
-  if (r == 0xff) {
+  if ((r == 0xff) || (r & 0xfe)) {
     spi_cs_high();
     r = -1;
-    return r;
-  }
-  if (r & 0xfe) {
-    spi_cs_high();
-    r = -2;
     return r;
   }
   

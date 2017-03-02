@@ -11,15 +11,16 @@
 #include <stm32f10x.h>
 
 #include <gfx.h>
-#include <gfxDMA.h>
 #include <uart.h>
 #include <memHelper.h>
+#include <tone.h>
 
 #include "gpuMain.h"
 #include "sdLoader.h"
 #include "gpuTiles.h"
 #include "sprites.h"
 #include "gui.h"
+#include "raycast.h"
 
 //===========================================================================//
 
@@ -479,6 +480,27 @@ __noreturn void run_GPU(void)
         //memset_DMA1(cmdBufferStr, 0x00, MAX_TEXT_SIZE);
       } break;
       
+      /*
+      case LDD_SND_FIL: {
+        waitCutBuf_UART1(cmdBufferStr, waitCutByte_UART1()); // get file name
+        
+        SDLoadSoundPattern(cmdBufferStr);
+      } break;
+      */      
+      
+      // ------------------ Sound ----------------- //
+      
+      case SND_PLAY_TONE: {
+        waitCutpBuf_UART1(4);
+        
+        playNote_Sound(cmdBuffer.par1, cmdBuffer.par2);
+      } break;
+      
+      /*
+      case SND_PLAY_BUF: {
+        playBuf_Sound(waitCutByte_UART1()); // play specified sound pattern
+      } break;
+      */
       
       // --------------- GUI commands -------------- //
 
@@ -513,6 +535,27 @@ __noreturn void run_GPU(void)
         drawTextWindowGUI(cmdBuffer.par1, cmdBuffer.par2, cmdBuffer.par3, cmdBuffer.par4, cmdBufferStr);
         memset(cmdBufferStr, 0x00, MAX_TEXT_SIZE);
       } break;
+      
+      
+      
+      // --------------- '3D' engine --------------- //
+      
+      case RENDER_MAP: {
+        render();
+      } break;
+      
+      case MOVE_CAMERA: {
+        moveCamera(waitCutByte_UART1());        
+      } break;
+      
+      /*
+      case SET_CAM_POS: {
+        waitCutBuf_UART1(x);
+        
+        setCameraPosition(uint16_t posX, uint16_t posY, uint16_t angle);
+      } break;
+      */
+      
       
       // -------------  TO DO: ---------- //
       /*

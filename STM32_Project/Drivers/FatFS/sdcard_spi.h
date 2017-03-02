@@ -37,13 +37,10 @@
 #define SPI_BaudRatePrescaler_SPI_SD  SPI_BaudRatePrescaler_2
 
 
-//#define spi_cs_low() do { GPIO_SPI_SD_CS->BRR = GPIO_Pin_SPI_SD_CS; } while (0)
-//#define spi_cs_high() do { GPIO_SPI_SD_CS->BSRR = GPIO_Pin_SPI_SD_CS; } while (0)
-  
 #define spi_cs_low() (GPIO_SPI_SD_CS->BRR = GPIO_Pin_SPI_SD_CS);
 #define spi_cs_high() (GPIO_SPI_SD_CS->BSRR = GPIO_Pin_SPI_SD_CS);
     
-#define WAIT_FOR_RX while ((SPI_SD->SR & SPI_I2S_FLAG_RXNE) == 0)
+#define WAIT_FOR_RX while((SPI_SD->SR & SPI_I2S_FLAG_RXNE) == 0)
   
   
 #define CAP_VER2_00	(1<<0)
@@ -51,6 +48,9 @@
   
   
 #define sd_get_r3 sd_get_r7
+
+// set to 0 to remove CRC Check by CRC16CCITT standart
+#define CALC_CRC16CCITT 0 
   
 /*---------------------------------------*/
   

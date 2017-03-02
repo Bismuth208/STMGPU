@@ -202,7 +202,7 @@
 // ----------------- SD card ---------------- //
 #define LDD_USR_PAL     0x50    // load user palette from SD card
 #define DRW_BMP_FIL     0x51    // draw bmp file located on SD card
-//#define NOT_USED        0x52
+#define LDD_SND_FIL     0x52    // load sound file
 //#define NOT_USED        0x53
 //#define NOT_USED        0x54
 //#define NOT_USED        0x55
@@ -211,11 +211,13 @@
 //#define NOT_USED        0x58 // make screenshot to SD card
 //#define NOT_USED        0x59
 //#define NOT_USED        0x5A
-//#define NOT_USED        0x5B
+//#define NOT_USED        0x5B 
+
+// ------------------ Sound ----------------- //
 //#define NOT_USED        0x5C
 //#define NOT_USED        0x5D
-//#define NOT_USED        0x5E
-//#define NOT_USED        0x5F
+#define SND_PLAY_TONE   0x5E
+#define SND_PLAY_BUF    0x5F
 
 
 // --------------- GUI commands -------------- //
@@ -227,10 +229,13 @@
 //#define DRW_BTN_NUM     0x65    // draw numerated buttons
 //#define NOT_USED        0x66
 //#define NOT_USED        0x67
-//#define NOT_USED        0x68
-//#define NOT_USED        0x69
-//#define NOT_USED        0x6A
-//#define NOT_USED        0x6B
+
+
+// --------------- '3D' engine --------------- //
+#define RENDER_MAP        0x68
+#define MOVE_CAMERA       0x69
+#define SET_CAM_POS       0x6A
+//#define RENDER_BCKGRND    0x6B  // render background; sky, floor
 //#define NOT_USED        0x6C
 //#define NOT_USED        0x6D
 //#define NOT_USED        0x6E

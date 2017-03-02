@@ -2,7 +2,6 @@
 #include <stm32f10x.h>
 
 #include <gfx.h>
-#include <gfxDMA.h>
 
 #if USE_FSMC
  #include <fsmcdrv.h>
@@ -12,7 +11,9 @@
 #include <memHelper.h>
 
 #include "gpuTiles.h"
+//#include "raycast.h"
 #include "nesPalette_ext.h"
+#include "STMsGPU_Palette.h"
 
 // -------------------------------------------------------- //
 
@@ -51,6 +52,9 @@ void loadDefaultPalette(void)
 {
   // 80 colors and each 2 byte in size
   memcpy32(currentPaletteArr, nesPalette_ext, 160);
+  
+  // 234 colors and each 2 byte in size
+  //memcpy32(currentPaletteArr, STMsGPU_234palette, STMSGPU_PALETTE*2);
 }
 
 #if 0
@@ -158,11 +162,7 @@ void drawTile8x8(void *tile)
   
   // on oscilloscope this one reduce few uS
   setSqAddrWindow(posX, posY, TILE_8x8_WINDOW_SIZE);
-#if USE_FSMC
-  sendData16_Arr_FSMC(lastTile8x8, TILE_ARR_8X8_SIZE);
-#else
-  sendData16_Fast_DMA1_SPI1(lastTile8x8, TILE_ARR_8X8_SIZE);
-#endif
+  SEND_ARR16_FAST(lastTile8x8, TILE_ARR_8X8_SIZE);
 }
 
 void drawTile16x16(void *tile)
@@ -187,11 +187,7 @@ void drawTile16x16(void *tile)
   
   // on oscilloscope this one reduce few uS
   setSqAddrWindow(posX, posY, TILE_16x16_WINDOW_SIZE);
-#if USE_FSMC
-  sendData16_Arr_FSMC(lastTile16x16, TILE_ARR_16X16_SIZE);
-#else
-  sendData16_Fast_DMA1_SPI1(lastTile16x16, TILE_ARR_16X16_SIZE);
-#endif
+  SEND_ARR16_FAST(lastTile16x16, TILE_ARR_16X16_SIZE);
 }
 
 
@@ -218,11 +214,7 @@ void drawTile32x32(void *tile)
   
   // on oscilloscope this one reduce few uS
   setSqAddrWindow(posX, posY, TILE_32x32_WINDOW_SIZE);
-#if USE_FSMC
-  sendData16_Arr_FSMC(lastTile32x32, TILE_ARR_32X32_SIZE);
-#else
-  sendData16_Fast_DMA1_SPI1(lastTile32x32, TILE_ARR_32X32_SIZE);
-#endif
+  SEND_ARR16_FAST(lastTile32x32, TILE_ARR_32X32_SIZE);
 }
 #endif /* STM32F10X_HD */
 
