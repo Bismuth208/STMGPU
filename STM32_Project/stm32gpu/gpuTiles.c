@@ -11,7 +11,7 @@
 #include <memHelper.h>
 
 #include "gpuTiles.h"
-//#include "raycast.h"
+#include "raycast.h"
 #include "nesPalette_ext.h"
 #include "STMsGPU_Palette.h"
 
@@ -55,6 +55,8 @@ void loadDefaultPalette(void)
   
   // 234 colors and each 2 byte in size
   //memcpy32(currentPaletteArr, STMsGPU_234palette, STMSGPU_PALETTE*2);
+  
+  setRayCastPalette(currentPaletteArr);
 }
 
 #if 0

@@ -541,7 +541,7 @@ __noreturn void run_GPU(void)
       // --------------- '3D' engine --------------- //
       
       case RENDER_MAP: {
-        render();
+        renderWalls();
       } break;
       
       case MOVE_CAMERA: {

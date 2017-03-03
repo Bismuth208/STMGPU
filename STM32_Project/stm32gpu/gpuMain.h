@@ -236,9 +236,9 @@
 #define MOVE_CAMERA       0x69
 #define SET_CAM_POS       0x6A
 //#define RENDER_BCKGRND    0x6B  // render background; sky, floor
-//#define NOT_USED        0x6C
-//#define NOT_USED        0x6D
-//#define NOT_USED        0x6E
+#define SET_RENDER_QA     0x6C  // set render quality
+#define SET_TEXTURE_MODE  0x6D  // 16x16 or 32x32(pro only)
+#define SET_TEXTURE_ID_M  0x6E  // set textures for map level
 //#define NOT_USED        0x6F
 
 // ---------------- NOT_USED ---------------- //
