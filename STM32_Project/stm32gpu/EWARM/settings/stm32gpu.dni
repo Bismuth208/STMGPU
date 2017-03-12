@@ -23,7 +23,7 @@ ShowSource=1
 Freq=10000000
 MultiCoreRunAll=1
 [stlink]
-stlinkserialNo=B7AE3E0E
+stlinkserialNo=EE5626A6
 stlinkfoundProbes=
 [Exceptions]
 StopOnUncaught=_ 0
@@ -46,7 +46,7 @@ ITMportsTermIO=0
 ITMportsLogFile=0
 ITMlogFile=$PROJ_DIR$\ITM.log
 [DebugChecksum]
-Checksum=-1370001639
+Checksum=-2003660112
 [CodeCoverage]
 Enabled=_ 0
 [CallStack]
@@ -96,7 +96,8 @@ LogFile=_ ""
 [Disassemble mode]
 mode=0
 [Breakpoints2]
-Count=0
+Bp0=_ 0 "EMUL_DATA" "colorId" 0 0 0 0 4294967295
+Count=1
 [Aliases]
 Count=0
 SuppressDialog=0

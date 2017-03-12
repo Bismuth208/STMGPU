@@ -22,9 +22,9 @@ int16_t _width  = ILI9341_TFTWIDTH;
 int16_t _height = ILI9341_TFTHEIGHT;
 
 
-uint8_t curBrightnessValue = 0xff; // max value
+uint16_t curBrightnessValue = 0xff; // max value
 #if USE_USER_FUNCTION
-uint8_t newBrightnessValue = 0xff; // max value
+uint16_t newBrightnessValue = 0xff; // max value
 uint8_t stepBrightnessValue =0;
 uint8_t dirBrightnessFade =0;
 #endif
@@ -112,7 +112,8 @@ void init_LCDBacklight()
   TIM_TimeBaseInitTypeDef timer4Init;
   timer4Init.TIM_CounterMode = TIM_CounterMode_Up;        /* Select the Counter Mode */
   timer4Init.TIM_Period =  1000;                          /* Set the Autoreload value */
-  timer4Init.TIM_Prescaler =  SystemCoreClock / 4000000;  /* Set the Prescaler value */
+  timer4Init.TIM_Prescaler =  SystemCoreClock / 400000;  /* Set the Prescaler value */
+  timer4Init.TIM_ClockDivision = TIM_CKD_DIV1;
   TIM_ARRPreloadConfig(TIM4, ENABLE);                     /* Set the ARR Preload Bit */
   TIM_TimeBaseInit(TIM4, &timer4Init);                    // apply and generate update event to reload prescaler value immediately
   
@@ -123,6 +124,8 @@ void init_LCDBacklight()
   timer4OC1init.TIM_Pulse = 500;                          /* Set the Capture Compare Register value */
   TIM_OC1PreloadConfig(TIM4, TIM_OCPreload_Enable);       /* Enable the Output Compare Preload feature */
   TIM_OC1Init(TIM4, &timer4OC1init);                      // apply and TIM4 CH1 output compare enable
+  
+  TIM_Cmd(TIM4, ENABLE);
 }
 
 void initLCD(void)
@@ -135,7 +138,7 @@ void initLCD(void)
 #endif
   initTFT_GPIO();
   
-  //init_LCDBacklight();
+  init_LCDBacklight();
   
   SET_TFT_RES_LOW;
   GRAB_TFT_CS;   // maybe remove this? And connect CS to Vcc?
@@ -342,7 +345,7 @@ void setIdleMode(bool mode)
   }
 }
 
-void setDispBrightness(uint8_t brightness)
+void setDispBrightness(uint16_t brightness)
 {
   /*
   writeCommand(ILI9341_WRDBR);
@@ -365,8 +368,8 @@ void makeFadeBrightness(void)
     if(curBrightnessValue >= newBrightnessValue) {
       disableRunTime = true;;
     } else {
-      if((curBrightnessValue + stepBrightnessValue) > 0xff) {
-        curBrightnessValue = 0xff;
+      if((curBrightnessValue + stepBrightnessValue) > 0xffff) {
+        curBrightnessValue = 0xffff;
         disableRunTime = true;
       } else {
         curBrightnessValue += stepBrightnessValue;
@@ -394,7 +397,7 @@ void makeFadeBrightness(void)
   TIM4->CCR2 = TIM4->ARR >> 1; // set 50% duty cycle
 }
 
-void setDispBrightnessFade(uint8_t dir, uint8_t newValue, uint8_t step)
+void setDispBrightnessFade(uint8_t dir, uint16_t newValue, uint8_t step)
 {
   dirBrightnessFade = dir;
   newBrightnessValue = newValue;

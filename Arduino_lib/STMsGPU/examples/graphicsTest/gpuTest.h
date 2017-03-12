@@ -55,7 +55,7 @@ void (*pArrExecGFXFunc[])(void) = {
 #define FUNC_TO_TEST_COUNT (sizeof(pArrExecGFXFunc)/sizeof(pArrExecGFXFunc[0]))
 
 // --------------------------------------------------------- //
-#define MAX_SPEED 0 
+#define MAX_SPEED 1 
 
 // can save ROM and increase speed, but its unfair!
 // use it if you know end resolution

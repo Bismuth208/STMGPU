@@ -38,6 +38,7 @@ void init_Sound(void)
   timer3Init.TIM_CounterMode = TIM_CounterMode_Up;        /* Select the Counter Mode */
   timer3Init.TIM_Period =  1000;                          /* Set the Autoreload value */
   timer3Init.TIM_Prescaler =  SystemCoreClock / 4000000;  /* Set the Prescaler value */
+  timer3Init.TIM_ClockDivision = TIM_CKD_DIV1;
   TIM_ARRPreloadConfig(TIM3, ENABLE);                     /* Set the ARR Preload Bit */
   TIM_TimeBaseInit(TIM3, &timer3Init);                    // apply and generate update event to reload prescaler value immediately
   

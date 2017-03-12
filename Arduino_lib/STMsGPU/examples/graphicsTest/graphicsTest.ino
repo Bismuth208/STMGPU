@@ -374,7 +374,6 @@ void loop() {
   uint8_t testsCount = FUNC_TO_TEST_COUNT;
 
   for (uint8_t count = 0; count < testsCount; count++) {
-    //(*pArrExecGFXFunc+count)(); // exec test function
     pArrExecGFXFunc[count](); // exec test function
 
     delay(1000); // little delay to see what happend on screen

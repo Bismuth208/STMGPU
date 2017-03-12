@@ -153,7 +153,7 @@
 #define TFT_DC_PIN      GPIO_Pin_11     //DC
 #define TFT_RES_PIN     GPIO_Pin_1      //RES on PB1 (pro and mini)
 
-#define LCD_BACKLIGHT_PIN  GPIO_Pin_5
+#define LCD_BACKLIGHT_PIN  GPIO_Pin_6
 #define BACKLIGHT_GPIO     GPIOB
 
 #define GPIO_SET_PIN(GPIOx, GPIO_Pin)     GPIOx->BSRR = GPIO_Pin;
@@ -351,8 +351,8 @@ static const uint8_t initSequence[] = {
   uint16_t scrollScreenSmooth(uint16_t lines, uint16_t yStart, uint8_t wait);
   void setSleep(bool enable);
   void setIdleMode(bool mode);
-  void setDispBrightness(uint8_t brightness);
-  void setDispBrightnessFade(uint8_t dir, uint8_t newValue, uint8_t step);
+  void setDispBrightness(uint16_t brightness);
+  void setDispBrightnessFade(uint8_t dir, uint16_t newValue, uint8_t step);
   void setInvertion(bool i);
   void setAdaptiveBrightness(uint8_t value);
   //void setGamma(uint8_t gamma);

@@ -2175,11 +2175,23 @@
       <file>
         <name>$PROJ_DIR$\..\..\Drivers\gfx_tft\gfx.h</name>
       </file>
+    </group>
+    <group>
+      <name>RaycasterEngine</name>
       <file>
-        <name>$PROJ_DIR$\..\..\Drivers\gfx_tft\gfxDMA.c</name>
+        <name>$PROJ_DIR$\..\..\Drivers\raycasterEngine\raycast.c</name>
       </file>
       <file>
-        <name>$PROJ_DIR$\..\..\Drivers\gfx_tft\gfxDMA.h</name>
+        <name>$PROJ_DIR$\..\..\Drivers\raycasterEngine\raycast.h</name>
+      </file>
+    </group>
+    <group>
+      <name>Sound</name>
+      <file>
+        <name>$PROJ_DIR$\..\..\Drivers\sound\tone.c</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\..\Drivers\sound\tone.h</name>
       </file>
     </group>
     <group>
@@ -2228,6 +2240,9 @@
       </file>
       <file>
         <name>$PROJ_DIR$\..\stm_gpu_nes_tilesMap.h</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\STMsGPU_Palette.h</name>
       </file>
     </group>
     <group>
@@ -2311,6 +2326,9 @@
         <name>$PROJ_DIR$\..\..\Drivers\STM32F10x_StdPeriph_Driver\inc\stm32f10x_spi.h</name>
       </file>
       <file>
+        <name>$PROJ_DIR$\..\..\Drivers\STM32F10x_StdPeriph_Driver\inc\stm32f10x_tim.h</name>
+      </file>
+      <file>
         <name>$PROJ_DIR$\..\..\Drivers\STM32F10x_StdPeriph_Driver\inc\stm32f10x_usart.h</name>
       </file>
     </group>
@@ -2339,6 +2357,9 @@
       </file>
       <file>
         <name>$PROJ_DIR$\..\..\Drivers\STM32F10x_StdPeriph_Driver\src\stm32f10x_spi.c</name>
+      </file>
+      <file>
+        <name>$PROJ_DIR$\..\..\Drivers\STM32F10x_StdPeriph_Driver\src\stm32f10x_tim.c</name>
       </file>
       <file>
         <name>$PROJ_DIR$\..\..\Drivers\STM32F10x_StdPeriph_Driver\src\stm32f10x_usart.c</name>
