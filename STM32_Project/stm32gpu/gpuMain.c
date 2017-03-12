@@ -14,13 +14,13 @@
 #include <uart.h>
 #include <memHelper.h>
 #include <tone.h>
+#include <raycast.h>
 
 #include "gpuMain.h"
 #include "sdLoader.h"
 #include "gpuTiles.h"
 #include "sprites.h"
 #include "gui.h"
-#include "raycast.h"
 
 //===========================================================================//
 
@@ -230,6 +230,12 @@ __noreturn void run_GPU(void)
       
       // ---------------- Low Level --------------- //
       
+      case SET_BRGHTNS_F: {
+        waitCutpBuf_UART1(3);
+        
+        setDispBrightnessFade(cmdBuffer.data[0], cmdBuffer.data[1], cmdBuffer.data[2]);
+      };
+      
       case SET_ADR_WIN: {
         waitCutpBuf_UART1(8);
         
@@ -317,7 +323,7 @@ __noreturn void run_GPU(void)
         waitCutBuf_UART1(cmdBufferStr, cmdBuffer.data[0]);
         
         setBusyStatus(1);
-        SDLoadTile8x8(cmdBufferStr, &cmdBuffer.data[1]);
+        SDLoadTile(cmdBufferStr, &cmdBuffer.data[1], TILE_8_BASE_SIZE, TILES_NUM_8x8);
         memset(cmdBufferStr, 0x00, MAX_TEXT_SIZE);
       } break;
       
@@ -329,7 +335,7 @@ __noreturn void run_GPU(void)
         waitCutBuf_UART1(cmdBufferStr, cmdBuffer.data[0]);
         
         setBusyStatus(1);
-        SDLoadTileSet8x8(cmdBufferStr, &cmdBuffer.data[1]);
+        SDLoadTileSet(cmdBufferStr, &cmdBuffer.data[1], TILE_8_BASE_SIZE, TILES_NUM_8x8);
         memset(cmdBufferStr, 0x00, MAX_TEXT_SIZE);
       } break;
       
@@ -348,7 +354,7 @@ __noreturn void run_GPU(void)
         waitCutBuf_UART1(cmdBufferStr, cmdBuffer.data[0]);
         
         setBusyStatus(1);
-        SDLoadTile16x16(cmdBufferStr, &cmdBuffer.data[1]);
+        SDLoadTile(cmdBufferStr, &cmdBuffer.data[1], TILE_16_BASE_SIZE, TILES_NUM_16x16);
         memset(cmdBufferStr, 0x00, MAX_TEXT_SIZE);
       } break;
       
@@ -360,7 +366,7 @@ __noreturn void run_GPU(void)
         waitCutBuf_UART1(cmdBufferStr, cmdBuffer.data[0]);
         
         setBusyStatus(1);
-        SDLoadTileSet16x16(cmdBufferStr, &cmdBuffer.data[1]);
+        SDLoadTileSet(cmdBufferStr, &cmdBuffer.data[1], TILE_16_BASE_SIZE, TILES_NUM_16x16);
         memset(cmdBufferStr, 0x00, MAX_TEXT_SIZE);
       } break;
       
@@ -379,7 +385,7 @@ __noreturn void run_GPU(void)
         waitCutBuf_UART1(cmdBufferStr, cmdBuffer.data[0]);
         
         setBusyStatus(1);
-        SDLoadTile32x32(cmdBufferStr, &cmdBuffer.data[1]);
+        SDLoadTile(cmdBufferStr, &cmdBuffer.data[1], TILE_32_BASE_SIZE, TILES_NUM_32x32);
         memset(cmdBufferStr, 0x00, MAX_TEXT_SIZE);
       } break;
       
@@ -391,7 +397,7 @@ __noreturn void run_GPU(void)
         waitCutBuf_UART1(cmdBufferStr, cmdBuffer.data[0]);
         
         setBusyStatus(1);
-        SDLoadTileSet32x32(cmdBufferStr, &cmdBuffer.data[1]);
+        SDLoadTileSet(cmdBufferStr, &cmdBuffer.data[1], TILE_32_BASE_SIZE, TILES_NUM_32x32);
         memset(cmdBufferStr, 0x00, MAX_TEXT_SIZE);
       } break;
       

@@ -18,18 +18,14 @@ typedef struct  {
   uint8_t tileMax;
 } tileParam_t;
 
+// a pointer to function returning pointer to tile array uint8_t*, 
+// and accepted uint8_t as nuber of tile array
+typedef uint8_t *(*pfGetFunc_t)(uint8_t);
+
 void init_sdCard(void);
 
-void SDLoadTile8x8(void *fileName, uint8_t *pData);
-void SDLoadTileSet8x8(void *fileName, uint8_t *pData);
-
-void SDLoadTile16x16(void *fileName, uint8_t *pData);
-void SDLoadTileSet16x16(void *fileName, uint8_t *pData);
-
-#ifdef STM32F10X_HD
-void SDLoadTile32x32(void *fileName, uint8_t *pData);
-void SDLoadTileSet32x32(void *fileName, uint8_t *pData);
-#endif
+void SDLoadTile(void *fileName, uint8_t *pData, uint16_t tleBaseSize, uint16_t tlesNumSize);
+void SDLoadTileSet(void *fileName, uint8_t *pData, uint16_t tleBaseSize, uint16_t tlesNumSize);
 
 void SDLoadTileMap(void *fileName);
 void SDLoadPalette(void *fileName);

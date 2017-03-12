@@ -17,7 +17,7 @@
 
 //===========================================================================//
 
-#define MAX_TEXT_SIZE   256
+#define MAX_TEXT_SIZE   192
 #define SYNC_SEQUENCE   0x42DD
 #define SYNC_OK         0xCC
 
@@ -134,10 +134,9 @@
 //#define NOT_USED        0x1C
 //#define NOT_USED        0x1D
 //#define NOT_USED        0x1E
-//#define NOT_USED        0x1F
-
 
 // ---------------- Low Level --------------- //
+#define SET_BRGHTNS_F   0x1F    // setDispBrightnessFade()
 #define SET_ADR_WIN     0x20
 #define SET_ROTATION    0x21
 #define SET_SCRL_AREA   0x22
