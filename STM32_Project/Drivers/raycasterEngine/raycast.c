@@ -19,8 +19,8 @@
 #include "raycast.h"
 
 // ---------------------------------- //
-float px =  70.0f;
-float py = 170.0f;
+float px =  50.0f;
+float py = 150.0f;
 float pa = -PI_1_2_NUM;
 // ---------------------------------- //
 
@@ -43,13 +43,14 @@ uint8_t *pLevel;
 // in texture mode == 1 drawed textures 16x16px
 // in texture mode == 2 drawed textures 32x32px
 //uint8_t textureMode = 1;
-uint8_t mapTextureId[MAP_TEXTURES_NUM_MAX] = {0};
+//uint8_t mapTextureId[MAP_TEXTURES_NUM_MAX] = {0};
 
 #define TLE_SIZE        256
 #define TILE_NUM_SIZE   10
-uint8_t (*pTileArray)[TILE_NUM_SIZE][TLE_SIZE];
+uint8_t *pTileArray;
 
 bool yAxisWall = false;
+bool checkWallCollision = true;
 
 float textureSizeOffset = TEXTURE_SIZE_OFF; // default value 0.8 (16x)
 uint8_t textureSize = TEXTURE_SIZE; // default value 16x
@@ -182,7 +183,7 @@ const uint8_t adamant_cube16x16_data[] = {
   0x0d, 0x0d, 0x0d, 0x0d
 };
 
-// all textures have size 64x64
+// all textures have size 16x16
 const uint8_t *textures[] =
 {
   //0, // no texture
@@ -223,7 +224,7 @@ const uint8_t level[] = {
   1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1,1
 };
 
- // -------------------------------------------------------------------- //
+// -------------------------------------------------------------------- //
 
 
 void castRay(float x, float y, float angle, uint16_t slicePosX, slice_t *result)
@@ -271,16 +272,13 @@ void castRay(float x, float y, float angle, uint16_t slicePosX, slice_t *result)
     yNext_y -= y;
     yNext_l = yNext_y * oneOverSine;
     
-    if( xNext_l < yNext_l )
-    {
+    if( xNext_l < yNext_l ) {
       yAxisWall = true;
       xNext_y = xNext_l * sine;
       blockX += stepX;
       x += xNext_x;
       y += xNext_y;
-    }
-    else
-    {
+    } else {
       yAxisWall = false;
       yNext_x = yNext_l * cosine;
       blockY += stepY;
@@ -315,6 +313,7 @@ void drawSlice( uint16_t screenX, slice_t *slice )
   
   uint16_t sliceYcount =0;
   uint8_t colorId =0;
+  //uint8_t colorIdInt =0;
   uint16_t textureYOffset =0;
   
   for(; sliceYcount < slice->sliceHeight && sliceYcount < RENDER_W_HEIGHT; sliceYcount++) {
@@ -323,8 +322,9 @@ void drawSlice( uint16_t screenX, slice_t *slice )
     
     // -1 mean normal number in tile RAM, in RAM tiles are located from 0
     // i.e. 0(no texture) not allowed
-    //colorId = (*pTileArray)[slice->textureId-1][slice->textureOffset*textureSize + textureYOffset];
-    colorId = textures[slice->textureId-1][slice->textureOffset*textureSize + textureYOffset];
+    colorId = pTileArray[((slice->textureId-1)*(TLE_SIZE)) + (slice->textureOffset*textureSize + textureYOffset)];
+    //colorId = pTileArray[0][slice->textureId-1][slice->textureOffset*textureSize + textureYOffset];
+    //colorIdInt = textures[slice->textureId-1][slice->textureOffset*textureSize + textureYOffset];
     
     if(yAxisWall) {
       sliceDMABuf[sliceYcount] = SHADOW_Y_SIDE(pCurrenPal[colorId]);
@@ -334,7 +334,7 @@ void drawSlice( uint16_t screenX, slice_t *slice )
   }
   
   setVAddrWindow(OFFSET_X+screenX, OFFSET_Y+offsetY, OFFSET_Y+offsetY+sliceYcount);
-  sendData16_Fast_DMA1_SPI1(sliceDMABuf, sliceYcount);
+  SEND_ARR16_FAST(sliceDMABuf, sliceYcount);
 }
 
 bool shouldInterpolate(slice_t *sliceA, slice_t *sliceB)
@@ -350,50 +350,38 @@ bool shouldInterpolate(slice_t *sliceA, slice_t *sliceB)
   return false;
 }
 
-void fastClearWindow(void)
-{
-  setAddrWindow(OFFSET_X+0, OFFSET_Y+0, RENDER_W_WIDTH-1, RENDER_W_HEIGHT-1);
-  
-#if USE_FSMC
-  repeatData16_Arr_FSMC(COLOR_BLACK, RENDER_W_WIDTH*RENDER_W_HEIGHT);
-#else
-  repeatData16_DMA1_SPI1(COLOR_BLACK,RENDER_W_WIDTH*RENDER_W_HEIGHT);
-#endif // USE_FSMC
-}
-
 void applyMove(float dx, float dy)
 {
   px += dx;
   py += dy;
   
-  /*
-   // Collision detection.  Still glitchy.
-   uint16_t testA = (uint16_t)( ( px - HIT_WIDTH ) / BLOCK_SIZE_F );
-   uint16_t testB = (uint16_t)( ( py - HIT_WIDTH ) / BLOCK_SIZE_F );
-   uint16_t testC = (uint16_t)( ( py + HIT_WIDTH ) / BLOCK_SIZE_F );
-   if( pgm_read_byte( &level[ testA + MAP_WIDTH * testB ] ) || pgm_read_byte( &level[ testA + MAP_WIDTH * testC ] ) ) {
-   px = (float)( testA + 1 ) * BLOCK_SIZE_F + HIT_WIDTH;
-   }
-   
-   testA = (uint16_t)( ( px + HIT_WIDTH ) / BLOCK_SIZE_F );
-   if( pgm_read_byte( &level[ testA + MAP_WIDTH * testB ] ) || pgm_read_byte( &level[ testA + MAP_WIDTH * testC ] ) ) {
-   px = (float)( testA ) * BLOCK_SIZE_F - HIT_WIDTH;
-   }
-   */
-  
-  /*
-   testA = (uint16_t)( ( py - HIT_WIDTH ) / BLOCK_SIZE_F );
-   testB = (uint16_t)( ( px - HIT_WIDTH ) / BLOCK_SIZE_F );
-   testC = (uint16_t)( ( px + HIT_WIDTH ) / BLOCK_SIZE_F );
-   if( pgm_read_byte( &level[ testB + MAP_WIDTH * testA ] ) || pgm_read_byte( &level[ testC + MAP_WIDTH * testA ] ) ) {
-   py = (float)( testA + 1 ) * BLOCK_SIZE_F + HIT_WIDTH;
-   }
-   
-   testA = (uint16_t)( ( py + HIT_WIDTH ) / BLOCK_SIZE_F );
-   if( pgm_read_byte( &level[ testB + MAP_WIDTH * testA ] ) || pgm_read_byte( &level[ testC + MAP_WIDTH * testA ] ) ) {
-   py = (float)( testA ) * BLOCK_SIZE_F - HIT_WIDTH;
-   }
-   */
+  if(checkWallCollision) {
+    // Collision detection.  Still glitchy.
+    uint16_t testA = (uint16_t)( ( px - HIT_WIDTH ) / BLOCK_SIZE_F );
+    uint16_t testB = (uint16_t)( ( py - HIT_WIDTH ) / BLOCK_SIZE_F );
+    uint16_t testC = (uint16_t)( ( py + HIT_WIDTH ) / BLOCK_SIZE_F );
+    if( ( level[ testA + MAP_WIDTH * testB ] ) || ( level[ testA + MAP_WIDTH * testC ] ) ) {
+      px = (float)( testA + 1 ) * BLOCK_SIZE_F + HIT_WIDTH;
+    }
+    
+    testA = (uint16_t)( ( px + HIT_WIDTH ) / BLOCK_SIZE_F );
+    if( ( level[ testA + MAP_WIDTH * testB ] ) || ( level[ testA + MAP_WIDTH * testC ] ) ) {
+      px = (float)( testA ) * BLOCK_SIZE_F - HIT_WIDTH;
+    }
+    
+    
+    testA = (uint16_t)( ( py - HIT_WIDTH ) / BLOCK_SIZE_F );
+    testB = (uint16_t)( ( px - HIT_WIDTH ) / BLOCK_SIZE_F );
+    testC = (uint16_t)( ( px + HIT_WIDTH ) / BLOCK_SIZE_F );
+    if( ( level[ testB + MAP_WIDTH * testA ] ) || ( level[ testC + MAP_WIDTH * testA ] ) ) {
+      py = (float)( testA + 1 ) * BLOCK_SIZE_F + HIT_WIDTH;
+    }
+    
+    testA = (uint16_t)( ( py + HIT_WIDTH ) / BLOCK_SIZE_F );
+    if( ( level[ testB + MAP_WIDTH * testA ] ) || ( level[ testC + MAP_WIDTH * testA ] ) ) {
+      py = (float)( testA ) * BLOCK_SIZE_F - HIT_WIDTH;
+    }
+  }
 }
 
 // this is need because this driver is separatted
@@ -409,17 +397,22 @@ void setLevelMap(uint8_t *pLevelMap)
   pLevel = pLevelMap;
 }
 
-void setTileArrayPonter(uint8_t (*pTleArrayRAM)[TILE_NUM_SIZE][TLE_SIZE])
+void setTileArrayPonter(uint8_t *pTleArrayRAM)
 {
   pTileArray = pTleArrayRAM;
+}
+
+void fastClearWindow(void)
+{
+  setAddrWindow(OFFSET_X+0, OFFSET_Y+0, OFFSET_X+RENDER_W_WIDTH-1, OFFSET_Y+RENDER_W_HEIGHT-1);
+  REPEAT_DATA16(COLOR_BLACK,RENDER_W_WIDTH*RENDER_W_HEIGHT);
 }
 
 // ----------------------- public ----------------------- //
 void renderWalls(void)
 {
   // clear previous render frame
-  fillRect(OFFSET_X+0, OFFSET_Y+0, RENDER_W_WIDTH, RENDER_W_HEIGHT, COLOR_BLACK);
-  //fastClearWindow();
+  fastClearWindow();
   
   slice_t sliceA, sliceB;
   slice_t sliceX[3];
@@ -517,4 +510,9 @@ void setTextureQuality(int8_t quality)
       } break;
     }
   }
+}
+
+void setWallCollision(bool state)
+{
+  checkWallCollision = state; 
 }

@@ -15,6 +15,13 @@
 #include "landscapeTileset.h"
 #include "landscapeTileMap.h"
 
+#define TITLE_SCREEN_W  18
+#define TITLE_SCREEN_H  6
+#define TITLE_TLE_NUM   TITLE_SCREEN_W*TITLE_SCREEN_H
+
+#define LOGO_POS_X 80
+#define LOGO_POS_Y 88
+
 //===========================================================================//
 
 static uint32_t nextInt = 9;  // yes, it real, true dice roll "random"!
@@ -55,9 +62,9 @@ void initRand(void)
 // pic consist of 18 tiles wide and 6 tiles high
 void drawSTMsGPU(void)
 {
-  uint8_t tilesLesft = 108; //stmGpuTileMap[0] * stmGpuTileMap[1];     // 18*6 = 108, tiles in pic
+  uint8_t tilesLesft = TITLE_TLE_NUM; // 18*6 = 108, tiles in pic
   // bit field? no no no, what you talking about?
-  uint8_t tilesDrawed[108];     // array of flags to show drawed tiles
+  uint8_t tilesDrawed[TITLE_TLE_NUM];     // array of flags to show drawed tiles
   
   struct tile_t {
     uint16_t rndTileX;
@@ -65,30 +72,26 @@ void drawSTMsGPU(void)
     uint8_t tileIndex;
   } tile;
   
-  memset(tilesDrawed, 0x01, tilesLesft); // 1 - need to draw, 0 - drawed
+  memset(tilesDrawed, 0x01, TITLE_TLE_NUM); // 1 - need to draw, 0 - drawed
   
   while(tilesLesft) {
-    tile.rndTileX = ( randNum() % stmGpuTileMap[0] ); // from 0 to 18
-    tile.rndTileY = ( randNum() % stmGpuTileMap[1] ); // from 0 to 6
+    tile.rndTileX = ( randNum() % TITLE_SCREEN_W ); // from 0 to 18
+    tile.rndTileY = ( randNum() % TITLE_SCREEN_H ); // from 0 to 6
     
     // index to draw is: x + y*wide
-    
-    tile.tileIndex = tile.rndTileX + tile.rndTileY*stmGpuTileMap[0];
+    tile.tileIndex = tile.rndTileX + tile.rndTileY*TITLE_SCREEN_W;
     
     if(tilesDrawed[tile.tileIndex]) { // == 1, need to draw tile?
-      
       tilesDrawed[tile.tileIndex] = 0; // change flag to 'drawed'
-      
       --tilesLesft;
       
       // get tile index from tile map
-      // 2 is offet from tileswide and tileshigh
-      tile.tileIndex = stmGpuTileMap[2 + tile.tileIndex];
+      tile.tileIndex = stmGpuTileMap[tile.tileIndex];
       
       // reuse rndTileX and rndTileY vars to show where to draw;
       // trying to draw in centre of screen
-      tile.rndTileX = (80 + ( tile.rndTileX * TILE_8_BASE_SIZE ));
-      tile.rndTileY = (88 + ( tile.rndTileY * TILE_8_BASE_SIZE ));
+      tile.rndTileX = (LOGO_POS_X + (tile.rndTileX * TILE_8_BASE_SIZE));
+      tile.rndTileY = (LOGO_POS_Y + (tile.rndTileY * TILE_8_BASE_SIZE));
       
       // draw tile
       drawTile8x8(&tile);
@@ -102,8 +105,8 @@ void drawSTMsGPU(void)
 
 void drawBootLogo(void)
 {
-  // 18 tiles, 8 wide, tiles array, tile size 8x8
-  loadInternalTileSet(18, 6, titleScreenTiles_data);
+  // 18 tiles, 6 wide, tiles array, tile size 8x8
+  loadInternalTileSet(TITLE_SCREEN_W, TITLE_SCREEN_H, titleScreenTiles_data);
   memcpy32(getMapArrPointer(), lanscapeTileMap, BACKGROUND_SIZE);
   drawBackgroundMap();
   

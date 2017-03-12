@@ -7,7 +7,7 @@
 #define BLOCK_SIZE    20
 #define BLOCK_SIZE_F  20.0f
 
-#define HIT_WIDTH     5.0f
+#define HIT_WIDTH     4.8f
 #define MOVE_SPEED    4.0f
 
 // calculated as "PI_NUM / 25.0f"
@@ -36,7 +36,7 @@
 #define OFFSET_X   0   // \__ render window offset
 #define OFFSET_Y   20  // /
 
-#define VISPLANEDIST_TIMES_WALLHEIGHT  3800.0f
+#define VISPLANEDIST_TIMES_WALLHEIGHT  4000.0f
 
 #define MIN_SINE_VAL  0.000001f
 
@@ -54,7 +54,10 @@
 #define RENDER_QA_MAX      8
 
 // make shadow for Y side in RGB565 color system
-#define SHADOW_Y_SIDE(color)   ((((color&0xF800)>>1)&0xF800) | (((color&0x07E0)>>1)&0x07E0) | (((color&0x001F)>>1)&0x001F))
+#define R_COLOR(color)         (((color & 0xF800)>>1) & 0xF800)
+#define G_COLOR(color)         (((color & 0x07E0)>>1) & 0x07E0)
+#define B_COLOR(color)         (((color & 0x001F)>>1) & 0x001F)
+#define SHADOW_Y_SIDE(color)   (R_COLOR(color) | G_COLOR(color) | B_COLOR(color))
 // -------------------------------------------------------------------- //
 #define MOVE_UP            0x01
 #define MOVE_DOWN          0x02
@@ -79,12 +82,13 @@ void renderWalls(void);
 void moveCamera(uint8_t direction);
 void setCameraPosition(uint16_t posX, uint16_t posY, uint16_t angle);
 void serRenderQuality(int8_t quality);
-//void setTextureQuality(uint8_t quality);
+void setTextureQuality(int8_t quality);
+void setWallCollision(bool state);
 
 // for init and internal use only
 void setRayCastPalette(uint16_t *pPal);
 void setLevelMap(uint8_t *pLevelMap);
-void setTileArrayPonter(uint8_t (*pTleArrayRAM)[10][256]);
+void setTileArrayPonter(uint8_t *pTleArrayRAM);
 // -------------------------------------------------------------------- //
 
 #endif /*_SLICE_H */

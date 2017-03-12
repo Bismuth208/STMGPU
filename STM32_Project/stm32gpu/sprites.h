@@ -4,12 +4,10 @@
 // -------------------------------------------------------- //
 #ifdef STM32F10X_MD
  #define MAX_SPRITE_NUM          56
- #define LAST_SPRITE_SIZE        1024
 #endif
 #ifdef STM32F10X_HD
 // if STM32F103VET6 64k RAM
  #define MAX_SPRITE_NUM          63
- #define LAST_SPRITE_SIZE        4096
 #endif
 
 // number of pixels in given sprite
@@ -60,10 +58,10 @@ typedef struct {
 
 typedef struct {
   object_t sprBase;
-  uint16_t posOffsetX;
-  uint16_t posOffsetY;
-  uint32_t spriteSize;
-  uint8_t tleNum;
+  //uint16_t posOffsetX;
+  //uint16_t posOffsetY;
+  //uint32_t spriteSize;
+  //uint8_t tleNum;
 } spriteData_t;
 #pragma pack(pop)
 

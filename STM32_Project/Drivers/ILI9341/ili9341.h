@@ -153,6 +153,9 @@
 #define TFT_DC_PIN      GPIO_Pin_11     //DC
 #define TFT_RES_PIN     GPIO_Pin_1      //RES on PB1 (pro and mini)
 
+#define LCD_BACKLIGHT_PIN  GPIO_Pin_5
+#define BACKLIGHT_GPIO     GPIOB
+
 #define GPIO_SET_PIN(GPIOx, GPIO_Pin)     GPIOx->BSRR = GPIO_Pin;
 #define GPIO_RESET_PIN(GPIOx, GPIO_Pin)   GPIOx->BRR = GPIO_Pin;
 
@@ -208,6 +211,7 @@
  #define SEND_2_DATA(a,b)  FSMC_SEND_DATA32(a,b)
 
  #define SEND_ARR16_FAST(pointer, size) sendData16_Arr_FSMC(pointer, size)
+ #define REPEAT_DATA16(data, size)       repeatData16_Arr_FSMC(data, size);
 
  #define WRITE_CMD(c)      FSMC_SEND_CMD(((uint16_t)(0x00<<8)|c));
  #define WRITE_DATA(c)     FSMC_SEND_DATA(((uint16_t)(0x00<<8)|c));
@@ -218,6 +222,7 @@
  #define SEND_2_DATA(a,b)  sendData32_SPI1(a,b)
 
  #define SEND_ARR16_FAST(pointer, size) sendData16_Fast_DMA1_SPI1(pointer, size)
+ #define REPEAT_DATA16(data, size)      repeatData16_DMA1_SPI1(data, size);
 
  #define WRITE_CMD(c)       SET_CMD(); sendData8_SPI1(c);
  #define WRITE_DATA(c)      SET_DATA(); sendData8_SPI1(c);
@@ -347,6 +352,7 @@ static const uint8_t initSequence[] = {
   void setSleep(bool enable);
   void setIdleMode(bool mode);
   void setDispBrightness(uint8_t brightness);
+  void setDispBrightnessFade(uint8_t dir, uint8_t newValue, uint8_t step);
   void setInvertion(bool i);
   void setAdaptiveBrightness(uint8_t value);
   //void setGamma(uint8_t gamma);

@@ -41,13 +41,13 @@ void init_Sound(void)
   TIM_ARRPreloadConfig(TIM3, ENABLE);                     /* Set the ARR Preload Bit */
   TIM_TimeBaseInit(TIM3, &timer3Init);                    // apply and generate update event to reload prescaler value immediately
   
-  TIM_OCInitTypeDef timer3OC1init;
-  timer3OC1init.TIM_OCMode = TIM_OCMode_PWM1;             /* Select the Output Compare Mode */
-  timer3OC1init.TIM_OCPolarity = TIM_OCPolarity_Low;      /* Set the Output Compare Polarity */
-  timer3OC1init.TIM_OutputState = TIM_OutputState_Enable; /* Set the Output State */
-  timer3OC1init.TIM_Pulse = 500;                          /* Set the Capture Compare Register value */
+  TIM_OCInitTypeDef timer3OC2init;
+  timer3OC2init.TIM_OCMode = TIM_OCMode_PWM1;             /* Select the Output Compare Mode */
+  timer3OC2init.TIM_OCPolarity = TIM_OCPolarity_Low;      /* Set the Output Compare Polarity */
+  timer3OC2init.TIM_OutputState = TIM_OutputState_Enable; /* Set the Output State */
+  timer3OC2init.TIM_Pulse = 500;                          /* Set the Capture Compare Register value */
   TIM_OC2PreloadConfig(TIM3, TIM_OCPreload_Enable);       /* Enable the Output Compare Preload feature */
-  TIM_OC2Init(TIM3, &timer3OC1init);                      // apply and TIM3 CH2 output compare enable
+  TIM_OC2Init(TIM3, &timer3OC2init);                      // apply and TIM3 CH2 output compare enable
   
   TIM_ITConfig(TIM3, TIM_IT_Update, ENABLE);              // TIM3 update interrupt enable
   

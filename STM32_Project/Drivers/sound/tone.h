@@ -7,7 +7,7 @@
 #define SOUND_PIN      GPIO_Pin_5
 #define SOUND_GPIO     GPIOB
 
-#define SOUND_BUF_SIZE      100  // size for note patterns
+#define SOUND_BUF_SIZE      50  // size for note patterns
 #define SOUND_BUF_PATTERNS  3    // number of sound patterns
 
 #define MIN_FREQ_LVL        50   // minimum frequency level

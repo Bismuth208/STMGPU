@@ -17,9 +17,6 @@
 
 sprite_t spriteArr[MAX_SPRITE_NUM];
 
-uint8_t lastSpriteNum = 0xFF;
-uint16_t lastSprite[LAST_SPRITE_SIZE]; // 4*2*maxSprSize
-
 uint8_t spriteAutoUpdFlag = 0;
 
 //===========================================================================//
@@ -48,28 +45,6 @@ void setSpriteTiles(void *src)
   memcpy(spriteArr[sprNum].tle, pData, 0x4);
 }
 
-void convertSprite(uint8_t sprNum, uint8_t size)
-{
-  uint8_t *pTileArr = 0;
-  uint16_t tleOffset = 0;
-  
-  for(uint8_t tleCount=0; tleCount < size; tleCount++) {
-    
-    pTileArr = getArrTilePointer8x8(spriteArr[sprNum].tle[tleCount]);
-    
-    for(uint16_t count =0; count < TILE_ARR_8X8_SIZE; count++) {
-      // convert colors from current palette to RGB565 color space
-      lastSprite[count + tleOffset] = currentPaletteArr[*pTileArr++];
-    }
-    
-    tleOffset += TILE_ARR_8X8_SIZE;
-    
-    // while convert new tile, send current
-    //wait_DMA1_SPI1_busy();
-    //SEND_ARR16_FAST(lastSprite[], TILE_ARR_8X8_SIZE);
-  }
-}
-
 void getSpriteData(uint8_t sprNum, spriteData_t *pSprData)
 {
   object_t sprBase;
@@ -80,37 +55,37 @@ void getSpriteData(uint8_t sprNum, spriteData_t *pSprData)
   switch(spriteArr[sprNum].type)
   {
   case SPR_1X1_8: {
-    pSprData->tleNum = SPR_TLE_NUM_1x1;
-    pSprData->spriteSize = SPR_SIZE_1X1_8;
-    pSprData->posOffsetX = sprBase.posX+7;
-    pSprData->posOffsetY = sprBase.posY+7;
+    //pSprData->tleNum = SPR_TLE_NUM_1x1;
+    //pSprData->spriteSize = SPR_SIZE_1X1_8;
+    //pSprData->posOffsetX = sprBase.posX+7;
+    //pSprData->posOffsetY = sprBase.posY+7;
     sprBase.width = 7;
     sprBase.height = 7;
   } break;
   
   case SPR_1X2_8: {
-    pSprData->tleNum = SPR_TLE_NUM_1x2;
-    pSprData->spriteSize = SPR_SIZE_1X2_8;
-    pSprData->posOffsetX = sprBase.posX+15;
-    pSprData->posOffsetY = sprBase.posY+7;
+    //pSprData->tleNum = SPR_TLE_NUM_1x2;
+    //pSprData->spriteSize = SPR_SIZE_1X2_8;
+    //pSprData->posOffsetX = sprBase.posX+15;
+    //pSprData->posOffsetY = sprBase.posY+7;
     sprBase.width = 15;
     sprBase.height = 7;           
   } break;
   
   case SPR_2X1_8: {
-    pSprData->tleNum = SPR_TLE_NUM_1x2;
-    pSprData->spriteSize = SPR_SIZE_1X2_8;
-    pSprData->posOffsetX = sprBase.posX+7;
-    pSprData->posOffsetY = sprBase.posY+15;
+    //pSprData->tleNum = SPR_TLE_NUM_1x2;
+    //pSprData->spriteSize = SPR_SIZE_1X2_8;
+    //pSprData->posOffsetX = sprBase.posX+7;
+    //pSprData->posOffsetY = sprBase.posY+15;
     sprBase.width = 7;
     sprBase.height = 15;
   } break;
   
   case SPR_2X2_8: {
-    pSprData->tleNum = SPR_TLE_NUM_2x2;
-    pSprData->spriteSize = SPR_SIZE_2X2_8;
-    pSprData->posOffsetX = sprBase.posX+15;
-    pSprData->posOffsetY = sprBase.posY+15;
+    //pSprData->tleNum = SPR_TLE_NUM_2x2;
+    //pSprData->spriteSize = SPR_SIZE_2X2_8;
+    //pSprData->posOffsetX = sprBase.posX+15;
+    //pSprData->posOffsetY = sprBase.posY+15;
     sprBase.width = 15;
     sprBase.height = 15;
   } break;
@@ -121,32 +96,98 @@ void getSpriteData(uint8_t sprNum, spriteData_t *pSprData)
   memcpy32(&pSprData->sprBase, &sprBase, sizeof(object_t));
 }
 
+uint8_t getTileOffsetSize(uint8_t sprNum)
+{
+  uint8_t value =0;
+    
+  switch(spriteArr[sprNum].type)
+  {
+  case SPR_1X1_8: case SPR_1X2_8:
+  case SPR_2X1_8: case SPR_2X2_8: {
+    value = TILE_8_BASE_SIZE;
+  } break;
+  
+  case SPR_1X1_16: case SPR_1X2_16:
+  case SPR_2X1_16: case SPR_2X2_16: {
+    value = TILE_16_BASE_SIZE;
+  } break;
+
+  case SPR_1X1_32: case SPR_1X2_32:
+  case SPR_2X1_32: case SPR_2X2_32: {
+    value = TILE_32_BASE_SIZE;
+  } break;
+  }
+  
+  return value;
+}
+
+uint8_t getTleNumberCount(uint8_t sprNum)
+{
+  uint8_t value =0;
+  
+  switch(spriteArr[sprNum].type)
+  {
+  case SPR_1X1_8: value = SPR_TLE_NUM_1x1; break;
+  case SPR_1X2_8: value = SPR_TLE_NUM_1x2; break;  //  \ __ not mistake
+  case SPR_2X1_8: value = SPR_TLE_NUM_1x2; break;  //  /    just same sizes
+  case SPR_2X2_8: value = SPR_TLE_NUM_2x2; break;
+  
+  case SPR_1X1_16: value = SPR_TLE_NUM_1x1; break;
+  case SPR_1X2_16: value = SPR_TLE_NUM_1x2; break;
+  case SPR_2X1_16: value = SPR_TLE_NUM_1x2; break;
+  case SPR_2X2_16: value = SPR_TLE_NUM_2x2; break;
+
+  case SPR_1X1_32: value = SPR_TLE_NUM_1x1; break;
+  case SPR_1X2_32: value = SPR_TLE_NUM_1x2; break;
+  case SPR_2X1_32: value = SPR_TLE_NUM_1x2; break;
+  case SPR_2X2_32: value = SPR_TLE_NUM_2x2; break;
+  }
+  
+  return value;
+}
+
 void drawSprite(uint8_t sprNum)
 {
   if(spriteArr[sprNum].visible) {
-    /*
-    if(sprNum < SPR_1X1_16) {
-      pConvSprite = convertSprite8x8;
-      pGetSpriteData = getSpriteData8x8;
+    
+    struct tile_t {
+      uint16_t posX;
+      uint16_t posY;
+      uint8_t tileNum;
+    } tile;
+    
+    uint8_t offset = getTileOffsetSize(sprNum);
+    uint8_t numberOfTiles = getTleNumberCount(sprNum);
+    
+    for(uint8_t tleCount=0; tleCount < numberOfTiles; tleCount++) {
       
-    } else if(() && ()) {
-      pConvSprite = convertSprite16x16;
-      pGetSpriteData = getSpriteData16x16;
-    } else {
-      pConvSprite = convertSprite32x32;
-      pGetSpriteData = getSpriteData32x32;
+      tile.tileNum = spriteArr[sprNum].tle[tleCount];
+      
+      switch(tleCount)
+      {
+      case 0: {
+        tile.posX = spriteArr[sprNum].posX;
+        tile.posY = spriteArr[sprNum].posY;
+      } break;
+      
+      case 1: {
+        tile.posX = spriteArr[sprNum].posX + offset;
+        tile.posY = spriteArr[sprNum].posY;
+      } break;
+      
+      case 2: {
+        tile.posX = spriteArr[sprNum].posX;
+        tile.posY = spriteArr[sprNum].posY + offset;
+      } break;
+      
+      case 3: {
+        tile.posX = spriteArr[sprNum].posX + offset;
+        tile.posY = spriteArr[sprNum].posY + offset;
+      } break;
+      }
+      
+      drawTile8x8(&tile);
     }
-    */
-    spriteData_t spriteData;
-    getSpriteData(sprNum, &spriteData);
-    
-    if(lastSpriteNum != sprNum) {
-      convertSprite(sprNum, spriteData.tleNum);
-    }
-    
-    setAddrWindow(spriteData.sprBase.posX, spriteData.sprBase.posY, 
-                  spriteData.posOffsetX, spriteData.posOffsetY);
-    SEND_ARR16_FAST(lastSprite, spriteData.spriteSize);
   }
 }
 
@@ -195,6 +236,8 @@ bool checkCollisionExP(object_t *objOne, object_t *objTwo)
 
 uint8_t getSpriteCollision(uint8_t sprNum1, uint8_t sprNum2)
 {
+  bool state = false;
+  
   if((spriteArr[sprNum1].visible) && (spriteArr[sprNum2].visible)) {
     
     spriteData_t sprDat1;
@@ -203,9 +246,8 @@ uint8_t getSpriteCollision(uint8_t sprNum1, uint8_t sprNum2)
     spriteData_t sprDat2;
     getSpriteData(sprNum2, &sprDat2);
     
-    return checkCollisionExP(&sprDat1.sprBase, &sprDat2.sprBase);
-    
-  } else {
-    return false;
-  }
+    state = checkCollisionExP(&sprDat1.sprBase, &sprDat2.sprBase);
+  } 
+  
+  return state;
 }

@@ -33,7 +33,7 @@ uint32_t _uptime(void)
 }
 
 #if USE_USER_FUNCTION
-void SysTimerSetRuntine(void (*pFunc)(void))
+void setSysTimerRuntine(void (*pFunc)(void))
 {
   pUserRunTimeFunc = pFunc;
 }

@@ -329,12 +329,7 @@ void fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color)
   if((y + h - 1) >= _height) h = _height - y;
   
   setAddrWindow(x, y, x+w-1, y+h-1);
-  
-#if USE_FSMC
-  repeatData16_Arr_FSMC(color, w*h);
-#else
-  repeatData16_DMA1_SPI1(color, w*h);
-#endif // USE_FSMC
+  REPEAT_DATA16(color, w*h);
 }
 
 // Draw a rounded rectangle
@@ -790,6 +785,23 @@ void drawPixel(int16_t x, int16_t y, uint16_t color)
 #endif /* USE_FSMC */
 }
 
+/*
+uint16_t readPixel(int16_t x, int16_t y)
+{
+  if((x < 0) || (x >= _width) || (y < 0) || (y >= _height)) return;
+  
+  setAddrPixel(x, y);
+  
+  writeCommand(ILI9341_RAMRD);
+  writeData(ILI9341_NOP);
+  
+  uint8_t r = readData8();
+  uint8_t g = readData8();
+  uint8_t b = readData8();
+  uint16_t color = color565(r, g, b);
+}
+*/
+
 void drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color)
 {
   // Rudimentary clipping
@@ -797,12 +809,7 @@ void drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color)
   if((y+h) >= _height) h = _height-y;
   
   setVAddrWindow(x, y, y+h);
-  
-#if USE_FSMC
-  repeatData16_Arr_FSMC(color, h);
-#else
-  repeatData16_DMA1_SPI1(color, h);
-#endif /* USE_FSMC */
+  REPEAT_DATA16(color, h);
 }
 
 void drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color)
@@ -812,23 +819,13 @@ void drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color)
   if((x+w) >= _width)  w = _width-x;
   
   setHAddrWindow(x, y, x+w);
-  
-#if USE_FSMC
-  repeatData16_Arr_FSMC(color, w);
-#else
-  repeatData16_DMA1_SPI1(color, w);
-#endif /* USE_FSMC */
+  REPEAT_DATA16(color, w);
 }
 
 void fillScreen(uint16_t color)
 {
   setAddrWindow(0, 0, _width-1, _height-1);
-  
-#if USE_FSMC
-  repeatData16_Arr_FSMC(color, _width * _height);
-#else
-  repeatData16_DMA1_SPI1(color, _width * _height);
-#endif
+  REPEAT_DATA16(color, _width * _height);
 }
 
 // converts 8-bit (each) R,G,B, to rgb565

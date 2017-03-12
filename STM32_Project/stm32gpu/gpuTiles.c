@@ -10,8 +10,9 @@
 #endif
 #include <memHelper.h>
 
+#include <raycast.h>
+
 #include "gpuTiles.h"
-#include "raycast.h"
 #include "nesPalette_ext.h"
 #include "STMsGPU_Palette.h"
 
@@ -55,7 +56,7 @@ void initRaycasterPointers(void)
   setRayCastPalette(currentPaletteArr);
   setLevelMap(mainBackGround);
   
-  setTileArrayPonter(&tileArr16x16);
+  setTileArrayPonter(&tileArr16x16[0][0]);
 }
 
 // load to RAM built-in palette
