@@ -1,7 +1,6 @@
 #include <STMsGPU.h>
 
-// --------------------------------------------------------- //
-
+// ---------------------------------------------------------- //
 //#define CHK_GPU_BSY_PIN 2 // which pin arduino must check
 
 /* BE CAREFULL!! USED ONLY HARDWARE SERIAL PORT!!
@@ -11,8 +10,8 @@
 */
 //STMGPU gpu(CHK_GPU_BSY_PIN); // use hardware BSY check, pin used
 STMGPU gpu; // use software BSY check, no pin used
-
 // ---------------------------------------------------------- //
+
 #define FS(x) (__FlashStringHelper*)(x)
 
 const char Loremipsum2[] = "\
@@ -25,17 +24,12 @@ In vestibulum purus a tortor imperdiet posuere.\n\n";
 // ---------------------------------------------------------- //
 
 void setup() {
-  //BAUD_SPEED_9600 = 9600
-  //BAUD_SPEED_57600 = 57600
-  //BAUD_SPEED_115200 = 115200
-  //BAUD_SPEED_1M = 1000000
-  gpu.begin(BAUD_SPEED_1M);
+  // different speeds can be found in library STMsGPU.h
+  gpu.begin(BAUD_SPEED_1M); // BAUD_SPEED_1M = 1,000,000 bod/s
 }
 
 void loop() {
-
   drawSlowEpicText(Loremipsum2, 5000);
-  
   gpu.fillScreen(COLOR_BLACK);
 }
 
@@ -49,7 +43,7 @@ void drawSlowEpicText(const char* text, uint16_t lastDelay)
   for(uint16_t count =0; count < len; count++) {
     gpu.print(text[count]);
     gpu.playNote(500, 1);
-	delay(30); // delay betwen chars, make retro effect
+	  delay(30); // delay betwen chars, make retro effect
   }
 
   delay(lastDelay); // delay to see text

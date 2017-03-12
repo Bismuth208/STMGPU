@@ -85,16 +85,12 @@ void fillScreenByTiles(void)
 
 // ---------------------------------------------------------- //
 void setup() {
-  //BAUD_SPEED_9600 = 9600
-  //BAUD_SPEED_57600 = 57600
-  //BAUD_SPEED_115200 = 115200
-  //BAUD_SPEED_1M = 1000000
-  gpu.begin(BAUD_SPEED_1M);
+  // different speeds can be found in library STMsGPU.h
+  gpu.begin(BAUD_SPEED_1M); // BAUD_SPEED_1M = 1,000,000 bod/s
 
-  /* load MAX_TILES tiles to GPU's RAM at RAM_BASE position in it's RAM,
+  /* load MAX_TILES tiles to sGPU's RAM at RAM_BASE position in it's RAM,
   *  from tileFileName,
-  *  located on SD card attached to STM32 GPU
-  *  5 - is width of tileSet in tiles ( 5 tiles width == 80 pixels)
+  *  located on SD card attached to STM32 sGPU
   *  TLE_START - nunber of tile in tileset from which tiles will be loaded
   *  file name must respond to 8.3 name system
   *  8 chars max for filename, 3 chars max for file extension

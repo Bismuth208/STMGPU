@@ -2,7 +2,6 @@
 #include "gpuTest.h"
 
 // --------------------------------------------------------- //
-
 //#define CHK_GPU_BSY_PIN 2 // which pin arduino must check
 
 /* BE CAREFULL!! USED ONLY HARDWARE SERIAL PORT!!
@@ -12,7 +11,6 @@
 */
 //STMGPU gpu(CHK_GPU_BSY_PIN); // use hardware BSY check, pin used
 STMGPU gpu; // use software BSY check, no pin used
-
 // --------------------------------------------------------- //
 
 static uint16_t nextInt = 9;
@@ -43,14 +41,13 @@ void testDrawTiles(void)
   }
 }
 
-// Draw on screen limited range of tiles
-// on screen must apear square 10x8 tiles
+// Draw on screen limited range of tiles on screen
 void drawRamTileSet32x32(void)
 {
   int16_t posX, posY;
   uint8_t count =0;
   
-  // draw 90 tiles
+  // draw TILE_SHOW_W*TILE_SHOW_H tiles
   for(uint8_t countY =0; countY <TILE_SHOW_W; countY++) {
     for(uint8_t countX =0; countX <TILE_SHOW_H; countX++) {
       
@@ -58,9 +55,7 @@ void drawRamTileSet32x32(void)
       posX = (50 + ( countX * TLE_32X32_SIZE ));
       posY = (50 + ( countY * TLE_32X32_SIZE ));
       
-      gpu.drawTile32x32(posX, posY, count);
-      
-      ++count;
+      gpu.drawTile32x32(posX, posY, count++);
     }
   }
 }
@@ -71,8 +66,8 @@ void fillScreenByTiles(void)
   uint8_t xStep, yStep;
   uint8_t maxXSize, maxYSize;
 
-  maxXSize = TFT_W / TLE_32X32_SIZE;
-  maxYSize = TFT_H / TLE_32X32_SIZE;
+  maxXSize = TFT_W / TLE_8X8_SIZE; // \__ calculate how much
+  maxYSize = TFT_H / TLE_8X8_SIZE; // /   tiles in x and y axis
 
   for (uint8_t i = 0; i < TEST_SAMPLE_SCREENS; i++) {
     for (yStep = 0; yStep < maxYSize; yStep++) {
@@ -87,22 +82,18 @@ void fillScreenByTiles(void)
 
 // ---------------------------------------------------------- //
 void setup() {
-  //BAUD_SPEED_9600 = 9600
-  //BAUD_SPEED_57600 = 57600
-  //BAUD_SPEED_115200 = 115200
-  //BAUD_SPEED_1M = 1000000
-  gpu.begin(BAUD_SPEED_1M);
+  // different speeds can be found in library STMsGPU.h
+  gpu.begin(BAUD_SPEED_1M); // BAUD_SPEED_1M = 1,000,000 bod/s
 
-  /* load MAX_TILES tiles to GPU's RAM at RAM_BASE position in it's RAM,
+  /* load MAX_TILES tiles to sGPU's RAM at RAM_BASE position in it's RAM,
   *  from tileFileName,
-  *  located on SD card attached to STM32 GPU
-  *  9 - is width of tileSet in tiles ( 9 tiles width == 72 pixels)
+  *  located on SD card attached to STM32 sGPU
   *  TLE_START - nunber of tile in tileset from which tiles will be loaded
   *  file name must respond to 8.3 name system
   *  8 chars max for filename, 3 chars max for file extension
   *  sGPU add *.tle extension automatically
   */
-  gpu.loadTileSet8x8("pcs32x32", TILE_SET_W-1, RAM_BASE, TLE_START, MAX_TILES);
+  gpu.loadTileSet32x32("pcs32x32", TILE_SET_W-1, RAM_BASE, TLE_START, MAX_TILES);
 }
 
 
@@ -110,9 +101,9 @@ void loop() {
   uint8_t testsCount = FUNC_TO_TEST_COUNT;
 
   for (uint8_t count = 0; count < testsCount; count++) {
-      pArrExecGFXFunc[count](); // exec test function
+    pArrExecGFXFunc[count](); // exec test function
 
-      delay(500); // little delay to see what happend on screen
-      gpu.fillScreen(COLOR_BLACK); // clear screen by black color
+    delay(500); // little delay to see what happend on screen
+    gpu.fillScreen(COLOR_BLACK); // clear screen by black color
   }
 }

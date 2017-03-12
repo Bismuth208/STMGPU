@@ -52,20 +52,34 @@ void (*pArrExecGFXFunc[])(void) = {
     matrixScreen
   };
 
-  #define FUNC_TO_TEST_COUNT (sizeof(pArrExecGFXFunc)/sizeof(pArrExecGFXFunc[0]))
+#define FUNC_TO_TEST_COUNT (sizeof(pArrExecGFXFunc)/sizeof(pArrExecGFXFunc[0]))
 
 // --------------------------------------------------------- //
+#define MAX_SPEED 0 
 
-#define TFT_W gpu.width()
-#define TFT_H gpu.height()
+// can save ROM and increase speed, but its unfair!
+// use it if you know end resolution
+#if MAX_SPEED
+ #define TFT_W 320
+ #define TFT_H 240
+#else
+ #define TFT_W gpu.width()
+ #define TFT_H gpu.height()
+#endif /* MAX_SPEED */
 
 #define TEST_SAMPLE_SIZE 2000
 #define TEST_SAMPLE_SCREENS 2
 
+#define BASE_RADIUS 10
+
+// macro definition for random function
 #define MIN_COLOR 32
 #define MAX_COLOR 255
 #define COLOR_RANGE (((MAX_COLOR + 1) - MIN_COLOR) + MIN_COLOR)
 #define RND_COLOR (randNum() % COLOR_RANGE)
+
+//#define RND_565COLOR(r, g, b)  (gpu.color565(r, g, b))
+#define RND_565COLOR  (((RND_COLOR & 0xF8) << 8) | ((RND_COLOR & 0xFC) << 3) | (RND_COLOR >> 3))
 
 #define RND_POSX(offset) (randNum() % (TFT_W-offset))
 #define RND_POSY(offset) (randNum() % (TFT_H-offset)) 

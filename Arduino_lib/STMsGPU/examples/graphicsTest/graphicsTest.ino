@@ -1,8 +1,7 @@
 #include <STMsGPU.h>
 #include "gpuTest.h"
 
-// --------------------------------------------------------- //
-
+// ---------------------------------------------------------- //
 //#define CHK_GPU_BSY_PIN 2 // which pin arduino must check
 
 /* BE CAREFULL!! USED ONLY HARDWARE SERIAL PORT!!
@@ -12,11 +11,7 @@
 */
 //STMGPU gpu(CHK_GPU_BSY_PIN); // use hardware BSY check, pin used
 STMGPU gpu; // use software BSY check, no pin used
-
-// --------------------------------------------------------- //
-
-unsigned long thisMicros = 0;
-unsigned long lastMicros = 0;
+// ---------------------------------------------------------- //
 
 static uint16_t nextInt = 9;
 
@@ -34,31 +29,23 @@ uint16_t randNum(void)
 
 void drawRandPixels(void)
 {
-  uint8_t r, g, b;
   uint16_t posX, posY;
 
   for (uint16_t i = 0; i < TEST_SAMPLE_SIZE; i++) {
-    r = RND_COLOR;
-    g = RND_COLOR;
-    b = RND_COLOR;
 
     posX = RND_POSX(1);
     posY = RND_POSY(1);
 
-    gpu.drawPixel(posX, posY, gpu.color565(r, g, b));
+    gpu.drawPixel(posX, posY, RND_565COLOR);
   }
 }
 
 void drawRandLines(void)
 {
-  uint8_t r, g, b;
   uint16_t posX, posY;
   uint16_t posX1, posY1;
 
   for (uint16_t i = 0; i < TEST_SAMPLE_SIZE; i++) {
-    r = RND_COLOR;
-    g = RND_COLOR;
-    b = RND_COLOR;
 
     posX = RND_POSX(1);
     posY = RND_POSY(1);
@@ -66,21 +53,17 @@ void drawRandLines(void)
     posX1 = RND_POSX(1);
     posY1 = RND_POSY(1);
 
-    gpu.drawLine(posX, posY, posX1, posY1, gpu.color565(r, g, b));
+    gpu.drawLine(posX, posY, posX1, posY1, RND_565COLOR);
   }
 }
 
 
 void drawRandRect(void)
 {
-  uint8_t r, g, b;
   uint16_t widght, height;
   uint16_t posX, posY;
 
   for (uint16_t i = 0; i < TEST_SAMPLE_SIZE; i++) {
-    r = RND_COLOR;
-    g = RND_COLOR;
-    b = RND_COLOR;
 
     posX = RND_POSX(4);
     posY = RND_POSY(4);
@@ -96,20 +79,16 @@ void drawRandRect(void)
       height = 2;
     }
 
-    gpu.drawRect(posX, posY, widght, height, gpu.color565(r, g, b));
+    gpu.drawRect(posX, posY, widght, height, RND_565COLOR);
   }
 }
 
 void drawRandFillRect(void)
 {
-  uint8_t r, g, b;
   uint16_t widght, height;
   uint16_t posX, posY;
 
   for (uint16_t i = 0; i < TEST_SAMPLE_SIZE; i++) {
-    r = RND_COLOR;
-    g = RND_COLOR;
-    b = RND_COLOR;
 
     posX = RND_POSX(4);
     posY = RND_POSY(4);
@@ -125,20 +104,16 @@ void drawRandFillRect(void)
       height = 2;
     }
 
-    gpu.fillRect(posX, posY, widght, height, gpu.color565(r, g, b));
+    gpu.fillRect(posX, posY, widght, height, RND_565COLOR);
   }
 }
 
 void drawRandTriangles(void)
 {
-  uint8_t r, g, b;
   uint16_t x1, x2, x3;
   uint16_t y1, y2, y3;
 
   for (uint16_t i = 0; i < TEST_SAMPLE_SIZE; i++) {
-    r = RND_COLOR;
-    g = RND_COLOR;
-    b = RND_COLOR;
 
     x1 = RND_POSX(4);
     y1 = RND_POSY(4);
@@ -149,21 +124,17 @@ void drawRandTriangles(void)
     x3 = RND_POSX(4);
     y3 = RND_POSY(4);
 
-    gpu.fillTriangle(x1, y1, x2, y2, x3, y3, gpu.color565(r, g, b));
+    gpu.fillTriangle(x1, y1, x2, y2, x3, y3, RND_565COLOR);
   }
 }
 
 void drawRandRoundRect(void)
 {
-  uint8_t r, g, b;
+  uint8_t r;
   uint16_t widght, height;
   uint16_t posX, posY;
-  uint16_t color;
 
   for (uint16_t i = 0; i < TEST_SAMPLE_SIZE; i++) {
-    r = RND_COLOR;
-    g = RND_COLOR;
-    b = RND_COLOR;
 
     posX = RND_POSX(1);
     posY = RND_POSY(1);
@@ -179,72 +150,56 @@ void drawRandRoundRect(void)
       height = 2;
     }
 
-    color = gpu.color565(r, g, b);
-    r = ((randNum() % 6)+4); // reuse for raduis
+    r = ((randNum() % 6)+4); // for raduis
 
-    gpu.drawRoundRect(posX, posY, widght, height, r, color);
+    gpu.drawRoundRect(posX, posY, widght, height, r, RND_565COLOR);
   }
 }
 
 void drawRandRoundFillRect(void)
 {
-  uint8_t r, g, b;
   uint16_t posX, posY;
 
   for (uint16_t i = 0; i < TEST_SAMPLE_SIZE; i++) {
-    r = RND_COLOR;
-    g = RND_COLOR;
-    b = RND_COLOR;
 
     posX = RND_POSX(1);
     posY = RND_POSY(1);
 
     gpu.fillRoundRect(posX, posY,
                 (TFT_W - posX), (TFT_H - posY), 
-                ((randNum() % 6)+4), gpu.color565(r, g, b));
+                ((randNum() % 6)+4), RND_565COLOR);
   }
 }
 
 
 void drawRandCircle(void)
 {
-  uint8_t r, g, b;
+  uint8_t r;
   uint16_t posX, posY;
-  uint16_t color;
 
   for (uint16_t i = 0; i < TEST_SAMPLE_SIZE; i++) {
-    r = RND_COLOR;
-    g = RND_COLOR;
-    b = RND_COLOR;
 
     posX = RND_POSX(1);
     posY = RND_POSY(1);
 
-    color = gpu.color565(r, g, b);
-    r = ((randNum() % TFT_H)/4); // reuse for radius
+    r = ((randNum() % TFT_H)/4); // for radius
 
-    gpu.drawCircle(posX, posY, r, color);
+    gpu.drawCircle(posX, posY, r, RND_565COLOR);
   }
 }
 
 void drawRandFillCircle(void)
 {
-  uint8_t r, g, b;
+  uint8_t r =0;
   uint16_t posX, posY;
-  uint16_t color;
 
   for (uint16_t i = 0; i < TEST_SAMPLE_SIZE; i++) {
-    r = RND_COLOR;
-    g = RND_COLOR;
-    b = RND_COLOR;
 
     posX = RND_POSX(1);
     posY = RND_POSY(1);
+    r = ((randNum() % TFT_H)/4); // for radius
 
-    color = gpu.color565(r, g, b);
-    r = ((randNum() % TFT_H)/4); // reuse for radius
-
-    gpu.fillCircle(posX, posY, r, color);
+    gpu.fillCircle(posX, posY, r, RND_565COLOR);
   }
 }
 
@@ -271,95 +226,77 @@ void matrixScreen(void)
 }
 
 // ---------------------------- GFX TESTs ------------------- //
+void testHLinesHelp(uint16_t x0, uint16_t y0, uint16_t y1)
+{
+  for(int16_t x1=0; x1 < TFT_W; x1+=6) {
+    gpu.drawLine(x0, y0, x1, y1, COLOR_YELLOW);
+  }
+}
+
+void testVLinesHelp(uint16_t x0, uint16_t y0, uint16_t x1)
+{
+  for(int16_t y1=0; y1 < TFT_H; y1+=6) {
+    gpu.drawLine(x0, y0, x1, y1, COLOR_YELLOW);
+  }
+}
+
 void testlines(void)
 {
-  uint16_t color = COLOR_YELLOW;
-
-  for (int16_t x=0; x < TFT_W; x+=6) {
-    gpu.drawLine(0, 0, x, TFT_H-1, color);
-  }
-  for (int16_t y=0; y < TFT_H; y+=6) {
-    gpu.drawLine(0, 0, TFT_W-1, y, color);
-  }
+  testHLinesHelp(0, 0, TFT_H);
+  testVLinesHelp(0, 0, TFT_W);
 
   gpu.fillScreen(COLOR_BLACK);
-  for (int16_t x=0; x < TFT_W; x+=6) {
-    gpu.drawLine(TFT_W-1, 0, x, TFT_H-1, color);
-  }
-  for (int16_t y=0; y < TFT_H; y+=6) {
-    gpu.drawLine(TFT_W-1, 0, 0, y, color);
-  }
+  testHLinesHelp(TFT_W, 0, TFT_H);
+  testVLinesHelp(TFT_W, 0, 0);
 
   gpu.fillScreen(COLOR_BLACK);
-  for (int16_t x=0; x < TFT_W; x+=6) {
-    gpu.drawLine(0, TFT_H-1, x, 0, color);
-  }
-  for (int16_t y=0; y < TFT_H; y+=6) {
-    gpu.drawLine(0, TFT_H-1, TFT_W-1, y, color);
-  }
+  testHLinesHelp(0, TFT_H, 0);
+  testVLinesHelp(0, TFT_H, TFT_W);
 
   gpu.fillScreen(COLOR_BLACK);
-  for (int16_t x=0; x < TFT_W; x+=6) {
-    gpu.drawLine(TFT_W-1, TFT_H-1, x, 0, color);
-  }
-  for (int16_t y=0; y < TFT_H; y+=6) {
-    gpu.drawLine(TFT_W-1, TFT_H-1, 0, y, color);
-  }
+  testHLinesHelp(TFT_W, TFT_H, 0);
+  testVLinesHelp(TFT_W, TFT_H, 0);
 }
 
 void testfastlines(void)
 {
-  uint16_t color1 = COLOR_RED;
-  uint16_t color2 = COLOR_BLUE;
-
   for (int16_t y=0; y < TFT_H; y+=5) {
-    gpu.drawFastHLine(0, y, TFT_W, color1);
+    gpu.drawFastHLine(0, y, TFT_W, COLOR_RED);
   }
   for (int16_t x=0; x < TFT_W; x+=5) {
-    gpu.drawFastVLine(x, 0, TFT_H, color2);
+    gpu.drawFastVLine(x, 0, TFT_H, COLOR_BLUE);
   }
 }
 
 void testdrawrects(void)
 {
-  uint16_t color = COLOR_GREEN;
-
   for (int16_t x=0; x < TFT_W; x+=6) {
-    gpu.drawRect(((TFT_W/2) - (x/2)), ((TFT_H/2) -((x/2))), x, x, color);
+    gpu.drawRect(((TFT_W/2) - (x/2)), ((TFT_H/2) -((x/2))), x, x, COLOR_GREEN);
   }
 }
 
 void testfillrects(void)
 {
-  uint16_t color1 = COLOR_YELLOW;
-  uint16_t color2 = COLOR_MAGENTA;
-
   for (int16_t x=TFT_H-1; x > 6; x-=6) {
-    gpu.fillRect(TFT_W/2 - x/2, TFT_H/2 - x/2 , x, x, color1);
-    gpu.drawRect(TFT_W/2 - x/2, TFT_H/2 - x/2 , x, x, color2);
+    gpu.fillRect(TFT_W/2 - x/2, TFT_H/2 - x/2 , x, x, COLOR_YELLOW);
+    gpu.drawRect(TFT_W/2 - x/2, TFT_H/2 - x/2 , x, x, COLOR_MAGENTA);
   }
 }
 
 void testdrawcircles(void)
 {
-  uint8_t radius = 10;
-  uint16_t color = COLOR_WHITE; 
-
-  for (int16_t x=0; x < TFT_W+radius; x+=radius*2) {
-    for (int16_t y=0; y < TFT_H+radius; y+=radius*2) {
-      gpu.drawCircle(x, y, radius, color);
+  for (int16_t x=0; x < TFT_W; x+= (BASE_RADIUS<<1)) {
+    for (int16_t y=0; y < TFT_H; y+= (BASE_RADIUS<<1)) {
+      gpu.drawCircle(x, y, BASE_RADIUS, COLOR_WHITE);
     }
   }
 }
 
 void testfillcircles(void)
 {
-  uint8_t radius = 10;
-  uint16_t color = COLOR_BLUE;
-
-  for (int16_t x=radius; x < TFT_W; x+=radius*2) {
-    for (int16_t y=radius; y < TFT_H; y+=radius*2) {
-      gpu.fillCircle(x, y, radius, color);
+  for (int16_t x=BASE_RADIUS; x < TFT_W; x+= (BASE_RADIUS<<1)) {
+    for (int16_t y=BASE_RADIUS; y < TFT_H; y+= (BASE_RADIUS<<1)) {
+      gpu.fillCircle(x, y, BASE_RADIUS, COLOR_BLUE);
     }
   }
 
@@ -429,20 +366,18 @@ void testdrawtext(void)
 
 // ---------------------------------------------------------- //
 void setup() {
-  //BAUD_SPEED_9600 = 9600
-  //BAUD_SPEED_57600 = 57600
-  //BAUD_SPEED_115200 = 115200
-  //BAUD_SPEED_1M = 1000000
-  gpu.begin(BAUD_SPEED_1M);
+  // different speeds can be found in library STMsGPU.h
+  gpu.begin(BAUD_SPEED_1M); // BAUD_SPEED_1M = 1,000,000 bod/s
 }
 
 void loop() {
   uint8_t testsCount = FUNC_TO_TEST_COUNT;
 
   for (uint8_t count = 0; count < testsCount; count++) {
-      pArrExecGFXFunc[count](); // exec test function
+    //(*pArrExecGFXFunc+count)(); // exec test function
+    pArrExecGFXFunc[count](); // exec test function
 
-      delay(1000); // little delay to see what happend on screen
-      gpu.fillScreen(COLOR_BLACK); // clear screen by black color
+    delay(1000); // little delay to see what happend on screen
+    gpu.fillScreen(COLOR_BLACK); // clear screen by black color
   }
 }

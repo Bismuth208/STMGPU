@@ -8,12 +8,16 @@
 #define TEST_SAMPLE_SIZE    300
 #define TEST_SAMPLE_SCREENS 20 // this is equal to 24000 tiles
 
+// this is need to load textures from *.tle file 
+// located on SD card - correctly
 #define MAX_TILES 70
+#define RAM_BASE 0
+#define TLE_START 0
+#define TILE_SET_W 9 // this is width of tileSet in tiles ( one tile width == 8 pixels)
 
 #define SPRITE_NUMBER 0
 
-// --------------------------------------------------------- //
-
+// ---------------------------------------------------------- //
 //#define CHK_GPU_BSY_PIN 2 // which pin arduino must check
 
 /* BE CAREFULL!! USED ONLY HARDWARE SERIAL PORT!!
@@ -23,8 +27,7 @@
 */
 //STMGPU gpu(CHK_GPU_BSY_PIN); // use hardware BSY check, pin used
 STMGPU gpu; // use software BSY check, no pin used
-
-// --------------------------------------------------------- //
+// ---------------------------------------------------------- //
 
 static uint16_t nextInt = 9;
 
@@ -38,8 +41,8 @@ uint16_t randNum(void)
   nextInt = (nextInt * 214013 );
   return nextInt;
 }
-// --------------------------------------------------------- //
 
+// --------------------------------------------------------- //
 // setup single sprite - number SPRITE_NUMBER
 void gpuMakeSprite(void)
 {
@@ -55,7 +58,6 @@ void gpuMakeSprite(void)
 }
 
 // --------------------------------------------------------- //
-
 // draw random tile at random position
 void drawRandSprites(void)
 {
@@ -69,31 +71,27 @@ void drawRandSprites(void)
     gpu.drawSprite(SPRITE_NUMBER, rndPosX, rndPosY);
   }
 }
-
 // ---------------------------------------------------------- //
-void setup() {
-  //BAUD_SPEED_9600 = 9600
-  //BAUD_SPEED_57600 = 57600
-  //BAUD_SPEED_115200 = 115200
-  //BAUD_SPEED_1M = 1000000
-  gpu.begin(BAUD_SPEED_1M);
 
-  /* load MAX_TILES tiles to GPU's RAM at 0 position in it's RAM,
+void setup() {
+  // different speeds can be found in library STMsGPU.h
+  gpu.begin(BAUD_SPEED_1M); // BAUD_SPEED_1M = 1,000,000 bod/s
+
+  /* load MAX_TILES tiles to sGPU's RAM at RAM_BASE position in it's RAM,
   *  from tileFileName,
-  *  located on SD card attached to STM32 GPU
-  *  9 - is width of tileSet in tiles ( 9 tiles width == 72 pixels)
+  *  located on SD card attached to STM32 sGPU
+  *  TLE_START - nunber of tile in tileset from which tiles will be loaded
   *  file name must respond to 8.3 name system
   *  8 chars max for filename, 3 chars max for file extension
   *  sGPU add *.tle extension automatically
   */
-  gpu.loadTileSet8x8("pcs8x8", 9, 0, 0, MAX_TILES);
+  gpu.loadTileSet8x8("pcs8x8", TILE_SET_W, RAM_BASE, TLE_START, MAX_TILES);
 
   gpuMakeSprite();
 }
 
 void loop() {
-
   drawRandSprites();
-  delay(500);
+  delay(500);  // little delay to see what happend on screen
   gpu.fillScreen(COLOR_BLACK); // clear screen by black color
 }

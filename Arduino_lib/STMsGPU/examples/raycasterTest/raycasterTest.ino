@@ -1,17 +1,16 @@
 #include <STMsGPU.h>
 
-// --------------------------------------------------------- //
-
+// ---------------------------------------------------------- //
 //#define CHK_GPU_BSY_PIN 2 // which pin arduino must check
 
-/*  BE CAREFULL!! USED ONLY HARDWARE SERIAL PORT!!
- *  If your board have only ONE hardware serial,
- *  then you MUST use SoftWareSerial instead!
- *  On STM32 boards used Serial1 on PA9 and PA10.
- */
+/* BE CAREFULL!! USED ONLY HARDWARE SERIAL PORT!!
+*  If your board have only ONE hardware serial,
+*  then you MUST use SoftWareSerial instead!
+*  On STM32 boards used Serial1 on PA9 and PA10.
+*/
 //STMGPU gpu(CHK_GPU_BSY_PIN); // use hardware BSY check, pin used
 STMGPU gpu; // use software BSY check, no pin used
-// --------------------------------------------------------- //
+// ---------------------------------------------------------- //
 
 /* pins to attach analoge sticks
  * at lest need two stick whith 2 move direction.
@@ -24,14 +23,23 @@ STMGPU gpu; // use software BSY check, no pin used
 
 #define PIN_NUM_COUNT 3 // total pins to read
 
-#define FPS_MIN 10
-#define FPS_MAX 30
+#define FPS_MIN 14  // \__ frame limit values
+#define FPS_MAX 24  // /
+
+// this is need to load textures from *.tle file 
+// located on SD card - correctly
+#define MAX_TILES 5 //
+#define RAM_BASE 0
+#define TLE_START 0
+#define TILE_SET_W 5 // this is width of tileSet in tiles ( one tile width == 8 pixels)
 
 // these array need to store calibrated values X, Y, or LR
 // (center positions of sticks)
 int calValueXYLR[PIN_NUM_COUNT] = { 0 };
 
-int pinsToReadXYLR[PIN_NUM_COUNT] = {
+// pins number stored in array for easy
+// accses in cicle
+uint8_t pinsToReadXYLR[PIN_NUM_COUNT] = {
   PIN_DIR_X,
   PIN_DIR_Y,
   PIN_DIR_LR
@@ -52,7 +60,17 @@ void setup() {
   // different speeds can be found in library STMsGPU.h
   gpu.begin(BAUD_SPEED_1M); // BAUD_SPEED_1M = 1,000,000 bod/s
 
-  gpu.fillScreen(COLOR_DARKGREY);
+  /* load MAX_TILES tiles to sGPU's RAM at RAM_BASE position in it's RAM,
+  *  from tileFileName,
+  *  located on SD card attached to STM32 sGPU
+  *  TLE_START - nunber of tile in tileset from which tiles will be loaded
+  *  file name must respond to 8.3 name system
+  *  8 chars max for filename, 3 chars max for file extension
+  *  sGPU add *.tle extension automatically
+  */
+  gpu.loadTileSet16x16("txtures", TILE_SET_W-1, RAM_BASE, TLE_START, MAX_TILES);
+
+  gpu.fillScreen(COLOR_DARKGREY); // make borders around render window
 
   // first call for calibration center values
   calibrateAnalogeSticks();
@@ -75,28 +93,28 @@ void loop() {
 
     // delay for frame limit, sGPU can glitch from DDoS like that
     // it also decrese input lag (i`m siriosly, this is not joke!)
-    //delay(100);
     limitFPS();
   }
 }
 
 void limitFPS(void)
 {
-  //This show how long we draw previous frame
+  // calculate how long we draw previous frame
   lastMicros = thisMicros;
   thisMicros = millis();
   uint32_t resultMicros = thisMicros - lastMicros;
     
   uint32_t fps = 1000/resultMicros;
  
-  if(fps <= FPS_MIN) --delayLong;    //trying to get 30 fps
-  if(fps >= FPS_MAX) ++delayLong;    //but not more 60 fps
+  if(fps <= FPS_MIN) --delayLong;    //trying to get FPS_MIN fps
+  if(fps >= FPS_MAX) ++delayLong;    //but not more FPS_MAX fps
 
   delay(delayLong*2); //slow down! it`s too faast!
 }
 
 void calibrateAnalogeSticks(void)
 {
+  // Before run, be shure what stiks at center position!
   for (uint8_t i = 0; i < PIN_NUM_COUNT; i++) {
     calValueXYLR[i] = getPinValue(pinsToReadXYLR[i]);
   }
@@ -123,7 +141,7 @@ uint8_t checkAnalogeSticks(void)
     
     // stick position changed?
     if(newValueXYLR != calValueXYLR[count]) {
-      // is it more than calibrated value? in both case apply direction
+      // is it more than calibrated value? (in both case apply direction)
       direction |= (newValueXYLR > calValueXYLR[count] ? dirArray[count][0] : dirArray[count][1]);
     }
   }

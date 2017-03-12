@@ -1,5 +1,13 @@
 #include <STMsGPU.h>
 
+// this is need to load textures from *.tle file 
+// located on SD card - correctly
+#define MAX_TILES 36
+#define RAM_BASE 0
+#define TLE_START 0
+#define TILE_SET_W 7 // this is width of tileSet in tiles ( one tile width == 8 pixels)
+
+// ---------------------------------------------------------- //
 //#define CHK_GPU_BSY_PIN 2 // which pin arduino must check
 
 /* BE CAREFULL!! USED ONLY HARDWARE SERIAL PORT!!
@@ -9,26 +17,21 @@
 */
 //STMGPU gpu(CHK_GPU_BSY_PIN); // use hardware BSY check, pin used
 STMGPU gpu; // use software BSY check, no pin used
-
-
 // ---------------------------------------------------------- //
-void setup() {
-  //BAUD_SPEED_9600 = 9600
-  //BAUD_SPEED_57600 = 57600
-  //BAUD_SPEED_115200 = 115200
-  //BAUD_SPEED_1M = 1000000
-  gpu.begin(BAUD_SPEED_1M);
 
-  /* load 36 tiles to GPU's RAM at 0 position in it's RAM,,
+void setup() {
+  // different speeds can be found in library STMsGPU.h
+  gpu.begin(BAUD_SPEED_1M); // BAUD_SPEED_1M = 1,000,000 bod/s
+
+  /* load MAX_TILES tiles to sGPU's RAM at RAM_BASE position in it's RAM,
   *  from tileFileName,
-  *  located on SD card attached to STM32 GPU
-  *  7 - is width of tileSet in tiles ( 7 tiles width == 56 pixels)
+  *  located on SD card attached to STM32 sGPU
+  *  TLE_START - nunber of tile in tileset from which tiles will be loaded
   *  file name must respond to 8.3 name system
-  *  8 chars max for filename and 3 chars max for file extension
+  *  8 chars max for filename, 3 chars max for file extension
   *  sGPU add *.tle extension automatically
   */
-  gpu.loadTileSet8x8("mario", 7, 0, 0, 36);
-
+  gpu.loadTileSet8x8("mario", TILE_SET_W, RAM_BASE, TLE_START, MAX_TILES);
 
   /* load tiled background to to GPU's RAM
   *  file must be located on SD card attached to STM32 GPU!

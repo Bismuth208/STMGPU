@@ -394,7 +394,7 @@ void STMGPU::cp437(bool cp)
 }
   
 #if 0
-// this is much faster, but how ways to add this...
+// this is much faster, but how to add this...
 size_t STMGPU::print(const char *str)
 {
   cmdBuffer.cmd = DRW_PRNT;
@@ -636,7 +636,7 @@ void STMGPU::drawTile16x16(int16_t posX, int16_t posY, uint8_t tileNum)
 }
   
   // ---- tile 32x32 ---- //
-  void STMGPU::loadTile32x32(const char *tileSetArrName, uint8_t tileSetW,
+void STMGPU::loadTile32x32(const char *tileSetArrName, uint8_t tileSetW,
                                   uint8_t ramTileNum, uint8_t tileNum)
 {
   loadTileBase(LDD_TLE_32, tileSetArrName, tileSetW, ramTileNum, tileNum);
