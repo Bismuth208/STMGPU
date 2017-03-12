@@ -46,6 +46,17 @@ uint16_t currentPaletteArr[USER_PALETTE_SIZE]; // user can specify max 256 color
 uint8_t palChanged =0; // status flag; force to redraw tiles
 
 // -------------------------------------------------------- //
+/* as raycaster engine isolated, 
+ * then need some accses to main global data
+ * this is one of the ways
+ */
+void initRaycasterPointers(void)
+{
+  setRayCastPalette(currentPaletteArr);
+  setLevelMap(mainBackGround);
+  
+  setTileArrayPonter(&tileArr16x16);
+}
 
 // load to RAM built-in palette
 void loadDefaultPalette(void)
@@ -55,8 +66,6 @@ void loadDefaultPalette(void)
   
   // 234 colors and each 2 byte in size
   //memcpy32(currentPaletteArr, STMsGPU_234palette, STMSGPU_PALETTE*2);
-  
-  setRayCastPalette(currentPaletteArr);
 }
 
 #if 0

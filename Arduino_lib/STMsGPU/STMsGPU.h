@@ -141,23 +141,22 @@
 // ----------------- SD card ---------------- //
 #define LDD_USR_PAL     0x50    // load user palette from SD card
 #define DRW_BMP_FIL     0x51    // draw bmp file located on SD card
-//#define NOT_USED        0x52
-//#define NOT_USED        0x53
+#define LDD_SND_FIL     0x52    // load sound file
+#define LDD_3D_MAP_FIL  0x53    // load map file for 3D level (raycast engine)
 //#define NOT_USED        0x54
 //#define NOT_USED        0x55
 //#define NOT_USED        0x56
 //#define NOT_USED        0x57
-//#define NOT_USED        0x58
+//#define NOT_USED        0x58 // make screenshot to SD card
 //#define NOT_USED        0x59
 //#define NOT_USED        0x5A
 //#define NOT_USED        0x5B
-//#define NOT_USED        0x5C
-
 
 // ------------------ Sound ----------------- //
+//#define NOT_USED        0x5C
 //#define NOT_USED        0x5D
 #define SND_PLAY_TONE   0x5E
-//#define NOT_USED        0x5F
+#define SND_PLAY_BUF    0x5F
 
 
 // --------------- GUI commands -------------- //
@@ -169,10 +168,13 @@
 //#define DRW_BTN_NUM     0x65    // draw numerated buttons
 //#define NOT_USED        0x66
 //#define NOT_USED        0x67
-//#define NOT_USED        0x68
-//#define NOT_USED        0x69
-//#define NOT_USED        0x6A
-//#define NOT_USED        0x6B
+
+
+// --------------- '3D' engine --------------- //
+#define RENDER_MAP        0x68
+#define MOVE_CAMERA       0x69
+#define SET_CAM_POS       0x6A
+//#define RENDER_BCKGRND    0x6B  // render background; sky, floor
 //#define NOT_USED        0x6C
 //#define NOT_USED        0x6D
 //#define NOT_USED        0x6E
@@ -221,6 +223,15 @@
 #define SPR_1X2_32 9
 #define SPR_2X1_32 10
 #define SPR_2X2_32 11
+
+// ------------------------------------------------------------------- //
+// Move direction defines for 3D
+#define MOVE_UP            0x01
+#define MOVE_DOWN          0x02
+#define MOVE_LEFT          0x04
+#define MOVE_RIGHT         0x08
+#define MOVE_CLOCKWISE_R   0x10
+#define MOVE_CLOCKWISE_L   0x20
 
 // ------------------------------------------------------------------- //
 #pragma pack(push, 1)
@@ -340,6 +351,11 @@ public:
        writeWordData(uint16_t c);
   
 // ------------------- Tile ----------------- //
+  void sendTileData(uint8_t tileType, int16_t posX, int16_t posY, uint8_t tileNum);
+  void loadTileBase(uint8_t tileType, const char *tileSetArrName, uint8_t tileSetW,
+                            uint8_t ramTileNum, uint8_t tileNum);
+  void loadTileBase(uint8_t tileType, const char *tileSetArrName, uint8_t tileSetW,
+                    uint8_t ramTileBase, uint8_t tileMin, uint8_t tileMax);
   // ---- tile 8x8 ---- //
   void loadTile8x8(const char *tileSetArrName, uint8_t tileSetW,
                             uint8_t ramTileNum, uint8_t tileNum);
@@ -405,6 +421,11 @@ public:
   void drawWindowGUI(int16_t posX, int16_t posY,
                          int16_t w, int16_t h, const __FlashStringHelper* str);
   
+  
+  // --------------- '3D' engine --------------- //
+  void renderFrame(void);
+  void moveCamera(uint8_t direction);
+  //void setCamPosition(uint16_t posX, uint16_t posY, uint16_t angle);
 
   
 private:

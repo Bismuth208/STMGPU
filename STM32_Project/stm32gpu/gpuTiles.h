@@ -43,6 +43,7 @@ extern uint8_t palChanged;
 // -------------------------------------------------------- //
 
 // for internal use only
+void initRaycasterPointers(void);
 void loadDefaultPalette(void);
 void loadTile8x8(uint8_t tileNum, uint8_t tileSetW, uint8_t *pTile, const uint8_t *pTileSet);
 void loadInternalTileSet(uint8_t tileSetSize, uint8_t tileSetW, const uint8_t *pTileSet);

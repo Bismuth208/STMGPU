@@ -68,6 +68,7 @@ void startupInit(void)
   
   setRotation(1); // horizontal
   loadDefaultPalette();
+  initRaycasterPointers();
   drawBootLogo();
   
   // Init SD and SPI_2 after all inited

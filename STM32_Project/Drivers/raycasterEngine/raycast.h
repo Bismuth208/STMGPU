@@ -16,16 +16,21 @@
 #define MAP_WIDTH   24
 #define MAP_HEIGHT  24
 
-// 320x130 == 41600 pixels, and still looks pretty good! aspect ratio: 2,46:1
-// when 300x160 == 48000 pixels. aspect ratio: 1,88:1
-#define LCD_WIDTH   320 //300
-#define LCD_HEIGHT  130 //160
+// Set seize of render window
+// 320x130 == 41600 pixels, and still looks pretty good!
+// aspect ratio: 2,46:1 (alomst silver ratio)
+#define RENDER_W_WIDTH   320
+#define RENDER_W_HEIGHT  130
 
 #define TEXTURE_SIZE      16
 // calculated as (TEXTURE_SIZE/BLOCK_SIZE)
 //#define TEXTURE_SIZE_OFF  3.2    // for 64x;
 //#define TEXTURE_SIZE_OFF  1.6    // for 32x;
 #define TEXTURE_SIZE_OFF  0.8    // for 16x;
+//#define TEXTURE_SIZE_OFF  0.4    // for 8x8 px, really, dont use it! It's terreble!
+
+#define TEXTURE_QA_MIN 0
+#define TEXTURE_QA_MAX 2
 
 
 #define OFFSET_X   0   // \__ render window offset
@@ -48,6 +53,8 @@
 #define RENDER_QA_MIN      4
 #define RENDER_QA_MAX      8
 
+// make shadow for Y side in RGB565 color system
+#define SHADOW_Y_SIDE(color)   ((((color&0xF800)>>1)&0xF800) | (((color&0x07E0)>>1)&0x07E0) | (((color&0x001F)>>1)&0x001F))
 // -------------------------------------------------------------------- //
 #define MOVE_UP            0x01
 #define MOVE_DOWN          0x02
@@ -59,11 +66,11 @@
 
 // Holds the result of a ray being cast.
 typedef struct {
-    uint16_t targetBlockX;
-    uint16_t targetBlockY;
-    uint16_t textureId;
-    uint16_t textureOffset;
-    uint16_t sliceHeight;
+  uint16_t targetBlockX;
+  uint16_t targetBlockY;
+  uint16_t textureId;
+  uint16_t textureOffset;
+  uint16_t sliceHeight;
 } slice_t;
 
 // -------------------------------------------------------------------- //
@@ -71,12 +78,13 @@ typedef struct {
 void renderWalls(void);
 void moveCamera(uint8_t direction);
 void setCameraPosition(uint16_t posX, uint16_t posY, uint16_t angle);
-void serRenderQuality(uint8_t quality);
-// private
-void castRay(float x, float y, float angle, uint16_t slicePosX, slice_t *result);
-bool shouldInterpolate(slice_t *sliceA, slice_t *sliceB);
+void serRenderQuality(int8_t quality);
+//void setTextureQuality(uint8_t quality);
+
+// for init and internal use only
 void setRayCastPalette(uint16_t *pPal);
 void setLevelMap(uint8_t *pLevelMap);
+void setTileArrayPonter(uint8_t (*pTleArrayRAM)[10][256]);
 // -------------------------------------------------------------------- //
 
 #endif /*_SLICE_H */

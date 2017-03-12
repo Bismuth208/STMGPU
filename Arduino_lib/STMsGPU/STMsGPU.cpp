@@ -72,7 +72,7 @@ void STMGPU::begin(uint32_t baudRate)
   
   if(_useHardwareBsy) {
     // setup GPU bsy pin
-    pinMode(_bsyPin, INPUT);   // set as input
+    pinMode(_bsyPin, INPUT);     // set as input
     digitalWrite(_bsyPin, HIGH); // pull-up; does it really need? or left HI-z?
   }
 
@@ -125,7 +125,6 @@ void STMGPU::sendCommand(void *buf, uint8_t size)
   // finally, send data to sGPU
   pSerial->write((uint8_t*)buf, size);
 }
-
 // ------------------------------------------------------------------------------------ //
 
 
@@ -395,7 +394,7 @@ void STMGPU::cp437(bool cp)
 }
   
 #if 0
-// this is much faster, but now ways to add this...
+// this is much faster, but how ways to add this...
 size_t STMGPU::print(const char *str)
 {
   cmdBuffer.cmd = DRW_PRNT;
@@ -563,11 +562,20 @@ void STMGPU::writeWordData(uint16_t c)
 }
   
 // ------------------- Tile ----------------- //
-  // ---- tile 8x8 ---- //
-void STMGPU::loadTile8x8(const char *tileSetArrName, uint8_t tileSetW,
-                                  uint8_t ramTileNum, uint8_t tileNum)
+void STMGPU::sendTileData(uint8_t tileType, int16_t posX, int16_t posY, uint8_t tileNum)
 {
-  cmdBuffer.cmd = LDD_TLE_8;
+  cmdBuffer.cmd = tileType;
+  cmdBuffer.par1 = posX;
+  cmdBuffer.par2 = posY;
+  cmdBuffer.data[5] = tileNum;
+  
+  sendCommand(cmdBuffer.data, 6);
+}
+  
+void STMGPU::loadTileBase(uint8_t tileType, const char *tileSetArrName, uint8_t tileSetW,
+                           uint8_t ramTileNum, uint8_t tileNum)
+{
+  cmdBuffer.cmd = tileType;
   cmdBuffer.data[1] = strlen(tileSetArrName);
   cmdBuffer.data[2] = tileSetW;
   cmdBuffer.data[3] = ramTileNum;
@@ -577,104 +585,72 @@ void STMGPU::loadTile8x8(const char *tileSetArrName, uint8_t tileSetW,
   sendCommand((void*)tileSetArrName, cmdBuffer.data[1]); // send name of file
 }
   
-void STMGPU::loadTileSet8x8(const char *tileSetArrName, uint8_t tileSetW,
-                                      uint8_t ramTileBase, uint8_t tileMin, uint8_t tileMax)
+void STMGPU::loadTileBase(uint8_t tileType, const char *tileSetArrName, uint8_t tileSetW,
+                            uint8_t ramTileBase, uint8_t tileMin, uint8_t tileMax)
 {
-  cmdBuffer.cmd = LDD_TLES_8;
+  cmdBuffer.cmd = tileType;
   cmdBuffer.data[1] = strlen(tileSetArrName);
   cmdBuffer.data[2] = tileSetW;
   cmdBuffer.data[3] = ramTileBase;
   cmdBuffer.data[4] = tileMin;
   cmdBuffer.data[5] = tileMax;
-    
+  
   sendCommand(cmdBuffer.data, 6);
   sendCommand((void*)tileSetArrName, cmdBuffer.data[1]); // send name of file
+}
+  
+  // ---- tile 8x8 ---- //
+void STMGPU::loadTile8x8(const char *tileSetArrName, uint8_t tileSetW,
+                                  uint8_t ramTileNum, uint8_t tileNum)
+{
+  loadTileBase(LDD_TLE_8, tileSetArrName, tileSetW, ramTileNum, tileNum);
+}
+  
+void STMGPU::loadTileSet8x8(const char *tileSetArrName, uint8_t tileSetW,
+                                      uint8_t ramTileBase, uint8_t tileMin, uint8_t tileMax)
+{
+  loadTileBase(LDD_TLES_8, tileSetArrName, tileSetW, ramTileBase, tileMin, tileMax);
 }
 
 void STMGPU::drawTile8x8(int16_t posX, int16_t posY, uint8_t tileNum)
 {
-  cmdBuffer.cmd = DRW_TLE_8;
-  cmdBuffer.par1 = posX;
-  cmdBuffer.par2 = posY;
-  cmdBuffer.data[5] = tileNum;
-    
-  sendCommand(cmdBuffer.data, 6);
+  sendTileData(DRW_TLE_8, posX, posY, tileNum);
 }
   
   // ---- tile 16x16 ---- //
 void STMGPU::loadTile16x16(const char *tileSetArrName, uint8_t tileSetW,
                                   uint8_t ramTileNum, uint8_t tileNum)
 {
-  cmdBuffer.cmd = LDD_TLE_16;
-  cmdBuffer.data[1] = strlen(tileSetArrName);
-  cmdBuffer.data[2] = tileSetW;
-  cmdBuffer.data[3] = ramTileNum;
-  cmdBuffer.data[4] = tileNum;
-    
-  sendCommand(cmdBuffer.data, 5);
-  sendCommand((void*)tileSetArrName, cmdBuffer.data[1]); // send name of file
+  loadTileBase(LDD_TLE_16, tileSetArrName, tileSetW, ramTileNum, tileNum);
 }
   
 void STMGPU::loadTileSet16x16(const char *tileSetArrName, uint8_t tileSetW,
                                       uint8_t ramTileBase, uint8_t tileMin, uint8_t tileMax)
 {
-  cmdBuffer.cmd = LDD_TLES_16;
-  cmdBuffer.data[1] = strlen(tileSetArrName);
-  cmdBuffer.data[2] = tileSetW;
-  cmdBuffer.data[3] = ramTileBase;
-  cmdBuffer.data[4] = tileMin;
-  cmdBuffer.data[5] = tileMax;
-    
-  sendCommand(cmdBuffer.data, 6);
-  sendCommand((void*)tileSetArrName, cmdBuffer.data[1]); // send name of file
+  loadTileBase(LDD_TLES_16, tileSetArrName, tileSetW, ramTileBase, tileMin, tileMax);
 }
 
 void STMGPU::drawTile16x16(int16_t posX, int16_t posY, uint8_t tileNum)
 {
-  cmdBuffer.cmd = DRW_TLE_16;
-  cmdBuffer.par1 = posX;
-  cmdBuffer.par2 = posY;
-  cmdBuffer.data[5] = tileNum;
-    
-  sendCommand(cmdBuffer.data, 6);
+  sendTileData(DRW_TLE_16, posX, posY, tileNum);
 }
   
   // ---- tile 32x32 ---- //
   void STMGPU::loadTile32x32(const char *tileSetArrName, uint8_t tileSetW,
                                   uint8_t ramTileNum, uint8_t tileNum)
 {
-  cmdBuffer.cmd = LDD_TLE_32;
-  cmdBuffer.data[1] = strlen(tileSetArrName);
-  cmdBuffer.data[2] = tileSetW;
-  cmdBuffer.data[3] = ramTileNum;
-  cmdBuffer.data[4] = tileNum;
-    
-  sendCommand(cmdBuffer.data, 5);
-  sendCommand((void*)tileSetArrName, cmdBuffer.data[1]); // send name of file
+  loadTileBase(LDD_TLE_32, tileSetArrName, tileSetW, ramTileNum, tileNum);
 }
   
 void STMGPU::loadTileSet32x32(const char *tileSetArrName, uint8_t tileSetW,
                                       uint8_t ramTileBase, uint8_t tileMin, uint8_t tileMax)
 {
-  cmdBuffer.cmd = LDD_TLES_32;
-  cmdBuffer.data[1] = strlen(tileSetArrName);
-  cmdBuffer.data[2] = tileSetW;
-  cmdBuffer.data[3] = ramTileBase;
-  cmdBuffer.data[4] = tileMin;
-  cmdBuffer.data[5] = tileMax;
-    
-  sendCommand(cmdBuffer.data, 6);
-  sendCommand((void*)tileSetArrName, cmdBuffer.data[1]); // send name of file
+  loadTileBase(LDD_TLES_32, tileSetArrName, tileSetW, ramTileBase, tileMin, tileMax);
 }
 
 void STMGPU::drawTile32x32(int16_t posX, int16_t posY, uint8_t tileNum)
 {
-  cmdBuffer.cmd = DRW_TLE_32;
-  cmdBuffer.par1 = posX;
-  cmdBuffer.par2 = posY;
-  cmdBuffer.data[5] = tileNum;
-    
-  sendCommand(cmdBuffer.data, 6);
+  sendTileData(DRW_TLE_32, posX, posY, tileNum);
 }
 
 // universal tile draw 8, 16, 32
@@ -936,11 +912,37 @@ void STMGPU::drawWindowGUI(int16_t posX, int16_t posY,
   sendCommand(cmdBuffer.data, 10);
   
   for (uint8_t count=0; count < cmdBuffer.data[9]; count++) {
-    sendCommand(pgm_read_byte(p + count), 1);
+    pSerial->write(pgm_read_byte(p + count));
   }
 }
   
+// --------------- '3D' engine --------------- //
+void STMGPU::renderFrame(void)
+{
+  // yep... only 1 byte. I make this for protect sGPU from DDoS.
+  cmdBuffer.cmd = RENDER_MAP;
+  sendCommand(cmdBuffer.data, 1);
+}
   
+void STMGPU::moveCamera(uint8_t direction)
+{
+  cmdBuffer.cmd = MOVE_CAMERA;
+  cmdBuffer.data[1] = direction;
+  
+  sendCommand(cmdBuffer.data, 2);
+}
+  
+/*
+void STMGPU::setCamPosition(uint16_t posX, uint16_t posY, uint16_t angle)
+{
+ cmdBuffer.cmd = SET_CAM_POS;
+ cmdBuffer.par1 = posX;
+ cmdBuffer.par2 = posY;
+ cmdBuffer.par3 = angle;
+ 
+ sendCommand(cmdBuffer.data, 7);
+}
+*/
   
 // -------------------- ___ ---------------------- //
 
