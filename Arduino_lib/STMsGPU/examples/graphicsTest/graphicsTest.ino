@@ -2,7 +2,14 @@
 #include "gpuTest.h"
 
 // ---------------------------------------------------------- //
-//#define CHK_GPU_BSY_PIN 2 // which pin arduino must check
+/*
+ * which pin arduino must check, 
+ * but by default this functianality is disabled to save
+ * RAM and ROM memory.
+ * To enable it go to STMsGPU.h and 
+ * set define: 'REMOVE_HARDWARE_BSY' to 0
+ */ 
+//#define CHK_GPU_BSY_PIN 2
 
 /* BE CAREFULL!! USED ONLY HARDWARE SERIAL PORT!!
 *  If your board have only ONE hardware serial,
@@ -178,11 +185,9 @@ void drawRandCircle(void)
   uint16_t posX, posY;
 
   for (uint16_t i = 0; i < TEST_SAMPLE_SIZE; i++) {
-
     posX = RND_POSX(1);
     posY = RND_POSY(1);
-
-    r = ((randNum() % TFT_H)/4); // for radius
+    r = ((randNum() % TFT_H)/4); // for radius   
 
     gpu.drawCircle(posX, posY, r, RND_565COLOR);
   }
@@ -194,11 +199,10 @@ void drawRandFillCircle(void)
   uint16_t posX, posY;
 
   for (uint16_t i = 0; i < TEST_SAMPLE_SIZE; i++) {
-
     posX = RND_POSX(1);
     posY = RND_POSY(1);
     r = ((randNum() % TFT_H)/4); // for radius
-
+    
     gpu.fillCircle(posX, posY, r, RND_565COLOR);
   }
 }
@@ -374,9 +378,10 @@ void loop() {
   uint8_t testsCount = FUNC_TO_TEST_COUNT;
 
   for (uint8_t count = 0; count < testsCount; count++) {
-    pArrExecGFXFunc[count](); // exec test function
+    pArrTestFunc[count](); // exec test function
 
-    delay(1000); // little delay to see what happend on screen
+    // little delay to see what happend on screen
+    gpu.iDelay(1000); // reque less ROM space and equal to delay()
     gpu.fillScreen(COLOR_BLACK); // clear screen by black color
   }
 }

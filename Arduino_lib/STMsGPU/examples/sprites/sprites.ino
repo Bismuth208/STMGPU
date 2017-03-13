@@ -2,8 +2,17 @@
 
 // --------------------------------------------------------- //
 
-#define TFT_W gpu.width()
-#define TFT_H gpu.height()
+#define MAX_SPEED 1 
+
+// can save ROM and increase speed, but its unfair!
+// use it if you know end resolution
+#if MAX_SPEED
+ #define TFT_W 320
+ #define TFT_H 240
+#else
+ #define TFT_W gpu.width()
+ #define TFT_H gpu.height()
+#endif /* MAX_SPEED */
 
 #define TEST_SAMPLE_SIZE    300
 #define TEST_SAMPLE_SCREENS 20 // this is equal to 24000 tiles
@@ -18,7 +27,14 @@
 #define SPRITE_NUMBER 0
 
 // ---------------------------------------------------------- //
-//#define CHK_GPU_BSY_PIN 2 // which pin arduino must check
+/*
+ * which pin arduino must check, 
+ * but by default this functianality is disabled to save
+ * RAM and ROM memory.
+ * To enable it go to STMsGPU.h and 
+ * set define: 'REMOVE_HARDWARE_BSY' to 0
+ */ 
+//#define CHK_GPU_BSY_PIN 2
 
 /* BE CAREFULL!! USED ONLY HARDWARE SERIAL PORT!!
 *  If your board have only ONE hardware serial,

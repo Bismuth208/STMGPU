@@ -6,18 +6,34 @@
 #include <uart.h>
 #include <STMsGPU_c.h>
 
-// --------------------------------------------------------- //
+/* BE CAREFULL!! USED ONLY HARDWARE SERIAL PORT!!
+ * If your board have only ONE hardware serial,
+ * then you MUST use softWare serial instead!
+ * moreover arduino libs here totally not supported!
+ */
 
-#define TFT_W gpuWidth()
-#define TFT_H gpuHeight()
+// --------------------------------------------------------- //
+#define MAX_SPEED 1 
+
+// can save ROM and increase speed, but its unfair!
+// use it if you know end resolution
+#if MAX_SPEED
+ #define TFT_W 320
+ #define TFT_H 240
+#else
+ #define TFT_W gpuWidth()
+ #define TFT_H gpuHeight()
+#endif /* MAX_SPEED */
 
 #define TEST_SAMPLE_SIZE    300
 #define TEST_SAMPLE_SCREENS 20 // this is equal to 24000 tiles
 
+// this is need to load textures from *.tle file 
+// located on SD card - correctly
 #define MAX_TILES 70
 #define RAM_BASE 0
 #define TLE_START 0
-#define TILE_SET_W 10 // ( 9 tiles width == 72 pixels)
+#define TILE_SET_W 10 // this is width of tileSet in tiles ( one tile width == 8 pixels)
 
 #define SPRITE_NUMBER 0
 
@@ -42,13 +58,13 @@ uint16_t randNum(void)
 
 void gpuLoadTiles(void)
 {
-  /* load MAX_TILES tiles to GPU's RAM at RAM_BASE position in it's RAM,
-  *  from tileFileName, located on SD card attached to STM32 GPU;
-  *  TILE_SET_W - is width of tileSet in tiles;
-  *  TLE_START - nunber of tile in tileset from which tiles will be loaded;
-  *  File name must respond to 8.3 name system,
-  *  8 chars max for filename, 3 chars max for file extension.
-  *  sGPU add *.tle extension automatically.
+  /* load MAX_TILES tiles to sGPU's RAM at RAM_BASE position in it's RAM,
+  *  from tileFileName,
+  *  located on SD card attached to STM32 sGPU
+  *  TLE_START - nunber of tile in tileset from which tiles will be loaded
+  *  file name must respond to 8.3 name system
+  *  8 chars max for filename, 3 chars max for file extension
+  *  sGPU add *.tle extension automatically
   */
   gpuSDLoadTileSet8x8(tileFileName, TILE_SET_W-1, RAM_BASE, TLE_START, MAX_TILES);
 }
@@ -90,11 +106,8 @@ int main(void)
   // need for delays;
   initSysTickTimer();
 
-  //BAUD_SPEED_9600 = 9600
-  //BAUD_SPEED_57600 = 57600
-  //BAUD_SPEED_115200 = 115200
-  //BAUD_SPEED_1M = 1000000
-  sync_gpu(BAUD_SPEED_1M);  // establish connection
+  // different speeds can be found in library STMsGPU_c.h
+  sync_gpu(BAUD_SPEED_1M);  // BAUD_SPEED_1M = 1,000,000 bod/s
 
   gpuLoadTiles();
   gpuMakeSprites();

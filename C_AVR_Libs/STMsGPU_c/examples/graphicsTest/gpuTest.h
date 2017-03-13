@@ -1,5 +1,36 @@
 #include <avr/pgmspace.h>
 
+#define MAX_SPEED 1 
+
+// can save ROM and increase speed, but its unfair!
+// use it if you know end resolution
+#if MAX_SPEED
+ #define TFT_W 320
+ #define TFT_H 240
+#else
+ #define TFT_W gpuWidth()
+ #define TFT_H gpuHeight()
+#endif /* MAX_SPEED */
+
+#define TEST_SAMPLE_SIZE 2000
+#define TEST_SAMPLE_SCREENS 2
+
+#define BASE_RADIUS 10
+
+#define MIN_COLOR 32
+#define MAX_COLOR 255
+#define COLOR_RANGE (((MAX_COLOR + 1) - MIN_COLOR) + MIN_COLOR)
+#define RND_COLOR (randNum() % COLOR_RANGE)
+
+// once again little more cheating...
+//#define RND_565COLOR(r, g, b)  (color565(r, g, b))
+#define RND_565COLOR  (((RND_COLOR & 0xF8) << 8) | ((RND_COLOR & 0xFC) << 3) | (RND_COLOR >> 3))
+
+#define RND_POSX(offset) (randNum() % (TFT_W-offset))
+#define RND_POSY(offset) (randNum() % (TFT_H-offset)) 
+
+// --------------------------------------------------------- //
+
 const uint8_t Loremipsum[] PROGMEM = "\
 Lorem ipsum dolor sit amet, consectetur adipiscing elit. \
 Curabitur adipiscing ante sed nibh tincidunt feugiat. \
@@ -38,7 +69,7 @@ void drawRandCircle(void);
 void drawRandFillCircle(void);
 void matrixScreen(void);
 
-void (*pArrExecGFXFunc[])(void) = {
+void (*pArrTestFunc[])(void) = {
     testdrawtext,
     testlines,
     testfastlines,
@@ -52,7 +83,7 @@ void (*pArrExecGFXFunc[])(void) = {
     drawRandLines,
     drawRandRect,
     drawRandFillRect,
-    //drawRandTriangles,
+    drawRandTriangles,
     //drawRandRoundRect,
     //drawRandRoundFillRect,
     drawRandCircle,
@@ -60,4 +91,4 @@ void (*pArrExecGFXFunc[])(void) = {
     matrixScreen
   };
 
-  #define FUNC_TO_TEST_COUNT (sizeof(pArrExecGFXFunc)/sizeof(pArrExecGFXFunc[0]))
+#define FUNC_TO_TEST_COUNT (sizeof(pArrTestFunc)/sizeof(pArrTestFunc[0]))

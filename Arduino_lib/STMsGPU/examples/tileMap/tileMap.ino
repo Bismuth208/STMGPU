@@ -8,7 +8,14 @@
 #define TILE_SET_W 7 // this is width of tileSet in tiles ( one tile width == 8 pixels)
 
 // ---------------------------------------------------------- //
-//#define CHK_GPU_BSY_PIN 2 // which pin arduino must check
+/*
+ * which pin arduino must check, 
+ * but by default this functianality is disabled to save
+ * RAM and ROM memory.
+ * To enable it go to STMsGPU.h and 
+ * set define: 'REMOVE_HARDWARE_BSY' to 0
+ */ 
+//#define CHK_GPU_BSY_PIN 2
 
 /* BE CAREFULL!! USED ONLY HARDWARE SERIAL PORT!!
 *  If your board have only ONE hardware serial,

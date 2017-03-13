@@ -1,17 +1,24 @@
 #include <STMsGPU.h>
 #include "gpuTest.h"
 
-// --------------------------------------------------------- //
-//#define CHK_GPU_BSY_PIN 2 // which pin arduino must check
+// ---------------------------------------------------------- //
+/*
+ * which pin arduino must check, 
+ * but by default this functianality is disabled to save
+ * RAM and ROM memory.
+ * To enable it go to library STMsGPU.h and 
+ * set define: 'REMOVE_HARDWARE_BSY' to 0
+ */ 
+//#define CHK_GPU_BSY_PIN 2
 
 /* BE CAREFULL!! USED ONLY HARDWARE SERIAL PORT!!
-*  If your board have only ONE hardware serial,
-*  then you MUST use SoftWareSerial instead!
-*  On STM32 boards used Serial1 on PA9 and PA10.
-*/
+ * If your board have only ONE hardware serial,
+ * then you MUST use SoftWareSerial instead!
+ * On STM32 boards used Serial1 on PA9 and PA10.
+ */
 //STMGPU gpu(CHK_GPU_BSY_PIN); // use hardware BSY check, pin used
 STMGPU gpu; // use software BSY check, no pin used
-// --------------------------------------------------------- //
+// ---------------------------------------------------------- //
 
 static uint16_t nextInt = 9;
 
@@ -71,7 +78,7 @@ void fillScreenByTiles(void)
 
   for(uint8_t i = 0; i < TEST_SAMPLE_SCREENS; i++) {
     for(yStep = 0; yStep < maxYSize; yStep++) {
-      for xStep = 0; xStep < maxXSize; xStep++) {
+      for(xStep = 0; xStep < maxXSize; xStep++) {
 
         // draw random tile form 0 to MAX_TILES
         gpu.drawTile8x8(xStep*TLE_8X8_SIZE, yStep*TLE_8X8_SIZE, randNum()%MAX_TILES);
@@ -101,7 +108,7 @@ void loop() {
   uint8_t testsCount = FUNC_TO_TEST_COUNT;
 
   for (uint8_t count = 0; count < testsCount; count++) {
-    pArrExecGFXFunc[count](); // exec test function
+    pArrTestFunc[count](); // exec test function
 
     delay(500); // little delay to see what happend on screen
     gpu.fillScreen(COLOR_BLACK); // clear screen by black color

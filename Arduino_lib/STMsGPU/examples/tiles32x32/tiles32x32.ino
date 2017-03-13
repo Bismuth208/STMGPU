@@ -1,8 +1,15 @@
 #include <STMsGPU.h>
 #include "gpuTest.h"
 
-// --------------------------------------------------------- //
-//#define CHK_GPU_BSY_PIN 2 // which pin arduino must check
+// ---------------------------------------------------------- //
+/*
+ * which pin arduino must check, 
+ * but by default this functianality is disabled to save
+ * RAM and ROM memory.
+ * To enable it go to library STMsGPU.h and 
+ * set define: 'REMOVE_HARDWARE_BSY' to 0
+ */ 
+//#define CHK_GPU_BSY_PIN 2
 
 /* BE CAREFULL!! USED ONLY HARDWARE SERIAL PORT!!
 *  If your board have only ONE hardware serial,
@@ -11,7 +18,7 @@
 */
 //STMGPU gpu(CHK_GPU_BSY_PIN); // use hardware BSY check, pin used
 STMGPU gpu; // use software BSY check, no pin used
-// --------------------------------------------------------- //
+// ---------------------------------------------------------- //
 
 static uint16_t nextInt = 9;
 

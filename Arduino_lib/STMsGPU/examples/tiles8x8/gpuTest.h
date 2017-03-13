@@ -1,5 +1,14 @@
-#define TFT_W gpu.width()
-#define TFT_H gpu.height()
+#define MAX_SPEED 1 
+
+// can save ROM and increase speed, but its unfair!
+// use it if you know end resolution
+#if MAX_SPEED
+ #define TFT_W 320
+ #define TFT_H 240
+#else
+ #define TFT_W gpu.width()
+ #define TFT_H gpu.height()
+#endif /* MAX_SPEED */
 
 #define TEST_SAMPLE_SIZE    12000
 #define TEST_SAMPLE_SCREENS 20 // this is equal to 24000 tiles
@@ -19,23 +28,10 @@ void drawRamTileSet8x8(void);
 void fillScreenByTiles(void);
 
 // this is pointers to test functions
-void (*pArrExecGFXFunc[])(void) = {
+void (*pArrTestFunc[])(void) = {
     testDrawTiles,
     drawRamTileSet8x8,
     fillScreenByTiles,
   };
 
-#define FUNC_TO_TEST_COUNT (sizeof(pArrExecGFXFunc)/sizeof(pArrExecGFXFunc[0]))
-
-
-#define MAX_SPEED 0 
-
-// can save ROM and increase speed, but its unfair!
-// use it if you know end resolution
-#if MAX_SPEED
- #define TFT_W 320
- #define TFT_H 240
-#else
- #define TFT_W gpu.width()
- #define TFT_H gpu.height()
-#endif /* MAX_SPEED */
+#define FUNC_TO_TEST_COUNT (sizeof(pArrTestFunc)/sizeof(pArrTestFunc[0]))

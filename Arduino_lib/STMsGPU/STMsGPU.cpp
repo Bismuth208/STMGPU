@@ -40,6 +40,7 @@
 // ------------------------------------------------------------------------------------ //
 
 // --------------- Constructor --------------- //
+#if !REMOVE_HARDWARE_BSY
 STMGPU::STMGPU(int8_t bsyPin):_bsyPin(bsyPin)
 {
   if(bsyPin) {
@@ -50,11 +51,15 @@ STMGPU::STMGPU(int8_t bsyPin):_bsyPin(bsyPin)
 }
 
 STMGPU::STMGPU():_useHardwareBsy(false) {}
+#else
+
+STMGPU::STMGPU() {}
+#endif /* REMOVE_HARDWARE_BSY */
 // ------------------------------------------- //
 
 
-// this one make sync whith GPU
-void STMGPU::begin(uint32_t baudRate)
+// this one make sync whith sGPU
+void STMGPU::begin(baudSpeed_t baudRate)
 {
   bool syncEstablished = false;
   uint8_t syncData[] = {0x42, 0xDD};
@@ -69,17 +74,18 @@ void STMGPU::begin(uint32_t baudRate)
 #endif
   
   pSerial->begin(baudRate);
-  
+#if !REMOVE_HARDWARE_BSY
   if(_useHardwareBsy) {
-    // setup GPU bsy pin
+    // setup sGPU bsy pin
     pinMode(_bsyPin, INPUT);     // set as input
     digitalWrite(_bsyPin, HIGH); // pull-up; does it really need? or left HI-z?
   }
-
+#endif
+  
   while(!syncEstablished) {
     while(pSerial->available()==0) {
       pSerial->write(syncData, 0x02); // two bytes
-      delay(1000); // one transfer per second
+      iDelay(1000); //delay(1000); // one transfer per second
     }
 
     if(pSerial->read() == SYNC_OK) {
@@ -108,22 +114,35 @@ void STMGPU::begin(uint32_t baudRate)
  */
 void STMGPU::sendCommand(void *buf, uint8_t size)
 {
-  // wait untill GPU buffer will ready
+#if !REMOVE_HARDWARE_BSY
+  // wait untill sGPU buffer will ready
   if(_useHardwareBsy) { // harware protection
-    
     // yep, stop to doing everything and watch only for this pin!
     while(digitalRead(_bsyPin));
     
   } else { // software protection
-    
     if(pSerial->read() == BSY_MSG_CODE_WAIT) {
       // same story as previous, all power of MCU will be concentrated for this
       while(pSerial->read() != BSY_MSG_CODE_READY);
     }
   }
+#else
+  if(pSerial->read() == BSY_MSG_CODE_WAIT) {
+    // same story as previous, all power of MCU will be concentrated for this
+    while(pSerial->read() != BSY_MSG_CODE_READY);
+  }
+#endif /* REMOVE_HARDWARE_BSY */
   
   // finally, send data to sGPU
   pSerial->write((uint8_t*)buf, size);
+}
+
+// reque less ROM space and almost equal* to delay()
+// *(no yeld() and less precition)
+void STMGPU::iDelay(uint16_t duty)
+{
+  uint32_t currentMillis = millis();
+  while((millis() - currentMillis) < duty) {};
 }
 // ------------------------------------------------------------------------------------ //
 
@@ -301,18 +320,8 @@ void STMGPU::getResolution(void)
   _height = cmdBuffer.par2;
 }
 
-int16_t STMGPU::height(void)
-{
-  return _height;
-}
-
-int16_t STMGPU::width(void)
-{
-  return _width;
-}
-
 // --------------- Font/Print --------------- //
-// make a DDoS to GPU's buffer...
+// make a DDoS to sGPU's buffer...
 #if ARDUINO >= 100
 size_t STMGPU::write(uint8_t c) {
 #else
@@ -932,7 +941,6 @@ void STMGPU::moveCamera(uint8_t direction)
   sendCommand(cmdBuffer.data, 2);
 }
   
-/*
 void STMGPU::setCamPosition(uint16_t posX, uint16_t posY, uint16_t angle)
 {
  cmdBuffer.cmd = SET_CAM_POS;
@@ -942,7 +950,6 @@ void STMGPU::setCamPosition(uint16_t posX, uint16_t posY, uint16_t angle)
  
  sendCommand(cmdBuffer.data, 7);
 }
-*/
   
 // -------------------- ___ ---------------------- //
 

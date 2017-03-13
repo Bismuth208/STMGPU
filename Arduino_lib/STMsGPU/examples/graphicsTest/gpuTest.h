@@ -30,7 +30,8 @@ void drawRandFillCircle(void);
 void matrixScreen(void);
 
 
-void (*pArrExecGFXFunc[])(void) = {
+// array wthith ponters to test functions 
+void (*pArrTestFunc[])(void) = {
     testdrawtext,
     testlines,
     testfastlines,
@@ -52,7 +53,7 @@ void (*pArrExecGFXFunc[])(void) = {
     matrixScreen
   };
 
-#define FUNC_TO_TEST_COUNT (sizeof(pArrExecGFXFunc)/sizeof(pArrExecGFXFunc[0]))
+#define FUNC_TO_TEST_COUNT (sizeof(pArrTestFunc)/sizeof(pArrTestFunc[0]))
 
 // --------------------------------------------------------- //
 #define MAX_SPEED 1 
@@ -78,6 +79,7 @@ void (*pArrExecGFXFunc[])(void) = {
 #define COLOR_RANGE (((MAX_COLOR + 1) - MIN_COLOR) + MIN_COLOR)
 #define RND_COLOR (randNum() % COLOR_RANGE)
 
+// once again little more cheating...
 //#define RND_565COLOR(r, g, b)  (gpu.color565(r, g, b))
 #define RND_565COLOR  (((RND_COLOR & 0xF8) << 8) | ((RND_COLOR & 0xFC) << 3) | (RND_COLOR >> 3))
 

@@ -1,5 +1,14 @@
-#define TFT_W gpu.width()
-#define TFT_H gpu.height()
+#define MAX_SPEED 1 
+
+// can save ROM and increase speed, but its unfair!
+// use it if you know end resolution
+#if MAX_SPEED
+ #define TFT_W 320
+ #define TFT_H 240
+#else
+ #define TFT_W gpu.width()
+ #define TFT_H gpu.height()
+#endif /* MAX_SPEED */
 
 #define TEST_SAMPLE_SIZE    12000
 #define TEST_SAMPLE_SCREENS 80

@@ -3,31 +3,33 @@
 #include <uart.h>
 #include <STMsGPU_c.h>
 
-// ---------------------------------------------------------- //
-// sGPU add *.bmp extension automatically
-const uint8_t bmpFileName1[] = "vice24";
-const uint8_t bmpFileName2[] = "circuit";
-const uint8_t bmpFileName3[] = "tiger";
-const uint8_t bmpFileName4[] = "house";
+/* BE CAREFULL!! USED ONLY HARDWARE SERIAL PORT!!
+ * If your board have only ONE hardware serial,
+ * then you MUST use softWare serial instead!
+ * moreover arduino libs here totally not supported!
+ */
 
 // ---------------------------------------------------------- //
+const uint8_t bmpFileName1[] = "tree1";
+const uint8_t bmpFileName2[] = "tree2";
+const uint8_t bmpFileName3[] = "tree3";
+// ---------------------------------------------------------- //
+
 int main(void)
 {
   // it`s enable timer0 on atmega328p;
   // need for delays;
   initSysTickTimer();
 
-  //BAUD_SPEED_9600 = 9600
-  //BAUD_SPEED_57600 = 57600
-  //BAUD_SPEED_115200 = 115200
-  //BAUD_SPEED_1M = 1000000
-  sync_gpu(BAUD_SPEED_1M);  // establish connection
+  // different speeds can be found in library STMsGPU_c.h
+  sync_gpu(BAUD_SPEED_1M);  // BAUD_SPEED_1M = 1,000,000 bod/s
 
   for(;;) {
+    // sGPU add *.bmp extension automatically
+    // at current moment sopported only BMP24 (whith no alpha channel)!
   	gpuSDPrintBMPat(0, 20, bmpFileName1);
     gpuSDPrintBMP(bmpFileName2);
     gpuSDPrintBMP(bmpFileName3);
-    gpuSDPrintBMP(bmpFileName4);
 
     gpuFillScreen(COLOR_BLACK);
   }

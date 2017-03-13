@@ -73,10 +73,9 @@
 //#define NOT_USED        0x1C
 //#define NOT_USED        0x1D
 //#define NOT_USED        0x1E
-//#define NOT_USED        0x1F
-
 
 // ---------------- Low Level --------------- //
+#define SET_BRGHTNS_F   0x1F    // setDispBrightnessFade()
 #define SET_ADR_WIN     0x20
 #define SET_ROTATION    0x21
 #define SET_SCRL_AREA   0x22
@@ -117,7 +116,7 @@
 #define DRW_TLE_MAP     0x3D    // draw background tile map 8x8 on TFT screen
 
 //#define LDD_TLE_U       0x3E    // load specified tile size from SD
-#define DRW_TLE_U       0x3F    // draw specified tile size on TFT screen
+//#define DRW_TLE_U       0x3F    // draw specified tile size on TFT screen
 
 // ----------------- Sprite ----------------- //
 #define SET_SPR_POS     0x40    // set sprite position
@@ -142,7 +141,7 @@
 #define LDD_USR_PAL     0x50    // load user palette from SD card
 #define DRW_BMP_FIL     0x51    // draw bmp file located on SD card
 #define LDD_SND_FIL     0x52    // load sound file
-#define LDD_3D_MAP_FIL  0x53    // load map file for 3D level (raycast engine)
+//#define NOT_USED        0x53
 //#define NOT_USED        0x54
 //#define NOT_USED        0x55
 //#define NOT_USED        0x56
@@ -175,9 +174,9 @@
 #define MOVE_CAMERA       0x69
 #define SET_CAM_POS       0x6A
 //#define RENDER_BCKGRND    0x6B  // render background; sky, floor
-//#define NOT_USED        0x6C
-//#define NOT_USED        0x6D
-//#define NOT_USED        0x6E
+#define SET_RENDER_QA     0x6C  // set render quality
+#define SET_TEXTURE_MODE  0x6D  // 16x16 or 32x32(pro only)
+#define SET_TEXTURE_ID_M  0x6E  // set textures for map level
 //#define NOT_USED        0x6F
 
 // ---------------- NOT_USED ---------------- //
@@ -205,6 +204,21 @@
 #define COLOR_WHITE       0xFFFF      // 255, 255, 255
 
 // ------------------------------------------------------------------- //
+/*
+ * WARNING!
+ * THIS IS REALLY DENGEROUS DEFINE!
+ * 
+ * It's remove check for BSY pin!
+ * This define created for reduce ROM size and RAM,
+ * also increase speed of code execution by little.
+ *
+ */
+#define REMOVE_HARDWARE_BSY  1
+// ------------------------------------------------------------------- //
+
+#define TLE_8X8     1
+#define TLE_16X16   2
+#define TLE_32X32   3
 
 // Sprites for tiles 8x8
 #define SPR_1X1_8 0
@@ -218,7 +232,7 @@
 #define SPR_2X1_16 6
 #define SPR_2X2_16 7
 
-// Srites for tiles 32x32 - avaliable only on GPU PRO version!
+// Srites for tiles 32x32 - avaliable only on sGPU PRO version!
 #define SPR_1X1_32 8
 #define SPR_1X2_32 9
 #define SPR_2X1_32 10
@@ -263,12 +277,13 @@ typedef enum {
 class STMGPU : public Print {
   
 public:
-  
+#if !REMOVE_HARDWARE_BSY
   STMGPU(int8_t bsyPin);
+#endif
   STMGPU();
   
-  void  begin(uint32_t baudRate),
-        sendCommand(void *buf, uint8_t size);
+  void  begin(baudSpeed_t baudRate);
+  void  iDelay(uint16_t duty);
 
 // ------------------ Base ------------------ //
   void  drawPixel(int16_t x, int16_t y, uint16_t color),
@@ -301,8 +316,8 @@ public:
   
   //uint8_t getRotation(void);
   void getResolution(void);
-  int16_t width(void);
-  int16_t height(void);
+  inline int16_t width(void) {return _width;}
+  inline int16_t height(void) {return _height;}
    
 // --------------- Font/Print --------------- //
 
@@ -425,7 +440,7 @@ public:
   // --------------- '3D' engine --------------- //
   void renderFrame(void);
   void moveCamera(uint8_t direction);
-  //void setCamPosition(uint16_t posX, uint16_t posY, uint16_t angle);
+  void setCamPosition(uint16_t posX, uint16_t posY, uint16_t angle);
 
   
 private:
@@ -434,13 +449,15 @@ private:
   
   SoftwareSerial *pSerial; // for boards which have no hardware serial port
 #else
-  HardwareSerial *pSerial; // becouse different boards have different serial ports
-  
+  HardwareSerial *pSerial; // because different boards have different serial ports
 #endif
+  
+  void sendCommand(void *buf, uint8_t size);
   
   // more RAM used but little faster, less ROM used and less problems whith stack
   cmdBuffer_t cmdBuffer;
   
+#if !REMOVE_HARDWARE_BSY
 #if defined (__AVR__) || defined(TEENSYDUINO)
   int8_t  _bsyPin;
 #elif defined (__arm__)
@@ -450,12 +467,14 @@ private:
 #elif defined (ESP8266)
   int32_t  _bsyPin;
 #endif
+  
+  bool _useHardwareBsy;
+#endif
 
-// at sync, GPU return it`s LCD resolution,
-// but you can ask GPU once again
+// at sync, sGPU return it`s LCD resolution,
+// but you can ask sGPU once again
   int16_t _width;
   int16_t _height;
-  bool _useHardwareBsy;
 };
 
 #endif /* _STMSGPU_H */
