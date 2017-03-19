@@ -56,7 +56,7 @@ void initRaycasterPointers(void)
   setRayCastPalette(currentPaletteArr);
   setLevelMap(mainBackGround);
   
-  setTileArrayPonter(&tileArr16x16[0][0]);
+  setTileArrayPonter((uint8_t*)tileArr16x16);
 }
 
 // load to RAM built-in palette

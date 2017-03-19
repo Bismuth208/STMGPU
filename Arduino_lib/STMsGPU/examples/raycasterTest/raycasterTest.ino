@@ -75,7 +75,7 @@ void setup() {
   *  8 chars max for filename, 3 chars max for file extension
   *  sGPU add *.tle extension automatically
   */
-  gpu.loadTileSet16x16("txtures", TILE_SET_W-1, RAM_BASE, TLE_START, MAX_TILES);
+  gpu.loadTileSet16x16("txtures", TILE_SET_W, RAM_BASE, TLE_START, MAX_TILES);
 
   gpu.fillScreen(COLOR_DARKGREY); // make borders around render window
 
