@@ -20,8 +20,8 @@
 __IO uint32_t data_left = 0;
 __IO uint16_t dataBuffer;                   // for single storage
 
-__IO uint16_t CR1_backup = 0;
-__IO uint16_t CR1_backup_16b_PS2 = 0;
+__IO uint16_t CR1_backup_16b_PS0 = 0;
+__IO uint16_t CR1_backup_8b_PS2 = 0;
 
 //---------------------------------------------------------------------------------------------//
 
@@ -99,7 +99,8 @@ inline void sendData16_SPI1(uint16_t data)
 
 inline void sendData32_SPI1(uint16_t data0, uint16_t data1)
 {
-  SET_BIT(SPI1->CR1, SPI_DataSize_16b);
+  SPI1->CR1 = CR1_backup_16b_PS0;
+  WAIT_FREE_TX; // tiny cheating to stable clock!
   SPI1->DR = data0;
   
   WAIT_FREE_TX;
@@ -108,7 +109,7 @@ inline void sendData32_SPI1(uint16_t data0, uint16_t data1)
   WAIT_FREE_TX;
   WAIT_FOR_BSY;
   //WAIT_FOR_END;
-  CLEAR_BIT(SPI1->CR1, SPI_DataSize_16b);
+  SPI1->CR1 = CR1_backup_8b_PS2;
 }
 
 void sendArr8_SPI1(void *data, uint32_t size)
@@ -173,7 +174,7 @@ void init_DMA1_SPI1(void)
   DMA1_Channel3->CPAR = (uint32_t)&(SPI1->DR);  // set DMA_PeripheralBaseAddr
   
   SPI1->CR2 |= SPI_I2S_DMAReq_Tx;               // enable DMA IRQ on Tx SPI1
-  CR1_backup = SPI1->CR1;       // save current settings
+  CR1_backup_8b_PS2 = SPI1->CR1;       // save current settings
   SPI1->CR1 |= SPI_DataSize_16b;        // set dataSize halfword (16 bit)
   /* DMA works propertly with higier speed,
   * that is why we can use max speed.
@@ -182,8 +183,8 @@ void init_DMA1_SPI1(void)
   */
   CLEAR_BIT(SPI1->CR1, SPI_BaudRatePrescaler_2); // set SPI_BaudRatePrescaler_2
   
-  CR1_backup_16b_PS2 = SPI1->CR1; // save DMA settings
-  SPI1->CR1 = CR1_backup;       // restore
+  CR1_backup_16b_PS0 = SPI1->CR1; // save DMA settings
+  SPI1->CR1 = CR1_backup_8b_PS2;       // restore
   
   // Enable DMA1 channel IRQ Channel
   NVIC_InitTypeDef NVIC_InitStructure;
@@ -201,8 +202,7 @@ void setMemoryBaseAddr_DMA1_SPI1(void *addr)
 
 void repeatData16_DMA1_SPI1(uint16_t color, uint32_t transferSize)
 {  
-  CR1_backup = SPI1->CR1;               //  \__ only 4 asm commands
-  SPI1->CR1 = CR1_backup_16b_PS2;       // /
+  SPI1->CR1 = CR1_backup_16b_PS0;
   
   dataBuffer = color;   // store data or, you can lost it
  
@@ -229,8 +229,7 @@ void repeatData16_DMA1_SPI1(uint16_t color, uint32_t transferSize)
  */
 void sendData16_DMA1_SPI1(void *data, uint32_t transferSize)
 {
-  CR1_backup = SPI1->CR1;
-  SPI1->CR1 = CR1_backup_16b_PS2;
+  SPI1->CR1 = CR1_backup_16b_PS0;
     
   DMA1_Channel3->CMAR = (uint32_t) data;    // apply DMA_MemoryBaseAddr
   
@@ -250,11 +249,9 @@ void sendData16_DMA1_SPI1(void *data, uint32_t transferSize)
 /*
  * No check for transfer data size
  */
-#if 1
 void sendData16_Fast_DMA1_SPI1(void *data, uint16_t transferSize)
 {
-  CR1_backup = SPI1->CR1;
-  SPI1->CR1 = CR1_backup_16b_PS2;
+  SPI1->CR1 = CR1_backup_16b_PS0;
     
   DMA1_Channel3->CMAR = (uint32_t) data;    // apply DMA_MemoryBaseAddr
   DMA1_Channel3->CNDTR = transferSize;      // set how much data to transfer
@@ -262,7 +259,6 @@ void sendData16_Fast_DMA1_SPI1(void *data, uint16_t transferSize)
   // shot DMA to transer; enable memory increment
   DMA1_Channel3->CCR |= (uint16_t)(DMA_CCR1_EN | DMA_MemoryInc_Enable);
 }
-#endif
 
 void DMA1_Channel3_IRQHandler(void) 
 {
@@ -283,7 +279,7 @@ void DMA1_Channel3_IRQHandler(void)
     } else {                                   // nope, end of transmission
       // disable: DMA1_Channel3, memory increment
       CLEAR_BIT(DMA1_Channel3->CCR, (DMA_CCR1_EN | DMA_MemoryInc_Enable));
-      SPI1->CR1 = CR1_backup; // set back dataSize byte (8 bit);
+      SPI1->CR1 = CR1_backup_8b_PS2; // set back dataSize byte (8 bit);
     }
     DMA1->IFCR = DMA1_IT_TC3;   // clear interrupt
   }

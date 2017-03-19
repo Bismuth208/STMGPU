@@ -25,6 +25,51 @@ SPI_InitTypeDef  SPI_InitStructure;
 
 hwif hw;
 
+
+//---------------------------------------------------------------------------------------------//
+// https://www.pololu.com/docs/0J1?section=5.f
+// https://github.com/hazelnusse/crc7/blob/master/crc7.cc
+
+#define _getCRC7value(crc, data)  (CRCTable[(crc << 1) ^ data])
+
+uint8_t CRCPoly = 0x89;  // the value of our CRC-7 polynomial
+uint8_t CRCTable[256];
+
+void generateCRCTable(void)
+{
+  int i, j;
+  
+  // generate a table value for all 256 possible byte values
+  for(i = 0; i < 256; i++) {
+    CRCTable[i] = (i & 0x80) ? i ^ CRCPoly : i;
+    for(j = 1; j < 8; j++) {
+      CRCTable[i] <<= 1;
+      if(CRCTable[i] & 0x80)
+        CRCTable[i] ^= CRCPoly;
+    }
+  }
+}
+
+// adds a message byte to the current CRC-7 to get a the new CRC-7
+uint8_t CRCAdd(uint8_t crc, uint8_t message_byte)
+{
+  return CRCTable[(crc << 1) ^ message_byte];
+}
+
+// returns the CRC-7 for a message of "length" bytes
+uint8_t getCRC(uint8_t *message, uint32_t length)
+{
+  uint8_t crc = 0;
+  
+  for(uint32_t i = 0; i < length; i++) {
+    //crc = CRCAdd(crc, message[i]);
+    crc = CRCTable[(crc << 1) ^ message[i]];
+  } 
+  
+  return crc;
+}
+//---------------------------------------------------------------------------------------------//
+
 //===========================================================================//
 
 void sd_spi_init(void)
@@ -73,6 +118,8 @@ void sd_spi_init(void)
 #pragma diag_default=Pe550
   
   spi_set_speed(SD_SPEED_400KHZ);
+  
+  generateCRCTable();
 }
 
 void spi_set_speed(enum sd_speed speed)
@@ -206,15 +253,14 @@ u16 crc16(const u8 *p, int len)
 
 
 /*** sd functions - on top of spi code ***/
-
 void sd_cmd(u8 cmd, u32 arg)
 {
-  u8 crc = 0;
-  crc = crc7_one(crc, 0x40 | cmd);
-  crc = crc7_one(crc, arg >> 24);
-  crc = crc7_one(crc, arg >> 16);
-  crc = crc7_one(crc, arg >> 8);
-  crc = crc7_one(crc, arg);
+  u8 crc = CRCAdd(0, 0x40 | cmd);
+  crc = CRCAdd(crc, arg >> 24);
+  crc = CRCAdd(crc, arg >> 16);
+  crc = CRCAdd(crc, arg >> 8);
+  crc = CRCAdd(crc, arg);
+  crc += crc;
   
   spi_txrx(0x40 | cmd);
   spi_txrx32(arg);
@@ -229,7 +275,7 @@ u8 sd_get_r1()
   
   while (tries--) {
     r = spi_txrx(0xff);
-    if ((r & 0x80) == 0)
+    if ((r & READY_FOR_DATA) == 0)
       return r;
   }
   return 0xff;
@@ -242,7 +288,7 @@ u16 sd_get_r2()
   
   while (tries--) {
     r = spi_txrx(0xff);
-    if ((r & 0x80) == 0)
+    if ((r & READY_FOR_DATA) == 0)
       break;
   }
   if (tries < 0)
@@ -297,7 +343,7 @@ int sd_init(hwif *hw)
   
   /* reset */
   spi_cs_low();
-  sd_cmd(0, 0);
+  sd_cmd(CMD0, 0);
   r = sd_get_r1();
   sd_nec();
   spi_cs_high();
@@ -313,7 +359,7 @@ int sd_init(hwif *hw)
   /* cmd8 - voltage.. */
   /* ask about voltage supply */
   spi_cs_low();
-  sd_cmd(8, 0x1aa /* VHS = 1 */);
+  sd_cmd(CMD8, 0x1aa /* VHS = 1 */);
   r = sd_get_r7(&r7);
   sd_nec();
   spi_cs_high();
@@ -334,7 +380,7 @@ int sd_init(hwif *hw)
   /* cmd58 - ocr.. */
   /* ask about voltage supply */
   spi_cs_low();
-  sd_cmd(58, 0);
+  sd_cmd(CMD58, 0);
   r = sd_get_r3(&r3);
   sd_nec();
   spi_cs_high();
@@ -371,7 +417,7 @@ int sd_init(hwif *hw)
     /* send we don't support SDHC */
     spi_cs_low();
     /* next cmd is ACMD */
-    sd_cmd(55, 0);
+    sd_cmd(CMD55, 0);
     r = sd_get_r1();
     sd_nec();
     spi_cs_high();
@@ -384,7 +430,7 @@ int sd_init(hwif *hw)
     }
     
     spi_cs_low();
-    sd_cmd(41, hcs);
+    sd_cmd(ACMD41, hcs);
     r = sd_get_r1();
     sd_nec();
     spi_cs_high();
@@ -409,7 +455,7 @@ int sd_init(hwif *hw)
     /* cmd58 - ocr, 2nd time.. */
     /* ask about voltage supply */
     spi_cs_low();
-    sd_cmd(58, 0);
+    sd_cmd(CMD58, 0);
     r = sd_get_r3(&r3);
     sd_nec();
     spi_cs_high();
@@ -445,7 +491,7 @@ int sd_init(hwif *hw)
   if ((hw->capabilities & CAP_SDHC) == 0) {
     /* cmd16 - block length.. */
     spi_cs_low();
-    sd_cmd(16, 512);
+    sd_cmd(CMD16, 512);
     r = sd_get_r1();
     sd_nec();
     spi_cs_high();
@@ -461,7 +507,7 @@ int sd_init(hwif *hw)
   /* cmd59 - enable crc.. */
   /* crc on */
   spi_cs_low();
-  sd_cmd(59, 0);
+  sd_cmd(CMD59, 0);
   r = sd_get_r1();
   sd_nec();
   spi_cs_high();
@@ -484,7 +530,7 @@ int sd_read_status(hwif *hw)
   u16 r2;
   
   spi_cs_low();
-  sd_cmd(13, 0);
+  sd_cmd(CMD13, 0);
   r2 = sd_get_r2();
   sd_nec();
   spi_cs_high();
@@ -573,7 +619,7 @@ int sd_read_csd(hwif *hw)
   int capacity;
   
   spi_cs_low();
-  sd_cmd(9, 0);
+  sd_cmd(CMD9, 0);
   r = sd_get_r1();
   if (r == 0xff) {
     spi_cs_high();
@@ -594,9 +640,7 @@ int sd_read_csd(hwif *hw)
   
   if ((buf[0] >> 6) + 1 == 1) {
     /* CSD v1 */
-    
     capacity = (((buf[6]&0x3)<<10 | buf[7]<<2 | buf[8]>>6)+1) << (2+(((buf[9]&3) << 1) | buf[10]>>7)) << ((buf[5] & 0xf) - 9);
-    /* ^ = (c_size+1) * 2**(c_size_mult+2) * 2**(read_bl_len-9) */
     
   } else {
     /* CSD v2 */
@@ -605,7 +649,6 @@ int sd_read_csd(hwif *hw)
     
     capacity = buf[7]<<16 | buf[8]<<8 | buf[9]; /* in 512 kB */
     capacity *= 1024; /* in 512 B sectors */
-    
   }
   
   hw->sectors = capacity;
@@ -625,7 +668,7 @@ int sd_read_cid(hwif *hw)
   int r;
   
   spi_cs_low();
-  sd_cmd(10, 0);
+  sd_cmd(CMD10, 0);
   r = sd_get_r1();
   if (r == 0xff) {
     spi_cs_high();
@@ -654,9 +697,9 @@ int sd_readsector(hwif *hw, u32 address, u8 *buf)
   
   spi_cs_low();
   if (hw->capabilities & CAP_SDHC)
-    sd_cmd(17, address); /* read single block */
+    sd_cmd(CMD17, address); /* read single block */
   else
-    sd_cmd(17, address*512); /* read single block */
+    sd_cmd(CMD17, address*512); /* read single block */
   
   r = sd_get_r1();
   if ((r == 0xff) || (r & 0xfe)) {
@@ -682,9 +725,9 @@ int sd_writesector(hwif *hw, u32 address, const u8 *buf)
   
   spi_cs_low();
   if (hw->capabilities & CAP_SDHC)
-    sd_cmd(24, address); /* write block */
+    sd_cmd(CMD24, address); /* write block */
   else
-    sd_cmd(24, address*512); /* write block */
+    sd_cmd(CMD24, address*512); /* write block */
   
   r = sd_get_r1();
   if (r == 0xff) {
@@ -748,15 +791,18 @@ int sd_read(hwif* hw, u32 address, u8 *buf)
   
   r = sd_readsector(hw, address, buf);
   
-  while (r < 0 && tries--) {
-    if (sd_init(hw) != 0)
-      continue;
-    
-    /* read status register */
-    sd_read_status(hw);
-    
-    r = sd_readsector(hw, address, buf);
+  if(r < 0) {
+    while (r < 0 && tries--) {
+      if (sd_init(hw) != 0)
+        continue;
+      
+      /* read status register */
+      sd_read_status(hw);
+      
+      r = sd_readsector(hw, address, buf);
+    }
   }
+  
   //if (tries == -1)
   //printf("%s: couldn't read sector %li\n", __func__, address);
   

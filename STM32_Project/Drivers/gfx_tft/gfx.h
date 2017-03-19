@@ -15,8 +15,8 @@
 #define COLOR_MAROON      0x7800      // 128,   0,   0
 #define COLOR_PURPLE      0x780F      // 128,   0, 128
 #define COLOR_OLIVE       0x7BE0      // 128, 128,   0
-#define COLOR_LIGHTGREY   0xC618      // 192, 192, 192
 #define COLOR_DARKGREY    0x7BEF      // 128, 128, 128
+#define COLOR_LIGHTGREY   0xC618      // 192, 192, 192
 #define COLOR_BLUE        0x001F      //   0,   0, 255
 #define COLOR_GREEN       0x07E0      //   0, 255,   0
 #define COLOR_CYAN        0x07FF      //   0, 255, 255
@@ -26,6 +26,9 @@
 #define COLOR_ORANGE      0xFD20      // 255, 165,   0
 #define COLOR_YELLOW      0xFFE0      // 255, 255,   0
 #define COLOR_WHITE       0xFFFF      // 255, 255, 255
+
+
+#define convRGBto565M(r,g,b)  (((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3))
 
 //-------------------------------------------------------------------------------------------//
 

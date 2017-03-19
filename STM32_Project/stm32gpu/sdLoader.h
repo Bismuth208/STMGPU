@@ -10,6 +10,7 @@
 #define T_PAL_SET_EXT_NAME      ".pal"  // 0x01
 #define T_MAP_SET_EXT_NAME      ".map"  // 0x03
 #define T_TLE_SET_EXT_NAME      ".tle"  // 0x02
+#define T_CSV_SET_EXT_NAME      ".csv"  // 0x04
 
 typedef struct  {
   uint8_t tileSetW;

@@ -30,7 +30,7 @@
         <option>
           <name>Variant</name>
           <version>21</version>
-          <state>0</state>
+          <state>38</state>
         </option>
         <option>
           <name>GEndianMode</name>
@@ -43,7 +43,7 @@
         </option>
         <option>
           <name>Input description</name>
-          <state></state>
+          <state>Automatic choice of formatter.</state>
         </option>
         <option>
           <name>Output variant</name>
@@ -52,7 +52,7 @@
         </option>
         <option>
           <name>Output description</name>
-          <state></state>
+          <state>Automatic choice of formatter.</state>
         </option>
         <option>
           <name>GOutputBinary</name>
@@ -65,7 +65,7 @@
         </option>
         <option>
           <name>OGCoreOrChip</name>
-          <state>0</state>
+          <state>1</state>
         </option>
         <option>
           <name>GRuntimeLibSelect</name>
@@ -79,7 +79,7 @@
         </option>
         <option>
           <name>RTDescription</name>
-          <state></state>
+          <state>Use the normal configuration of the C/C++ runtime library. No locale interface, C locale, no file descriptor support, no multibytes in printf and scanf, and no hex floats in strtod.</state>
         </option>
         <option>
           <name>OGProductVersion</name>
@@ -99,7 +99,7 @@
         </option>
         <option>
           <name>OGChipSelectEditMenu</name>
-          <state></state>
+          <state>STM32F103x8	ST STM32F103x8</state>
         </option>
         <option>
           <name>GenLowLevelInterface</name>
@@ -107,7 +107,7 @@
         </option>
         <option>
           <name>GEndianModeBE</name>
-          <state>0</state>
+          <state>1</state>
         </option>
         <option>
           <name>OGBufferedTerminalOutput</name>
@@ -115,7 +115,7 @@
         </option>
         <option>
           <name>GenStdoutInterface</name>
-          <state>0</state>
+          <state>1</state>
         </option>
         <option>
           <name>GeneralMisraRules98</name>
@@ -133,21 +133,21 @@
         </option>
         <option>
           <name>RTConfigPath2</name>
-          <state></state>
+          <state>$TOOLKIT_DIR$\INC\c\DLib_Config_Normal.h</state>
         </option>
         <option>
           <name>GFPUCoreSlave</name>
           <version>21</version>
-          <state>0</state>
+          <state>38</state>
         </option>
         <option>
           <name>GBECoreSlave</name>
           <version>21</version>
-          <state>1</state>
+          <state>38</state>
         </option>
         <option>
           <name>OGUseCmsis</name>
-          <state>0</state>
+          <state>1</state>
         </option>
         <option>
           <name>OGUseCmsisDspLib</name>
@@ -168,7 +168,8 @@
         <debug>1</debug>
         <option>
           <name>CCDefines</name>
-          <state></state>
+          <state>NDEBUG</state>
+          <state>USE_STDPERIPH_DRIVER</state>
         </option>
         <option>
           <name>CCPreprocFile</name>
@@ -281,7 +282,7 @@
         </option>
         <option>
           <name>OutputFile</name>
-          <state></state>
+          <state>$FILE_BNAME$.o</state>
         </option>
         <option>
           <name>CCLibConfigHeader</name>
@@ -297,7 +298,19 @@
         </option>
         <option>
           <name>CCIncludePath2</name>
-          <state></state>
+          <state>$PROJ_DIR$\..\..\Drivers\STM32F10x_StdPeriph_Driver\inc\</state>
+          <state>$PROJ_DIR$\..\..\Drivers\STM32F10x_StdPeriph_Driver\src\</state>
+          <state>$PROJ_DIR$\..\..\Drivers\CMSIS\</state>
+          <state>$PROJ_DIR$\..\..\Drivers\systicktimer\</state>
+          <state>$PROJ_DIR$\..\..\Drivers\stmSPI\</state>
+          <state>$PROJ_DIR$\..\..\Drivers\uart\</state>
+          <state>$PROJ_DIR$\..\..\Drivers\gfx_tft\</state>
+          <state>$PROJ_DIR$\..\..\Drivers\ILI9341\</state>
+          <state>$PROJ_DIR$\..\..\Drivers\fsmc\</state>
+          <state>$PROJ_DIR$\..\..\Drivers\FatFS\</state>
+          <state>$PROJ_DIR$\..\..\Drivers\memory\</state>
+          <state>$PROJ_DIR$\..\..\Drivers\sound\</state>
+          <state>$PROJ_DIR$\..\..\Drivers\raycasterEngine\</state>
         </option>
         <option>
           <name>CCStdIncCheck</name>
@@ -539,7 +552,7 @@
         </option>
         <option>
           <name>AOutputFile</name>
-          <state></state>
+          <state>$FILE_BNAME$.o</state>
         </option>
         <option>
           <name>AMultibyteSupport</name>
@@ -585,7 +598,7 @@
         <option>
           <name>OOCOutputFormat</name>
           <version>3</version>
-          <state>0</state>
+          <state>3</state>
         </option>
         <option>
           <name>OCOutputOverride</name>
@@ -593,7 +606,7 @@
         </option>
         <option>
           <name>OOCOutputFile</name>
-          <state></state>
+          <state>stm32gpu.bin</state>
         </option>
         <option>
           <name>OOCCommandLineProducer</name>
@@ -601,7 +614,7 @@
         </option>
         <option>
           <name>OOCObjCopyEnable</name>
-          <state>0</state>
+          <state>1</state>
         </option>
       </data>
     </settings>
@@ -708,11 +721,11 @@
         </option>
         <option>
           <name>IlinkIcfOverride</name>
-          <state>0</state>
+          <state>1</state>
         </option>
         <option>
           <name>IlinkIcfFile</name>
-          <state>lnk0t.icf</state>
+          <state>$PROJ_DIR$\f103c8t6.icf</state>
         </option>
         <option>
           <name>IlinkIcfFileSlave</name>
@@ -772,7 +785,7 @@
         </option>
         <option>
           <name>IlinkProgramEntryLabel</name>
-          <state></state>
+          <state>__iar_program_start</state>
         </option>
         <option>
           <name>DoFill</name>
@@ -1172,7 +1185,7 @@
         <option>
           <name>CCAllowList</name>
           <version>1</version>
-          <state>10111110</state>
+          <state>10101110</state>
         </option>
         <option>
           <name>CCDebugInfo</name>
@@ -1939,6 +1952,9 @@
     </group>
     <group>
       <name>FSMC</name>
+      <excluded>
+        <configuration>Debug</configuration>
+      </excluded>
       <file>
         <name>$PROJ_DIR$\..\..\Drivers\fsmc\fsmcdrv.c</name>
       </file>
@@ -2167,6 +2183,7 @@
       <file>
         <name>$PROJ_DIR$\..\..\Drivers\CMSIS\startup_stm32f10x_hd.s</name>
         <excluded>
+          <configuration>Debug</configuration>
           <configuration>Release</configuration>
         </excluded>
       </file>

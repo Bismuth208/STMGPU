@@ -26,8 +26,8 @@ void setup() {
 
 void loop() {
   // sGPU add *.bmp extension automatically
-  // at current moment sopported only BMP24 (whith no alpha channel)!
-  gpu.printBMP(0, 0, F("tree1")); // draw bmp picture at position
-  gpu.printBMP(F("tree2"));  // \__ draw pic at 0,0 position
-  gpu.printBMP(F("tree3"));  // /
+  // at current moment sopported only BMP16 and BMP24 (whith no alpha channel)!
+  gpu.printBMP(0, 0, F("tree1")); // draw bmp24 picture at position
+  gpu.printBMP(F("tree2"));  // \__ draw bmp24 and bmp16 pics at 0,0 position
+  gpu.printBMP(F("tree36"));  // /
 }

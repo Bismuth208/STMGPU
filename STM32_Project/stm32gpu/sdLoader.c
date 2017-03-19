@@ -23,13 +23,17 @@
 #include "sdLoader.h"
 #include "gpuTiles.h"
 
-#define BUFFPIXELCOUNT 80
+#define LCD_BUFFER_SIZE  80     // for rgb565 color for LCD
+#define RGB_BUFFER_SIZE  240    // for r,g,b pixels
 #define MAX_SD_INIT_ATTEMPTS 30 // yep, sometimes need so much attempts...
+
+#define LCD_BMP16_LINE_SIZE     (LCD_BUFFER_SIZE*2)
+#define LCD_BMP16_1_2LINE_SIZE  (LCD_BUFFER_SIZE/2)
 
 //===========================================================================//
 
-uint8_t  sdbuffer[3 * BUFFPIXELCOUNT]; // pixel in buffer (R+G+B per pixel)
-uint16_t lcdbuffer[BUFFPIXELCOUNT];  // pixel out buffer (16-bit per pixel)
+uint8_t  sdbuffer[RGB_BUFFER_SIZE];  // pixel in buffer (R+G+B per pixel)
+uint16_t lcdbuffer[LCD_BUFFER_SIZE]; // pixel out buffer (16-bit per pixel)
 
 //uint8_t buffer[50]; // for loaded text
 
@@ -90,24 +94,26 @@ FRESULT openSDFile(void *pFileName, const char *extension)
 
 pfGetFunc_t getFuncArrTilePointer(uint16_t tleBaseSize)
 {
+  pfGetFunc_t pTmpFunc =0;
+  
   switch(tleBaseSize)
   {
   case TILE_8_BASE_SIZE: {
-    return getArrTilePointer8x8;
+    pTmpFunc = getArrTilePointer8x8;
   } break;
   
   case TILE_16_BASE_SIZE: {
-    return getArrTilePointer16x16;
+    pTmpFunc = getArrTilePointer16x16;
   } break;
   
 #ifdef STM32F10X_HD
   case TILE_32_BASE_SIZE: {
-    return getArrTilePointer32x32;
+    pTmpFunc = getArrTilePointer32x32;
   } break;
 #endif
   }
   
-  return 0;
+  return pTmpFunc;
 }
 
 void SDLoadTile(void *fileName, uint8_t *pData, uint16_t tleBaseSize, uint16_t tlesNumSize)
@@ -249,11 +255,12 @@ void SDLoadPalette(void *fileName)
         r = sdbuffer[3 * count];
         g = sdbuffer[3 * count + 1];
         b = sdbuffer[3 * count + 2];
-        currentPaletteArr[count] = convRGBto565(r, g, b);
+        currentPaletteArr[count] = convRGBto565M(r, g, b);
       } 
     }
     
-    palChanged = 1; // force 
+    palChanged = 1; // force
+    //tleForeRedraw.allTle = 0x00; // 0 is need to redraw
     
   }
   f_close(&File);
@@ -263,71 +270,78 @@ void SDLoadPalette(void *fileName)
 
 
 
+// --------------------------------------------------------- //
+#if 0
+void loadExecCSVFile(void *fileName)
+{
+  if(openSDFile(fileName, T_CSV_SET_EXT_NAME) == FR_OK) {
+    
+  }
+  
+  f_close(&File);
+  // TODO: add some error code when return
+}
+#endif
+
+
 // ---------------- *.BMP pictures ------------------------- //
 // These read 16- and 32-bit types from the SD card file.
 uint16_t read16()
 {
   UINT cnt;
-  uint16_t result16 =0;
-  uint8_t result8[2];
+  uint16_t result16;
   
-  f_read(&File, (char*)result8, 2, &cnt);
+  f_read(&File, (uint8_t*)&result16, 2, &cnt);
   
-  result16 = (uint16_t)((result8[1] <<8) | result8[0]);
   return result16;
 }
 
 uint32_t read32()
 {
   UINT cnt;
-  union uResult_t {
-    uint8_t resultArr[4];
-    uint32_t result32;
-  } uResult;
+  uint32_t result32;
+
+  f_read(&File, (uint8_t*)&result32, 4, &cnt);
   
-  f_read(&File, (char*)uResult.resultArr, 4, &cnt);
-  
-  return uResult.result32;
+  return result32;
 }
 
-void drawBMP24(uint16_t w, uint16_t h, uint32_t bmpImageoffset)
+void drawBMP24(uint16_t w, uint16_t h)
 {
   UINT cnt; // how much bytes really read
   uint8_t  r, g, b;
-  
-  f_lseek(&File, bmpImageoffset);
 
   for(uint16_t row = 0; row < h; row++) { // For each scanline...
-    for(uint16_t col = 0; col < w; col += BUFFPIXELCOUNT) {
+    for(uint16_t col = 0; col < w; col += LCD_BUFFER_SIZE) {
       // read pixels into the buffer
-      f_read(&File, sdbuffer, 3 * BUFFPIXELCOUNT, &cnt);
+      f_read(&File, sdbuffer, RGB_BUFFER_SIZE, &cnt);
       
       // convert color
-      for(uint16_t p = 0; p < BUFFPIXELCOUNT; p++) {
+      for(uint16_t p = 0; p < LCD_BUFFER_SIZE; p++) {
         b = sdbuffer[3 * p];
         g = sdbuffer[3 * p + 1];
         r = sdbuffer[3 * p + 2];
-        lcdbuffer[p] = convRGBto565(r, g, b);
+        lcdbuffer[p] = convRGBto565M(r, g, b);
       }
       // push buffer to TFT
-      SEND_ARR16_FAST(lcdbuffer, BUFFPIXELCOUNT);
+      SEND_ARR16_FAST(lcdbuffer, LCD_BUFFER_SIZE);
     }
   }
 }
 
-void drawBMP16(uint16_t w, uint16_t h, uint32_t bmpImageoffset)
+void drawBMP16(uint16_t w, uint16_t h)
 {
   UINT cnt;
   
-  f_lseek(&File, bmpImageoffset); // skip header
-  
   for(uint16_t row = 0; row < h; row++) { // For each scanline...
-    for(uint16_t col = 0; col < w; col += BUFFPIXELCOUNT) {
+    for(uint16_t col = 0; col < w; col += LCD_BUFFER_SIZE) {
+      // little protection...
+      while(DMA1_Channel3->CNDTR > LCD_BMP16_1_2LINE_SIZE);
       // read pixels into the buffer
-      f_read(&File, lcdbuffer, BUFFPIXELCOUNT, &cnt);
+      f_read(&File, lcdbuffer, LCD_BMP16_LINE_SIZE, &cnt);
       
       // push buffer to TFT
-      SEND_ARR16_FAST(lcdbuffer, BUFFPIXELCOUNT);
+      SEND_ARR16_FAST(lcdbuffer, LCD_BUFFER_SIZE);
     }
   }
 }
@@ -365,6 +379,9 @@ void SDPrintBMP(uint16_t x, uint16_t y, void *fileName)
       if(read16() == 1) { // must be '1'; 0x16 or 0x1A
         bmpDepth = read16(); // bits per pixel; 0x18 or 0x1C
         
+        //(void)read32(); // get compression info 0 = uncompressed, 1 = comressed
+        f_lseek(&File, bmpImageoffset); // skip header
+        
         // If bmpHeight is negative, image is in top-down order.
         // This is not canon but has been observed in the wild.
         if(bmpHeight < 0) {
@@ -380,16 +397,17 @@ void SDPrintBMP(uint16_t x, uint16_t y, void *fileName)
         // Set TFT address window to clipped image bounds
         setAddrWindow(x, y, x + w - 1, y + h - 1);
         
-        if(read32() == 0) { // 0 = uncompressed
-          if(bmpDepth == 24) {	// standard 24bit bmp
-            drawBMP24(w, h, bmpImageoffset);
-          } else {
-            //print("Unsupported Bit Depth.");
-          }
-        } else { // 1 = comressed
-          if(bmpDepth == 16) {	// 565 format
-            drawBMP16(w, h, bmpImageoffset);
-          }
+        switch(bmpDepth)
+        {
+        case 16: { // 565 format
+          drawBMP16(w, h);
+        } break;
+        
+        case 24: { // standard 24bit bmp
+          drawBMP24(w, h);
+        } break;
+        
+        default: break; //print("Unsupported Bit Depth.");
         }
       }
     }

@@ -322,22 +322,18 @@ void STMGPU::getResolution(void)
 
 // --------------- Font/Print --------------- //
 // make a DDoS to sGPU's buffer...
-#if ARDUINO >= 100
-size_t STMGPU::write(uint8_t c) {
-#else
-  void STMGPU::write(uint8_t c) {
-#endif
-    cmdBuffer.cmd = DRW_PRNT_C;
-    cmdBuffer.data[1] = c;
+size_t STMGPU::write(uint8_t c)
+{
+  cmdBuffer.cmd = DRW_PRNT_C;
+  cmdBuffer.data[1] = c;
     
-    // DO NOT CHAHNGE TO: pSerial->write(cmdBuffer.data, 2); !
-    // ONLY sendCommand(cmdBuffer.data, 2); FUNCTION ALLOWED!
-    // OTHERWISE sGPU WILL BE VEEERY UNSTABLE!
-    sendCommand(cmdBuffer.data, 2);
-#if ARDUINO >= 100
-    return 1;
-#endif
-  }
+  // DO NOT CHAHNGE TO: pSerial->write(cmdBuffer.data, 2); !
+  // ONLY sendCommand(cmdBuffer.data, 2); FUNCTION ALLOWED!
+  // OTHERWISE sGPU WILL BE VEEERY UNSTABLE!
+  sendCommand(cmdBuffer.data, 2);
+
+  return 1;
+}
 
 void STMGPU::drawChar(int16_t x, int16_t y, uint8_t c, uint16_t color, uint16_t bg, uint8_t size)
 {

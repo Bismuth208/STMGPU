@@ -316,8 +316,8 @@ public:
   
   //uint8_t getRotation(void);
   void getResolution(void);
-  inline int16_t width(void) {return _width;}
-  inline int16_t height(void) {return _height;}
+  int16_t width(void) __attribute__((always_inline)) {return _width;}
+  int16_t height(void) __attribute__((always_inline)) {return _height;}
    
 // --------------- Font/Print --------------- //
 
@@ -336,11 +336,7 @@ public:
         setTextWrap(bool wrap),
         cp437(bool cp);
   
-#if ARDUINO >= 100
   virtual size_t write(uint8_t);
-#else
-  virtual void   write(uint8_t);
-#endif
   
   //virtual size_t print(const char[]);
   

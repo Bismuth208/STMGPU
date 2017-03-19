@@ -51,6 +51,24 @@
 
 // set to 0 to remove CRC Check by CRC16CCITT standart
 #define CALC_CRC16CCITT 0 
+
+
+#define CMD0   0
+#define CMD8   8
+#define CMD9   9
+#define CMD10  10
+#define CMD13  13
+#define CMD16  16
+#define CMD17  17
+#define CMD24  24
+#define CMD55  55
+#define CMD58  58
+#define CMD59  59
+
+#define ACMD41  41
+
+
+#define READY_FOR_DATA 0x80
   
 /*---------------------------------------*/
   
@@ -61,6 +79,49 @@ typedef struct  {
   int capabilities;
 } hwif;
 
+
+/*
+// 5.2 CID register
+#pragma pack(push, 1)
+typedef struct {
+  uint32_t manufacturerID :8;
+  uint32_t OEMApplicationID :16;
+  union {
+    uint8_t productNameArr[5];
+    uint32_t productName1   :32;
+    uint32_t productName2   :8;
+  };
+  uint32_t productRevision :8;
+  uint32_t productSerialNum :32;
+  uint32_t reserved :4;
+  uint32_t manufacturingDate  :12;
+  uint32_t crc7     :7;
+  uint32_t reserved :1;
+} regCID_t;
+
+typedef union {
+  uint16_t data[3];
+  struct {
+    uint16_t S        :1;
+    uint16_t D        :1;
+    uint16_t Index    :6;
+    
+    uint16_t BSY      :1;
+    uint16_t HCS      :1;
+    uint16_t FB       :1;
+    uint16_t XPC      :1;
+    uint16_t Reserved :3;
+    uint16_t S18R     :1;
+    
+    uint16_t OCR      :16;
+    
+    uint16_t Reserved :8;
+    uint16_t CRC7     :7;
+    uint16_t E        :1;
+  };
+} sdArg_t; // command structure for SD card ( ACMD41)
+#pragma pack(pop)
+*/
 
 extern hwif hw;
 
