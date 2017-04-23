@@ -24,7 +24,7 @@ inline void memcpy8(void *dst, void const *src, size_t len)
 void memcpy32(void *dst, void const *src, size_t len)
 {
   uint32_t *plDst = (uint32_t *)dst;
-  uint32_t const * plSrc = (uint32_t const *)src;
+  uint32_t const *plSrc = (uint32_t const *)src;
   
   while(len >= 4) {
     *plDst++ = *plSrc++;

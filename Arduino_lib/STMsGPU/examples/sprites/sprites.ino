@@ -1,18 +1,12 @@
 #include <STMsGPU.h>
 
 // --------------------------------------------------------- //
-
-#define MAX_SPEED 1 
-
-// can save ROM and increase speed, but its unfair!
-// use it if you know end resolution
-#if MAX_SPEED
- #define TFT_W 320
- #define TFT_H 240
-#else
- #define TFT_W gpu.width()
- #define TFT_H gpu.height()
-#endif /* MAX_SPEED */
+/* in library STMsGPU.h exist define USE_GPU_RETURN_RESOLUTION
+ * set it to 0 and it can save ROM and increase speed, but its unfair!
+ * use it if you know end resolution
+ */
+#define TFT_W gpu.width()
+#define TFT_H gpu.height()
 
 #define TEST_SAMPLE_SIZE    300
 #define TEST_SAMPLE_SCREENS 20 // this is equal to 24000 tiles
@@ -108,6 +102,6 @@ void setup() {
 
 void loop() {
   drawRandSprites();
-  delay(500);  // little delay to see what happend on screen
+  gpu.iDelay(500);  // little delay to see what happend on screen
   gpu.fillScreen(COLOR_BLACK); // clear screen by black color
 }

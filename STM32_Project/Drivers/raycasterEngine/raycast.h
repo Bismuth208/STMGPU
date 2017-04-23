@@ -20,17 +20,28 @@
 // 320x130 == 41600 pixels, and still looks pretty good!
 // aspect ratio: 2,46:1 (alomst silver ratio)
 #define RENDER_W_WIDTH   320
-#define RENDER_W_HEIGHT  130
+#define RENDER_W_HEIGHT  160//130
 
-#define TEXTURE_SIZE      16
-// calculated as (TEXTURE_SIZE/BLOCK_SIZE)
-//#define TEXTURE_SIZE_OFF  3.2    // for 64x;
-//#define TEXTURE_SIZE_OFF  1.6    // for 32x;
-#define TEXTURE_SIZE_OFF  0.8    // for 16x;
-//#define TEXTURE_SIZE_OFF  0.4    // for 8x8 px, really, dont use it! It's terreble!
+// calculated as (TEXTURE_SIZE_X/BLOCK_SIZE)
+#define RCE_TEXTURE_SIZE_OFF_64  3.2f    // for 64x;
+#define RCE_TEXTURE_SIZE_OFF_32  1.6f    // for 32x;
+#define RCE_TEXTURE_SIZE_OFF_16  0.8f    // for 16x;
+#define RCE_TEXTURE_SIZE_OFF_8   0.4f    // for 8x8 px, really, dont use it! It's terreble!
 
 #define TEXTURE_QA_MIN 0
 #define TEXTURE_QA_MAX 2
+
+#define TEXTURE_QA_0        0
+#define TEXTURE_QA_1        1
+#define TEXTURE_QA_2        2
+
+#define RCE_TLE_8_SIZE      64
+#define RCE_TLE_16_SIZE     256
+#define RCE_TLE_32_SIZE     1024
+
+#define RCE_TEXTURE_SIZE_8   8
+#define RCE_TEXTURE_SIZE_16  16
+#define RCE_TEXTURE_SIZE_32  32
 
 
 #define OFFSET_X   0   // \__ render window offset
@@ -80,15 +91,17 @@ typedef struct {
 // public
 void renderWalls(void);
 void moveCamera(uint8_t direction);
-void setCameraPosition(uint16_t posX, uint16_t posY, uint16_t angle);
+void setCameraPosition(int16_t posX, int16_t posY, int16_t angle);
 void serRenderQuality(int8_t quality);
 void setTextureQuality(int8_t quality);
 void setWallCollision(bool state);
+void getCamPosition(void *pBuf);
+void setFloorSkyColor(uint16_t sky, uint16_t floor);
 
 // for init and internal use only
 void setRayCastPalette(uint16_t *pPal);
 void setLevelMap(uint8_t *pLevelMap);
-void setTileArrayPonter(uint8_t *pTleArrayRAM);
+void setTileArrayPonter(uint8_t *pTleArrayRAM, uint8_t type);
 // -------------------------------------------------------------------- //
 
 #endif /*_SLICE_H */

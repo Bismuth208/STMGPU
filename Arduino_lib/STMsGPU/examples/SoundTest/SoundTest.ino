@@ -50,9 +50,9 @@ void drawSlowEpicText(const char* text, uint16_t lastDelay)
   for(uint16_t count =0; count < len; count++) {
     gpu.print(text[count]);
     gpu.playNote(500, 1);
-	  delay(30); // delay betwen chars, make retro effect
+	  gpu.iDelay(30); // delay betwen chars, make retro effect
   }
 
-  delay(lastDelay); // delay to see text
+  gpu.iDelay(lastDelay); // delay to see text
 }
 

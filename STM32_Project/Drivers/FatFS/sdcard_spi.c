@@ -264,8 +264,14 @@ void sd_cmd(u8 cmd, u32 arg)
   
   spi_txrx(0x40 | cmd);
   spi_txrx32(arg);
-  //spi_txrx(0x95);	/* crc7, for cmd0 */
-  spi_txrx(crc | 0x1);	/* crc7, for cmd0 */
+  spi_txrx(crc | 0x1);	/* crc7 */
+}
+
+void sd_cmd0(void)
+{
+  spi_txrx(0x40);
+  spi_txrx32(0x00000000);
+  spi_txrx(0x95);	/* crc7, for cmd0 */
 }
 
 u8 sd_get_r1()
@@ -343,9 +349,9 @@ int sd_init(hwif *hw)
   
   /* reset */
   spi_cs_low();
-  sd_cmd(CMD0, 0);
+  sd_cmd0();
   r = sd_get_r1();
-  sd_nec();
+  //sd_nec();
   spi_cs_high();
   
   if (r == 0xff)
@@ -532,7 +538,7 @@ int sd_read_status(hwif *hw)
   spi_cs_low();
   sd_cmd(CMD13, 0);
   r2 = sd_get_r2();
-  sd_nec();
+  //sd_nec();
   spi_cs_high();
   if (r2 & 0x8000)
     return -1;
@@ -545,8 +551,8 @@ int sd_get_data(hwif *hw, u8 *buf, int len)
 {
   int tries = 20000;
   u8 r;
-  u16 _crc16;
 #if CALC_CRC16CCITT
+  u16 _crc16;
   u16 calc_crc;
 #endif
   while (tries--) {
@@ -559,13 +565,15 @@ int sd_get_data(hwif *hw, u8 *buf, int len)
   
   spi_txrxArr(buf, len, 0xff);
  
+#if CALC_CRC16CCITT
   _crc16 = spi_txrx16(0xffff);
 
-#if CALC_CRC16CCITT
   calc_crc = crc16(buf, len);
   if (_crc16 != calc_crc) {
     return -1;
   }
+#else
+  (void)spi_txrx16(0xffff);
 #endif
   
   return 0;
@@ -631,7 +639,7 @@ int sd_read_csd(hwif *hw)
   }
   
   r = sd_get_data(hw, buf, 16);
-  sd_nec();
+  //sd_nec();
   spi_cs_high();
   if (r == -1) {
     /* failed to get csd */
@@ -680,7 +688,7 @@ int sd_read_cid(hwif *hw)
   }
   
   r = sd_get_data(hw, buf, 16);
-  sd_nec();
+  //sd_nec();
   spi_cs_high();
   if (r == -1) {
     /* failed to get cid */
@@ -709,7 +717,7 @@ int sd_readsector(hwif *hw, u32 address, u8 *buf)
   }
   
   r = sd_get_data(hw, buf, 512);
-  sd_nec();
+  //sd_nec();
   spi_cs_high();
   if (r == -1) {
     r = -3;

@@ -1257,7 +1257,7 @@
           <state>$PROJ_DIR$\..\..\Drivers\STM32F10x_StdPeriph_Driver\src\</state>
           <state>$PROJ_DIR$\..\..\Drivers\CMSIS\</state>
           <state>$PROJ_DIR$\..\..\Drivers\systicktimer\</state>
-          <state>$PROJ_DIR$\..\..\Drivers\stmSPI\</state>
+          <state>$PROJ_DIR$\..\..\Drivers\spi\</state>
           <state>$PROJ_DIR$\..\..\Drivers\uart\</state>
           <state>$PROJ_DIR$\..\..\Drivers\gfx_tft\</state>
           <state>$PROJ_DIR$\..\..\Drivers\ILI9341\</state>
@@ -1266,6 +1266,8 @@
           <state>$PROJ_DIR$\..\..\Drivers\memory\</state>
           <state>$PROJ_DIR$\..\..\Drivers\sound\</state>
           <state>$PROJ_DIR$\..\..\Drivers\raycasterEngine\</state>
+          <state>$PROJ_DIR$\..\src\</state>
+          <state>$PROJ_DIR$\..\inc\</state>
         </option>
         <option>
           <name>CCStdIncCheck</name>
@@ -2004,10 +2006,10 @@
     <group>
       <name>SPI</name>
       <file>
-        <name>$PROJ_DIR$\..\..\Drivers\stmSPI\spi.c</name>
+        <name>$PROJ_DIR$\..\..\Drivers\spi\spi.c</name>
       </file>
       <file>
-        <name>$PROJ_DIR$\..\..\Drivers\stmSPI\spi.h</name>
+        <name>$PROJ_DIR$\..\..\Drivers\spi\spi.h</name>
       </file>
     </group>
     <group>
@@ -2034,75 +2036,48 @@
     <group>
       <name>common</name>
       <file>
-        <name>$PROJ_DIR$\..\landscapeTileMap.h</name>
+        <name>$PROJ_DIR$\..\inc\landscapeTileMap.h</name>
       </file>
       <file>
-        <name>$PROJ_DIR$\..\landscapeTileset.h</name>
+        <name>$PROJ_DIR$\..\inc\landscapeTileset.h</name>
       </file>
       <file>
-        <name>$PROJ_DIR$\..\nesPalette_ext.h</name>
+        <name>$PROJ_DIR$\..\inc\nesPalette_ext.h</name>
       </file>
       <file>
-        <name>$PROJ_DIR$\..\stm_gpu_nes_tiles2.h</name>
+        <name>$PROJ_DIR$\..\inc\stm_gpu_nes_tiles2.h</name>
       </file>
       <file>
-        <name>$PROJ_DIR$\..\stm_gpu_nes_tilesMap.h</name>
+        <name>$PROJ_DIR$\..\inc\stm_gpu_nes_tilesMap.h</name>
       </file>
       <file>
-        <name>$PROJ_DIR$\..\STMsGPU_Palette.h</name>
+        <name>$PROJ_DIR$\..\inc\STMsGPU_Palette.h</name>
       </file>
     </group>
     <group>
       <name>core GPU</name>
       <file>
-        <name>$PROJ_DIR$\..\gpuMain.c</name>
+        <name>$PROJ_DIR$\..\src\gpuMain.c</name>
       </file>
       <file>
-        <name>$PROJ_DIR$\..\gpuMain.h</name>
+        <name>$PROJ_DIR$\..\src\initGPU.c</name>
       </file>
       <file>
-        <name>$PROJ_DIR$\..\initGPU.c</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$\..\logoGPU.c</name>
+        <name>$PROJ_DIR$\..\src\logoGPU.c</name>
       </file>
     </group>
-    <group>
-      <name>gui</name>
-      <file>
-        <name>$PROJ_DIR$\..\gui.c</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$\..\gui.h</name>
-      </file>
-    </group>
-    <group>
-      <name>SD card</name>
-      <file>
-        <name>$PROJ_DIR$\..\sdLoader.c</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$\..\sdLoader.h</name>
-      </file>
-    </group>
-    <group>
-      <name>sprites</name>
-      <file>
-        <name>$PROJ_DIR$\..\sprites.c</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$\..\sprites.h</name>
-      </file>
-    </group>
-    <group>
-      <name>tiles</name>
-      <file>
-        <name>$PROJ_DIR$\..\gpuTiles.c</name>
-      </file>
-      <file>
-        <name>$PROJ_DIR$\..\gpuTiles.h</name>
-      </file>
-    </group>
+    <file>
+      <name>$PROJ_DIR$\..\src\gui.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\src\sdLoader.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\src\sprites.c</name>
+    </file>
+    <file>
+      <name>$PROJ_DIR$\..\src\tiles.c</name>
+    </file>
   </group>
   <group>
     <name>STM32_SPL_Core</name>

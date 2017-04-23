@@ -32,6 +32,7 @@ uint16_t dataAvailable_UART1(void)
 
 uint8_t readData8_UART1(void)
 {
+  while(!RX_AVALIABLE);
   return rxBuffer[rx_buffer.tail++];
 }
 
@@ -47,32 +48,10 @@ uint8_t readData8_UART1(void)
   }
 }
 
-// this one if no overflow in circle buffer
-// and yes, my imagigination for names end...
-inline void cutData2(uint8_t *pDest, uint16_t size)
-{
-  uint8_t *pRxBuffer = &rxBuffer[rx_buffer.tail];
-  rx_buffer.tail += size; //yes, i know, this is incorrect, but it works!
-  
-  while(size) {
-    while(!RX_AVALIABLE ); // wait for something in buf
-    *pDest++ = *pRxBuffer++; // copy data as fast as possible
-    --size;
-  }
-}
-
 uint8_t waitCutByte_UART1(void)
 {
-  uint8_t byteData;
-#if 0
   while(!RX_AVALIABLE); // wait for something in buf
-  
-  byteData = rxBuffer[rx_buffer.tail++];
-#else
-  
-  cutData(&byteData, 1);
-#endif
-  return byteData;
+  return rxBuffer[rx_buffer.tail++];
 }
 
 uint16_t waitCutWord_UART1(void)
@@ -99,9 +78,7 @@ void waitCutBuf_UART1(void *dest, uint16_t size)
         rx_buffer.tail += size;
         return;
       }
-    }
-    //cutData2(pDest, size);
-    //return; 
+    } 
   } 
   
   // nope, nope, nope, no one condition fit to us
@@ -124,8 +101,6 @@ void waitCutpBuf_UART1(uint16_t size)
         return;
       }
     }
-    //cutData2(pDest, size);
-    //return; 
   } 
   
   // nope, nope, nope, no one condition fit to us

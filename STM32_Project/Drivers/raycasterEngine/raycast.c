@@ -1,9 +1,13 @@
 /**
 * LCDWolf3D
-* jaburns
+* jaburns (Jeremy A Burns' LCD Raycaster)
+* https://www.youtube.com/watch?v=GlCye0TyHrE
+* https://github.com/jaburns/lcd-wolf3d  
+* http://gendev.spritesmind.net/forum/viewtopic.php?t=25&start=75
 */
 
 #include <stdbool.h>
+#include <string.h>
 #include <math.h>
 //#include "trigonometry.h"
 
@@ -14,7 +18,6 @@
 #else
  #include <spi.h>
 #endif
-//#include <memHelper.h>
 
 #include "raycast.h"
 
@@ -40,20 +43,27 @@ uint16_t *pCurrenPal;
 // points to mainBackGround array in gpuTiles.c
 uint8_t *pLevel;
 
-// in texture mode == 1 drawed textures 16x16px
-// in texture mode == 2 drawed textures 32x32px
-//uint8_t textureMode = 1;
-//uint8_t mapTextureId[MAP_TEXTURES_NUM_MAX] = {0};
+// in texture mode == 0 draw textures 8x8px
+// in texture mode == 1 draw textures 16x16px
+// in texture mode == 2 draw textures 32x32px
+//uint8_t curTextureModeQA = 1;
 
-#define TLE_SIZE        256
-#define TILE_NUM_SIZE   10
+// ponters to tileArrYxY array in gpuTiles.c
+uint8_t *pTileArray8;
+uint8_t *pTileArray16;
+uint8_t *pTileArray32;
+// base pointer, to all arrays 8px, 16px, 32px; 
+// ponter destination is selected by current texture quality mode
 uint8_t *pTileArray;
+
 
 bool yAxisWall = false;
 bool checkWallCollision = true;
 
-float textureSizeOffset = TEXTURE_SIZE_OFF; // default value 0.8 (16x)
-uint8_t textureSize = TEXTURE_SIZE; // default value 16x
+// setup default values for 16px tiles
+float textureSizeOffset = RCE_TEXTURE_SIZE_OFF_16;
+uint8_t textureSize = RCE_TEXTURE_SIZE_16;
+uint16_t textureTileSize = RCE_TLE_16_SIZE;
 
 // in future will be replaced by texture id
 uint16_t skyColor = COLOR_DARKCYAN;
@@ -104,6 +114,7 @@ void castRay(float x, float y, float angle, uint16_t slicePosX, slice_t *result)
   // coordinate of the texture block we're sitting in
   float blockX = (float)((uint16_t)(x / BLOCK_SIZE));
   float blockY = (float)((uint16_t)(y / BLOCK_SIZE));
+  uint8_t textureId =0;
   
   float cosine = cos(angle);
   float sine   = sin(angle);
@@ -150,10 +161,13 @@ void castRay(float x, float y, float angle, uint16_t slicePosX, slice_t *result)
       y += yNext_y;
     }
     
-    result->textureId =  level[ (uint16_t)(blockX + MAP_WIDTH * blockY)];
-    //result->textureId =  pLevel[ (uint16_t)(blockX + MAP_WIDTH * blockY)];
-  } while(result->textureId == 0);
+    //textureId =  level[ (uint16_t)(blockX + MAP_WIDTH * blockY)];
+    textureId =  pLevel[ (uint16_t)(blockX + MAP_WIDTH * blockY)];
+  } while(textureId == 0);
   
+  // -1 mean normal number in tile RAM, in RAM tiles are located from 0
+  // i.e. 0(no texture) not allowed
+  result->textureId = textureId -1;
   result->targetBlockX = (uint16_t)blockX;
   result->targetBlockY = (uint16_t)blockY;
   
@@ -173,30 +187,29 @@ void castRay(float x, float y, float angle, uint16_t slicePosX, slice_t *result)
 
 void drawSlice( uint16_t screenX, slice_t *slice )
 {
-  uint16_t offsetY   = ( slice->sliceHeight >  RENDER_W_HEIGHT) ? (0) : ((RENDER_W_HEIGHT/2) - (slice->sliceHeight >> 1));
-  uint16_t overflowY = ( slice->sliceHeight <= RENDER_W_HEIGHT) ? (0) : ((slice->sliceHeight - RENDER_W_HEIGHT) >> 1);
-  
+  uint8_t  colorId =0;
   uint16_t sliceYcount =0;
-  uint8_t colorId =0;
   uint16_t textureYOffset =0;
+  uint16_t sliceHeight = slice->sliceHeight;
   
-  for(; sliceYcount < slice->sliceHeight && sliceYcount < RENDER_W_HEIGHT; sliceYcount++) {
+  uint16_t offsetY   = ( sliceHeight >  RENDER_W_HEIGHT) ? (0) : ((RENDER_W_HEIGHT/2) - (sliceHeight >> 1));
+  uint16_t overflowY = ( sliceHeight <= RENDER_W_HEIGHT) ? (0) : ((sliceHeight - RENDER_W_HEIGHT) >> 1);
+ 
+  // precalculate base texture offset 
+  uint16_t textureIdSizeOffset = (slice->textureId*textureTileSize + slice->textureOffset*textureSize);
+  
+  // this is much fster than clear whole screen
+  memset(sliceDMABuf, 0x00, RENDER_W_HEIGHT*2);
+  
+  for(; (sliceYcount < sliceHeight) && (sliceYcount < RENDER_W_HEIGHT); sliceYcount++) {
     
-    textureYOffset = ((sliceYcount + overflowY) * textureSize) / slice->sliceHeight;
-    
-    // -1 mean normal number in tile RAM, in RAM tiles are located from 0
-    // i.e. 0(no texture) not allowed
-    colorId = pTileArray[((slice->textureId-1)*(TLE_SIZE)) + (slice->textureOffset*textureSize + textureYOffset)];
-
-    if(yAxisWall) {
-      sliceDMABuf[sliceYcount] = SHADOW_Y_SIDE(pCurrenPal[colorId]);
-    } else {
-      sliceDMABuf[sliceYcount] = pCurrenPal[colorId];
-    }
+    textureYOffset = ((sliceYcount + overflowY) * textureSize) / sliceHeight;
+    colorId = pTileArray[textureIdSizeOffset + textureYOffset];
+    sliceDMABuf[sliceYcount+offsetY] = yAxisWall ? SHADOW_Y_SIDE(pCurrenPal[colorId]) : pCurrenPal[colorId];
   }
   
-  setVAddrWindow(OFFSET_X+screenX, OFFSET_Y+offsetY, OFFSET_Y+offsetY+sliceYcount);
-  SEND_ARR16_FAST(sliceDMABuf, sliceYcount);
+  setVAddrWindow(OFFSET_X+screenX, OFFSET_Y, OFFSET_Y+RENDER_W_HEIGHT);
+  SEND_ARR16_FAST(sliceDMABuf, RENDER_W_HEIGHT);
 }
 
 bool shouldInterpolate(slice_t *sliceA, slice_t *sliceB)
@@ -222,12 +235,12 @@ void applyMove(float dx, float dy)
     uint16_t testA = (uint16_t)( ( px - HIT_WIDTH ) / BLOCK_SIZE_F );
     uint16_t testB = (uint16_t)( ( py - HIT_WIDTH ) / BLOCK_SIZE_F );
     uint16_t testC = (uint16_t)( ( py + HIT_WIDTH ) / BLOCK_SIZE_F );
-    if( ( level[ testA + MAP_WIDTH * testB ] ) || ( level[ testA + MAP_WIDTH * testC ] ) ) {
+    if( ( pLevel[ testA + MAP_WIDTH * testB ] ) || ( pLevel[ testA + MAP_WIDTH * testC ] ) ) {
       px = (float)( testA + 1 ) * BLOCK_SIZE_F + HIT_WIDTH;
     }
     
     testA = (uint16_t)( ( px + HIT_WIDTH ) / BLOCK_SIZE_F );
-    if( ( level[ testA + MAP_WIDTH * testB ] ) || ( level[ testA + MAP_WIDTH * testC ] ) ) {
+    if( ( pLevel[ testA + MAP_WIDTH * testB ] ) || ( pLevel[ testA + MAP_WIDTH * testC ] ) ) {
       px = (float)( testA ) * BLOCK_SIZE_F - HIT_WIDTH;
     }
     
@@ -235,12 +248,12 @@ void applyMove(float dx, float dy)
     testA = (uint16_t)( ( py - HIT_WIDTH ) / BLOCK_SIZE_F );
     testB = (uint16_t)( ( px - HIT_WIDTH ) / BLOCK_SIZE_F );
     testC = (uint16_t)( ( px + HIT_WIDTH ) / BLOCK_SIZE_F );
-    if( ( level[ testB + MAP_WIDTH * testA ] ) || ( level[ testC + MAP_WIDTH * testA ] ) ) {
+    if( ( pLevel[ testB + MAP_WIDTH * testA ] ) || ( pLevel[ testC + MAP_WIDTH * testA ] ) ) {
       py = (float)( testA + 1 ) * BLOCK_SIZE_F + HIT_WIDTH;
     }
     
     testA = (uint16_t)( ( py + HIT_WIDTH ) / BLOCK_SIZE_F );
-    if( ( level[ testB + MAP_WIDTH * testA ] ) || ( level[ testC + MAP_WIDTH * testA ] ) ) {
+    if( ( pLevel[ testB + MAP_WIDTH * testA ] ) || ( pLevel[ testC + MAP_WIDTH * testA ] ) ) {
       py = (float)( testA ) * BLOCK_SIZE_F - HIT_WIDTH;
     }
   }
@@ -257,31 +270,30 @@ void setRayCastPalette(uint16_t *pPal)
 void setLevelMap(uint8_t *pLevelMap)
 {
   pLevel = pLevelMap;
+  //memcpy(pLevelMap, level, 576 /*24*24*/);
 }
 
-void setTileArrayPonter(uint8_t *pTleArrayRAM)
+void setTileArrayPonter(uint8_t *pTleArrayRAM, uint8_t type)
 {
+  switch(type)
+  {
+  case 1: pTileArray8=pTleArrayRAM; break;
+  case 2: pTileArray16=pTleArrayRAM; break;
+  case 3: pTileArray32=pTleArrayRAM; break;
+  }
+  
   pTileArray = pTleArrayRAM;
-}
-
-void fastClearWindow(void)
-{
-  setAddrWindow(OFFSET_X+0, OFFSET_Y+0, OFFSET_X+RENDER_W_WIDTH-1, OFFSET_Y+RENDER_W_HEIGHT-1);
-  REPEAT_DATA16(COLOR_BLACK,RENDER_W_WIDTH*RENDER_W_HEIGHT);
 }
 
 // ----------------------- public ----------------------- //
 void renderWalls(void)
-{
-  // clear previous render frame
-  fastClearWindow();
-  
+{  
   slice_t sliceA, sliceB;
   slice_t sliceX[3];
   
   castRay(px, py, pa, 0, &sliceA);
   
-  for(uint16_t x = rndrQAModeStep; x < RENDER_W_WIDTH; x += rndrQAModeStep) {
+  for(uint16_t x = 1+rndrQAModeStep; x < RENDER_W_WIDTH; x += rndrQAModeStep) {
     castRay(px, py, pa, x, &sliceB);
     
     if(shouldInterpolate(&sliceA , &sliceB)) {
@@ -309,12 +321,19 @@ void renderWalls(void)
   }
 }
 
-
-void setCameraPosition(uint16_t posX, uint16_t posY, uint16_t angle)
+void setCameraPosition(int16_t posX, int16_t posY, int16_t angle)
 {
   px = (float)posX;
   py = (float)posY;
   pa = (float)angle;
+}
+
+void getCamPosition(void *pBuf)
+{
+  uint16_t *pBufArr = (uint16_t*)pBuf;
+  pBufArr[0] = (uint16_t)px;
+  pBufArr[1] = (uint16_t)py;
+  pBufArr[2] = (uint16_t)pa;
 }
 
 void moveCamera(uint8_t direction)
@@ -356,21 +375,29 @@ void setTextureQuality(int8_t quality)
   if((quality >= TEXTURE_QA_MIN) || (quality <= TEXTURE_QA_MAX)) {
     switch(quality)
     {
-      case 0: { // 8x8px
-        textureSizeOffset = 0.4f;
-        textureSize = 8;
-      } break;
-        
-      case 1: { // 16x16px
-        textureSizeOffset = 0.8f;
-        textureSize = 16;
-      } break;
-        
-      case 2: { // 32x32px (pro version only!)
-        textureSizeOffset = 1.6f;
-        textureSize = 32;
-      } break;
+    case TEXTURE_QA_0: { // 8x8px
+      textureSizeOffset = RCE_TEXTURE_SIZE_OFF_8;
+      textureSize = RCE_TEXTURE_SIZE_8;
+      textureTileSize = RCE_TLE_8_SIZE;
+      pTileArray = pTileArray8;
+    } break;
+    
+    case TEXTURE_QA_1: { // 16x16px
+      textureSizeOffset = RCE_TEXTURE_SIZE_OFF_16;
+      textureSize = RCE_TEXTURE_SIZE_16;
+      textureTileSize = RCE_TLE_16_SIZE;
+      pTileArray = pTileArray16;
+    } break;
+    
+    case TEXTURE_QA_2: { // 32x32px (pro version only!)
+      textureSizeOffset = RCE_TEXTURE_SIZE_OFF_32;
+      textureSize = RCE_TEXTURE_SIZE_32;
+      textureTileSize = RCE_TLE_32_SIZE;
+      pTileArray = pTileArray32;
+    } break;
     }
+    
+    //curTextureModeQA = quality;
   }
 }
 
@@ -384,5 +411,5 @@ void setWallCollision(bool state)
 void setFloorSkyColor(uint16_t sky, uint16_t floor)
 {
   skyColor = sky;
-  floorColor floor;
+  floorColor = floor;
 }

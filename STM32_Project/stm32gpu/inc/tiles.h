@@ -1,5 +1,5 @@
-#ifndef _GPUTTILES_H
-#define _GPUTTILES_H
+#ifndef _TILES_H
+#define _TILES_H
 
 // -------------------------------------------------------- //
 // in px
@@ -64,4 +64,4 @@ void drawBackgroundMap(void);
 // -------------------------------------------------------- //
 
 
-#endif /* _GPUTTILES_H */
+#endif /* _TILES_H */

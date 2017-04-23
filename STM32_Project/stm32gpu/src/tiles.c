@@ -12,7 +12,7 @@
 
 #include <raycast.h>
 
-#include "gpuTiles.h"
+#include "tiles.h"
 #include "nesPalette_ext.h"
 #include "STMsGPU_Palette.h"
 
@@ -56,7 +56,11 @@ void initRaycasterPointers(void)
   setRayCastPalette(currentPaletteArr);
   setLevelMap(mainBackGround);
   
-  setTileArrayPonter((uint8_t*)tileArr16x16);
+#ifdef STM32F10X_HD
+  setTileArrayPonter((uint8_t*)tileArr32x32, 3);
+#endif
+  setTileArrayPonter((uint8_t*)tileArr8x8, 1);
+  setTileArrayPonter((uint8_t*)tileArr16x16, 2); // last one as default value
 }
 
 // load to RAM built-in palette

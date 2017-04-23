@@ -189,7 +189,7 @@ void init_DMA1_SPI1(void)
   // Enable DMA1 channel IRQ Channel
   NVIC_InitTypeDef NVIC_InitStructure;
   NVIC_InitStructure.NVIC_IRQChannel = DMA1_Channel3_IRQn;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 0;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
   NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
   NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
   NVIC_Init(&NVIC_InitStructure);
@@ -263,8 +263,9 @@ void sendData16_Fast_DMA1_SPI1(void *data, uint16_t transferSize)
 void DMA1_Channel3_IRQHandler(void) 
 {
   if((DMA1->ISR & DMA1_IT_TC3)) { // is it our IRQ? // != (uint32_t)RESET
+    DMA1->IFCR = DMA1_IT_TC3;   // clear interrupt
+    
     if(data_left) {               // all pixels transfered?
-      
       CLEAR_BIT(DMA1_Channel3->CCR, DMA_CCR1_EN);
       
       if(data_left > MAX_DMA_REQUEST) {         // left something?
@@ -281,7 +282,6 @@ void DMA1_Channel3_IRQHandler(void)
       CLEAR_BIT(DMA1_Channel3->CCR, (DMA_CCR1_EN | DMA_MemoryInc_Enable));
       SPI1->CR1 = CR1_backup_8b_PS2; // set back dataSize byte (8 bit);
     }
-    DMA1->IFCR = DMA1_IT_TC3;   // clear interrupt
   }
 }
 //----------------------------------------------------------------------------//

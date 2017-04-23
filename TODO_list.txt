@@ -1,20 +1,12 @@
 /* current must be */
 
+fix bmp width draw
+add floor and sky draw in raycaster;
+add sprites draw in raycaster;
+load, draw sprites for tiles 16px and 32px;
 fix 1x2, 2x2 sprites;
 
-draw *.bmp 16bit files;
-
-load, draw sprites for tiles 16px and 32px;
-
-reduce ROM usage for Arduino lib version (almost done);
-
-add drawing text from SD card;
-
 /* add this soon */
-
-rotate tiles (matrix transformation);
-
-/* in nearly future */
 
 fix GUI commands:
  - draw GUI window;
@@ -25,17 +17,20 @@ add GUI commands:
  - draw GUI button;
  - draw GUI buttons;
 
-
+add command execution from .csv file;
+add loading sound patterns from SD card;
 add FSMC;
 
-improve main switch() section;
+improve speed of raycaster;
+reduce ROM and RAM usage for Arduino lib version even more;
+ 
+/* in nearly future */
 
+add drawing text from SD card;
 add re-sync with CPU;
-
-reduce registers and stack usage by minimise number of params to func (struct); 
+rotate tiles (matrix transformation);
+reduce registers and stack usage by minimise number of params to func (struct);
 
 /* veeeery veeeery far far future */
-load, draw 3d model(s);
-add sound engine;
-command execution from .csv file;
+
 

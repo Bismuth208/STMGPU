@@ -21,7 +21,7 @@
 #include <sdcard_spi.h>
 
 #include "sdLoader.h"
-#include "gpuTiles.h"
+#include "tiles.h"
 
 #define LCD_BUFFER_SIZE  80     // for rgb565 color for LCD
 #define RGB_BUFFER_SIZE  240    // for r,g,b pixels
@@ -36,7 +36,6 @@ uint8_t  sdbuffer[RGB_BUFFER_SIZE];  // pixel in buffer (R+G+B per pixel)
 uint16_t lcdbuffer[LCD_BUFFER_SIZE]; // pixel out buffer (16-bit per pixel)
 
 //uint8_t buffer[50]; // for loaded text
-
 //===========================================================================//
 
 FATFS SDfs;				/* File system object for each logical drive */
@@ -236,6 +235,58 @@ void SDLoadTileMap(void *fileName)
   
   f_close(&File);
 }
+
+// slow but not need additionnal program to convert tile map from 'pixelEdit'
+// aaand much much flexible...
+// just rename *.txt file to *.map, and add {} at begin and end of data array
+#if 0
+void SDLoadTileMap(void *fileName)
+{
+  UINT cnt;
+  bool enterArray = false;
+  bool endArray = false;
+  uint8_t enterChar = 0;
+  uint8_t tileId = 0;
+  uint16_t tileIdCount =0;
+  
+  uint8_t *pTileMapArr = getMapArrPointer();
+  
+  if(openSDFile(fileName, T_MAP_SET_EXT_NAME) == FR_OK) {
+    
+    while(!enterArray) {
+      f_read(&File, (void*)enterChar, 1, &cnt);
+      
+      if((enterChar == '{') || (enterChar == '[')) {
+        enterArray = true;
+      }
+    }
+    
+    enterArray = false;
+    
+    while((f_tell(&File) != f_size(&File)) && (!endArray)) {
+      
+      tileId = 0;
+      
+      while(!enterArray) {
+        f_read(&File, (void*)enterChar, 1, &cnt);
+        
+        if((enterChar == ',') || (enterChar == LF_FILE_MARK) || (enterChar == CR_FILE_MARK)) {
+          enterArray = true;
+        } else if((enterChar == '}') || (enterChar == ']')) {
+          endArray = false;
+          enterArray = true;
+        } else {
+          tileId = ((tileId*10) | (enterChar-0x30)); // convert ASCII to number...
+          pTileMapArr[tileIdCount] = tileId;
+          ++tileIdCount;
+        }
+      }
+    }
+  }
+  
+  f_close(&File);
+}
+#endif
 // --------------------------------------------------------- //
 
 
@@ -306,6 +357,7 @@ uint32_t read32()
   return result32;
 }
 
+// i'll fix problem whith 'w' later
 void drawBMP24(uint16_t w, uint16_t h)
 {
   UINT cnt; // how much bytes really read
@@ -329,6 +381,7 @@ void drawBMP24(uint16_t w, uint16_t h)
   }
 }
 
+// i'll fix problem whith 'w' later
 void drawBMP16(uint16_t w, uint16_t h)
 {
   UINT cnt;
@@ -348,27 +401,24 @@ void drawBMP16(uint16_t w, uint16_t h)
 
 void SDPrintBMP(uint16_t x, uint16_t y, void *fileName)
 {
+  UINT cnt;
+  
   int32_t  bmpWidth, bmpHeight;   // W+H in pixels
-  uint8_t  bmpDepth;              // Bit depth (currently must be 24)
-  uint8_t  headerSize;
-  uint32_t bmpImageoffset;        // Start of image data in file
+  uint8_t  bmpDepth;              // Bit depth; must be 24 or 16
   uint16_t w, h;
+  
+  bmpCore_t bmpHeader; // base header info
   
   if((x >= width()) || (y >= height())) return;
   
   if(openSDFile(fileName, T_BMP_SET_EXT_NAME) == FR_OK) {
+    // read core header info
+    f_read(&File, bmpHeader.bmpArr, BMP_FILE_HEADER_SIZE, &cnt);
+    
     // Parse BMP header
-    if(read16() == 0x4D42) { // BMP signature; 0x00
+    if(bmpHeader.fileMark == BMP_FILE_MARK) { // BMP signature; 0x00
       
-      (void)read32(); // files size; 0x02
-      (void)read32(); // Read & ignore creator bytes; 0x06, 0x08
-      
-      bmpImageoffset = read32(); // Start of image data; 0x0A
-      
-      // Read bcSize ( biSize, bV4Size, bV5Size )
-      headerSize = read32();
-      
-      if(headerSize > 0xC) { // 3, 4, and 5 version
+      if(bmpHeader.headerSize > BMP_345_VER_MARK) { // 3, 4, and 5 version
         bmpWidth = read32();   // 0x12
         bmpHeight = read32();  // 0x16
       } else { // CORE version
@@ -376,17 +426,11 @@ void SDPrintBMP(uint16_t x, uint16_t y, void *fileName)
         bmpHeight = read16();  // 0x14
       }
       
-      if(read16() == 1) { // must be '1'; 0x16 or 0x1A
+      if(read16() == 1) {    // must be '1'; 0x16 or 0x1A
         bmpDepth = read16(); // bits per pixel; 0x18 or 0x1C
         
         //(void)read32(); // get compression info 0 = uncompressed, 1 = comressed
-        f_lseek(&File, bmpImageoffset); // skip header
-        
-        // If bmpHeight is negative, image is in top-down order.
-        // This is not canon but has been observed in the wild.
-        if(bmpHeight < 0) {
-          bmpHeight = -bmpHeight;
-        }
+        f_lseek(&File, bmpHeader.bmpImageoffset); // skip header
         
         // Crop area to be loaded
         w = bmpWidth;

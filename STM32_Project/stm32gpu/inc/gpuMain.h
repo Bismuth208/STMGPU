@@ -101,7 +101,7 @@
 // ------------------ Base ------------------ //  
 //#define NOT_USED         0x00
 #define FLL_SCR         0x01
-//#define NOT_USED          0x02
+#define GPU_SW_RESET    0x02
 #define DRW_PIXEL       0x03
 
 // ------------- Primitives/GFX ------------- // 
@@ -202,7 +202,7 @@
 #define LDD_USR_PAL     0x50    // load user palette from SD card
 #define DRW_BMP_FIL     0x51    // draw bmp file located on SD card
 #define LDD_SND_FIL     0x52    // load sound file
-//#define NOT_USED        0x53
+//#define LDD_CSV_FIL     0x53    // load and exec *.csv file
 //#define NOT_USED        0x54
 //#define NOT_USED        0x55
 //#define NOT_USED        0x56
@@ -226,19 +226,19 @@
 #define DRW_WND_AT      0x63    // draw window at position
 #define DRW_WND_TXT     0x64    // draw window whith text
 //#define DRW_BTN_NUM     0x65    // draw numerated buttons
-//#define NOT_USED        0x66
-//#define NOT_USED        0x67
 
 
 // --------------- '3D' engine --------------- //
-#define RENDER_MAP        0x68
+#define SET_BACKGRND      0x66
+//#define NOT_USED        0x67
+#define RENDER_MAP        0x68  // render walls
 #define MOVE_CAMERA       0x69
-#define SET_CAM_POS       0x6A
+#define SET_CAM_POS       0x6A  // set current camera position
 //#define RENDER_BCKGRND    0x6B  // render background; sky, floor
 #define SET_RENDER_QA     0x6C  // set render quality
 #define SET_TEXTURE_MODE  0x6D  // 16x16 or 32x32(pro only)
-#define SET_TEXTURE_ID_M  0x6E  // set textures for map level
-//#define NOT_USED        0x6F
+#define SET_WALL_CLD      0x6E  // set wall collision state
+#define GET_CAM_POS       0x6F  // get current camera position
 
 // ---------------- NOT_USED ---------------- //
 // -------------- 0x70 - 0xFF --------------- //
@@ -273,13 +273,6 @@ __noreturn void run_GPU(void);
 void initRand(void);
 uint32_t randNum(void);
 void drawBootLogo(void);
-
-
-/*
-//void drawBitmap(int16_t x, int16_t y, const uint8_t *bitmap, int16_t w, int16_t h, uint16_t color);
-//void drawBitmapBG(int16_t x, int16_t y, const uint8_t *bitmap, int16_t w, int16_t h, uint16_t color, uint16_t bg);
-//void drawXBitmap(int16_t x, int16_t y, const uint8_t *bitmap, int16_t w, int16_t h, uint16_t color);
-*/
 
 // ------------------------------------------------------------------- //
 

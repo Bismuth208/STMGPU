@@ -1,14 +1,9 @@
-#define MAX_SPEED 1 
-
-// can save ROM and increase speed, but its unfair!
-// use it if you know end resolution
-#if MAX_SPEED
- #define TFT_W 320
- #define TFT_H 240
-#else
- #define TFT_W gpu.width()
- #define TFT_H gpu.height()
-#endif /* MAX_SPEED */
+/* in library STMsGPU.h exist define USE_GPU_RETURN_RESOLUTION
+ * set it to 0 and it can save ROM and increase speed, but its unfair!
+ * use it if you know end resolution
+ */
+#define TFT_W gpu.width()
+#define TFT_H gpu.height()
 
 #define TEST_SAMPLE_SIZE    12000
 #define TEST_SAMPLE_SCREENS 80

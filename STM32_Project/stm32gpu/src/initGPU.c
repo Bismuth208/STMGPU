@@ -26,8 +26,8 @@ void sync_CPU(void)
   
   while(!syncEstablished) {
     if(dataAvailable_UART1() >= 2) {
-      if(readData8_UART1() == 0x42) {
-        if(readData8_UART1() == 0xDD) {
+      if(waitCutByte_UART1() == 0x42) {
+        if(waitCutByte_UART1() == 0xDD) {
           
           fflush_UART1();
           syncEstablished = true;

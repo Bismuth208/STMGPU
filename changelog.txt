@@ -1,3 +1,25 @@
+v.0.1.6 - STM32 side:           
+		   - add highly optimised raycaster engine;
+		   - add sound generation;
+		   - add new palette (thx to @DuhaTheBest);
+		   - add tiles 16x16 and 32x32;
+		   - add bmp16;
+		   - add simple GUI primitives;
+		   - add code for PRO version;
+		   - add new FATFS version (R0.12b);
+		   - make boot logo more interesting;
+		   - huge speed improve in draw bmp files;
+		   - improve spi speed for LCD and SD card;
+		   - improve tile loading algorithm from SD card;
+		   - improve speed of cmd execution in main switch section;
+		   - reduce RAM usage;		   
+		- Arduino side:
+		   - reduce RAM and ROM usage;
+		   - add STM32 support;
+		   - add ATtiny support;
+		   - add more examples;
+		   - add much more comments in examples;
+
 v.0.1.5 - STM32 side:
            - fix bazillions of warnings;
            - add baud speed selection by GPIO on STM32 (look for STM32_GPU_GPIO_Pinout.txt);

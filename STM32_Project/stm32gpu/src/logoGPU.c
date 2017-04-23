@@ -7,7 +7,7 @@
 #include <memHelper.h>
 
 #include "gpuMain.h"
-#include "gpuTiles.h"
+#include "tiles.h"
 
 #include "stm_gpu_nes_tiles2.h"
 #include "stm_gpu_nes_tilesMap.h"

@@ -38,9 +38,9 @@
 // SMTH - SMOOTH
 
 // ------------------ Base ------------------ //
-//#define NOT_USED         0x00
+//#define NOT_USED        0x00
 #define FLL_SCR         0x01
-//#define NOT_USED          0x02
+#define GPU_SW_RESET    0x02
 #define DRW_PIXEL       0x03
 
 // ------------- Primitives/GFX ------------- //
@@ -165,19 +165,19 @@
 #define DRW_WND_AT      0x63    // draw window at position
 #define DRW_WND_TXT     0x64    // draw window whith text
 //#define DRW_BTN_NUM     0x65    // draw numerated buttons
-//#define NOT_USED        0x66
-//#define NOT_USED        0x67
 
 
 // --------------- '3D' engine --------------- //
-#define RENDER_MAP        0x68
+#define SET_BACKGRND      0x66
+//#define NOT_USED        0x67
+#define RENDER_MAP        0x68  // render walls
 #define MOVE_CAMERA       0x69
-#define SET_CAM_POS       0x6A
+#define SET_CAM_POS       0x6A  // set current camera position
 //#define RENDER_BCKGRND    0x6B  // render background; sky, floor
 #define SET_RENDER_QA     0x6C  // set render quality
 #define SET_TEXTURE_MODE  0x6D  // 16x16 or 32x32(pro only)
-#define SET_TEXTURE_ID_M  0x6E  // set textures for map level
-//#define NOT_USED        0x6F
+#define SET_WALL_CLD      0x6E  // set wall collision state
+#define GET_CAM_POS       0x6F  // get current camera position
 
 // ---------------- NOT_USED ---------------- //
 // -------------- 0x70 - 0xFF --------------- //
@@ -191,8 +191,8 @@
 #define COLOR_MAROON      0x7800      // 128,   0,   0
 #define COLOR_PURPLE      0x780F      // 128,   0, 128
 #define COLOR_OLIVE       0x7BE0      // 128, 128,   0
-#define COLOR_LIGHTGREY   0xC618      // 192, 192, 192
 #define COLOR_DARKGREY    0x7BEF      // 128, 128, 128
+#define COLOR_LIGHTGREY   0xC618      // 192, 192, 192
 #define COLOR_BLUE        0x001F      //   0,   0, 255
 #define COLOR_GREEN       0x07E0      //   0, 255,   0
 #define COLOR_CYAN        0x07FF      //   0, 255, 255
@@ -214,6 +214,24 @@
  *
  */
 #define REMOVE_HARDWARE_BSY  1
+// ------------------------------------------------------------------- //
+// ------------------------------------------------------------------- //
+/*
+ * WARNING!
+ * THIS IS ALSO REALLY DENGEROUS DEFINE!
+ *
+ * It's remove check for returning resolution!
+ * This define created for reduce ROM size and RAM,
+ * also increase speed of code execution by little.
+ *
+ */
+#define USE_GPU_RETURN_RESOLUTION  1
+
+// Describe end resolution of LCD/TFT if its known
+#if !USE_GPU_RETURN_RESOLUTION
+ #define GPU_LCD_W   320
+ #define GPU_LCD_H   240
+#endif
 // ------------------------------------------------------------------- //
 
 #define TLE_8X8     1
@@ -247,12 +265,19 @@
 #define MOVE_CLOCKWISE_R   0x10
 #define MOVE_CLOCKWISE_L   0x20
 
+// definitions for texture sizes
+#define TEXTURE_MODE_0     0  // 8x8 tiles
+#define TEXTURE_MODE_1     1  // 16x16 tiles
+#define TEXTURE_MODE_2     2  // 32x32 tiles (only PRO version!)
+
 // ------------------------------------------------------------------- //
+// DO NOT REMOVE THIS PRAGMA DIRECTIVE!!
 #pragma pack(push, 1)
 typedef union {
   uint8_t data[15];
   struct {
-  	uint8_t  cmd;
+  	uint8_t  cmd;  // if no #pragma, then here will be hole in 1 byte...
+    //uint16_t cmd;
     uint16_t par1;
     uint16_t par2;
     uint16_t par3;
@@ -286,7 +311,8 @@ public:
   void  iDelay(uint16_t duty);
 
 // ------------------ Base ------------------ //
-  void  drawPixel(int16_t x, int16_t y, uint16_t color),
+  void  swReset(void),
+        drawPixel(int16_t x, int16_t y, uint16_t color),
         fillScreen(uint16_t color);
    
 // ------------- Primitives/GFX ------------- //
@@ -306,19 +332,27 @@ public:
   uint16_t  scroll(uint16_t lines, uint16_t yStart),
             scrollSmooth(uint16_t lines, uint16_t yStart, uint8_t wait);
   
-  //void drawBitmap(int16_t x, int16_t y, const uint8_t *bitmap, int16_t w, int16_t h, uint16_t color);
-  //void drawBitmap(int16_t x, int16_t y, const uint8_t *bitmap, int16_t w, int16_t h, uint16_t color, uint16_t bg);
-  void drawXBitmap(int16_t x, int16_t y, const uint8_t *bitmap, int16_t w, int16_t h, uint16_t color);
+  void drawBitmap(int16_t x, int16_t y, const uint8_t *bitmap, int16_t w, int16_t h, uint16_t color),
+       drawBitmap(int16_t x, int16_t y, const uint8_t *bitmap, int16_t w, int16_t h, uint16_t color, uint16_t bg),
+       drawBitmap(int16_t x, int16_t y, uint8_t *bitmap, int16_t w, int16_t h, uint16_t color),
+       drawBitmap(int16_t x, int16_t y, uint8_t *bitmap, int16_t w, int16_t h, uint16_t color, uint16_t bg),
+       drawXBitmap(int16_t x, int16_t y, const uint8_t *bitmap, int16_t w, int16_t h, uint16_t color);
   
   uint16_t  color565(uint8_t r, uint8_t g, uint8_t b),
             conv8to16(uint8_t x);
   
-  
   //uint8_t getRotation(void);
+  
+#if USE_GPU_RETURN_RESOLUTION
   void getResolution(void);
-  int16_t width(void) __attribute__((always_inline)) {return _width;}
+  int16_t width(void)  __attribute__((always_inline)) {return _width;}
   int16_t height(void) __attribute__((always_inline)) {return _height;}
-   
+#else
+  void getResolution(void){}
+  int16_t width(void)  __attribute__((always_inline)) {return GPU_LCD_W;}
+  int16_t height(void) __attribute__((always_inline)) {return GPU_LCD_H;}
+#endif
+  
 // --------------- Font/Print --------------- //
 
 // get current cursor position (get rotation safe maximum values, using: width() for x, height() for y)
@@ -437,6 +471,11 @@ public:
   void renderFrame(void);
   void moveCamera(uint8_t direction);
   void setCamPosition(uint16_t posX, uint16_t posY, uint16_t angle);
+  void setWallCollision(bool state);
+  void getCamPosition(uint16_t *pArrPos);
+  // in future will be replaced by texture id;
+  // also it will be ranamed to setFloorSkyTexture
+  void setSkyFloor(uint16_t sky, uint16_t floor);
 
   
 private:
@@ -465,12 +504,14 @@ private:
 #endif
   
   bool _useHardwareBsy;
-#endif
+#endif /* REMOVE_HARDWARE_BSY */
 
+#if USE_GPU_RETURN_RESOLUTION
 // at sync, sGPU return it`s LCD resolution,
 // but you can ask sGPU once again
   int16_t _width;
   int16_t _height;
+#endif
 };
 
 #endif /* _STMSGPU_H */

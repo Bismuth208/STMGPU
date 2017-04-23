@@ -91,6 +91,7 @@ void STMGPU::begin(baudSpeed_t baudRate)
     if(pSerial->read() == SYNC_OK) {
       syncEstablished = true;
       
+#if USE_GPU_RETURN_RESOLUTION
       while(pSerial->available() < 3); // wait for resolution
       // get _width
       cmdBuffer.data[1] = pSerial->read();
@@ -103,6 +104,7 @@ void STMGPU::begin(baudSpeed_t baudRate)
       _height = cmdBuffer.par2;
       
       pSerial->flush();
+#endif
     }
   }
 }
@@ -148,6 +150,11 @@ void STMGPU::iDelay(uint16_t duty)
 
 
 // ------------------ Base ------------------ //
+void STMGPU::swReset(void)
+{
+  cmdBuffer.cmd = GPU_SW_RESET;
+  sendCommand(cmdBuffer.data, 1);
+}
 
 void STMGPU::drawPixel(int16_t x, int16_t y, uint16_t color)
 {
@@ -303,6 +310,7 @@ void STMGPU::fillTriangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_
   sendCommand(cmdBuffer.data, 15);
 }
 
+#if USE_GPU_RETURN_RESOLUTION
 void STMGPU::getResolution(void)
 {
   pSerial->flush();
@@ -319,6 +327,7 @@ void STMGPU::getResolution(void)
   _width  = cmdBuffer.par1;
   _height = cmdBuffer.par2;
 }
+#endif
 
 // --------------- Font/Print --------------- //
 // make a DDoS to sGPU's buffer...
@@ -802,7 +811,7 @@ void STMGPU::printBMP(const __FlashStringHelper *str)
   
 void STMGPU::printBMP(uint16_t x, uint16_t y, const String &str)
 {
-  sendBaseBMP(0, 0, str.length());
+  sendBaseBMP(x, y, str.length());
   
   for (uint16_t i = 0; i < str.length(); i++) {
     pSerial->write(str[i]);
@@ -904,7 +913,6 @@ void STMGPU::drawWindowGUI(int16_t posX, int16_t posY,
 void STMGPU::drawWindowGUI(int16_t posX, int16_t posY,
                                int16_t w, int16_t h, const __FlashStringHelper* str)
 {
-  uint8_t c;
   PGM_P p = reinterpret_cast<PGM_P>(str);
   
   cmdBuffer.cmd = DRW_WND_TXT;
@@ -946,7 +954,40 @@ void STMGPU::setCamPosition(uint16_t posX, uint16_t posY, uint16_t angle)
  
  sendCommand(cmdBuffer.data, 7);
 }
+
+void STMGPU::setWallCollision(bool state)
+{
+  cmdBuffer.cmd = SET_WALL_CLD;
+  cmdBuffer.data[1] = state;
   
+  sendCommand(cmdBuffer.data, 2);
+}
+
+void STMGPU::getCamPosition(uint16_t *pArrPos)
+{
+  cmdBuffer.cmd = GET_CAM_POS;
+  sendCommand(cmdBuffer.data, 1);
+  
+  while(pSerial->available() < 6) { // wait for: posX, posY and angle
+    pArrPos[0] = pSerial->read();
+    pArrPos[0] |= pSerial->read()<<8;
+    
+    pArrPos[1] = pSerial->read();
+    pArrPos[1] |= pSerial->read()<<8;
+    
+    pArrPos[2] = pSerial->read();
+    pArrPos[2] |= pSerial->read()<<8;
+  }
+}
+
+void STMGPU::setSkyFloor(uint16_t sky, uint16_t floor)
+{
+  cmdBuffer.cmd = SET_BACKGRND;
+  cmdBuffer.par1 = sky;
+  cmdBuffer.par2 = floor;
+  
+  sendCommand(cmdBuffer.data, 5);
+}
 // -------------------- ___ ---------------------- //
 
 // Pass 8-bit (each) R,G,B, get back 16-bit packed color
@@ -955,8 +996,81 @@ uint16_t STMGPU::color565(uint8_t r, uint8_t g, uint8_t b)
   return ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3);
 }
 
-//void drawBitmap(int16_t x, int16_t y, const uint8_t *bitmap, int16_t w, int16_t h, uint16_t color);
-//void drawBitmapBG(int16_t x, int16_t y, const uint8_t *bitmap, int16_t w, int16_t h, uint16_t color, uint16_t bg);
+
+// Draw a 1-bit image (bitmap) at the specified (x,y) position from the
+// provided bitmap buffer (must be PROGMEM memory) using the specified
+// foreground color (unset bits are transparent).
+void STMGPU::drawBitmap(int16_t x, int16_t y, const uint8_t *bitmap,
+                        int16_t w, int16_t h, uint16_t color)
+{
+  
+  int16_t i, j, byteWidth = (w + 7) / 8;
+  uint8_t byte;
+  
+  for(j=0; j<h; j++) {
+    for(i=0; i<w; i++) {
+      if(i & 7) byte <<= 1;
+      else      byte   = pgm_read_byte(bitmap + j * byteWidth + i / 8);
+      if(byte & 0x80) drawPixel(x+i, y+j, color);
+    }
+  }
+}
+
+// Draw a 1-bit image (bitmap) at the specified (x,y) position from the
+// provided bitmap buffer (must be PROGMEM memory) using the specified
+// foreground (for set bits) and background (for clear bits) colors.
+void STMGPU::drawBitmap(int16_t x, int16_t y, const uint8_t *bitmap,
+                        int16_t w, int16_t h, uint16_t color, uint16_t bg)
+{
+  
+  int16_t i, j, byteWidth = (w + 7) / 8;
+  uint8_t byte;
+  
+  for(j=0; j<h; j++) {
+    for(i=0; i<w; i++ ) {
+      if(i & 7) byte <<= 1;
+      else      byte   = pgm_read_byte(bitmap + j * byteWidth + i / 8);
+      if(byte & 0x80) drawPixel(x+i, y+j, color);
+      else            drawPixel(x+i, y+j, bg);
+    }
+  }
+}
+
+// drawBitmap() variant for RAM-resident (not PROGMEM) bitmaps.
+void STMGPU::drawBitmap(int16_t x, int16_t y, uint8_t *bitmap,
+                        int16_t w, int16_t h, uint16_t color)
+{
+  
+  int16_t i, j, byteWidth = (w + 7) / 8;
+  uint8_t byte;
+  
+  for(j=0; j<h; j++) {
+    for(i=0; i<w; i++ ) {
+      if(i & 7) byte <<= 1;
+      else      byte   = bitmap[j * byteWidth + i / 8];
+      if(byte & 0x80) drawPixel(x+i, y+j, color);
+    }
+  }
+}
+
+// drawBitmap() variant w/background for RAM-resident (not PROGMEM) bitmaps.
+void STMGPU::drawBitmap(int16_t x, int16_t y, uint8_t *bitmap,
+                        int16_t w, int16_t h, uint16_t color, uint16_t bg)
+{
+  
+  int16_t i, j, byteWidth = (w + 7) / 8;
+  uint8_t byte;
+  
+  for(j=0; j<h; j++) {
+    for(i=0; i<w; i++ ) {
+      if(i & 7) byte <<= 1;
+      else      byte   = bitmap[j * byteWidth + i / 8];
+      if(byte & 0x80) drawPixel(x+i, y+j, color);
+      else            drawPixel(x+i, y+j, bg);
+    }
+  }
+}
+
 void STMGPU::drawXBitmap(int16_t x, int16_t y, const uint8_t *bitmap,
                          int16_t w, int16_t h, uint16_t color)
 {

@@ -103,14 +103,13 @@ void setup() {
   gpu.loadTileSet8x8("pcs8x8", TILE_SET_W-1, RAM_BASE, TLE_START, MAX_TILES);
 }
 
-
 void loop() {
   uint8_t testsCount = FUNC_TO_TEST_COUNT;
 
   for (uint8_t count = 0; count < testsCount; count++) {
     pArrTestFunc[count](); // exec test function
 
-    delay(500); // little delay to see what happend on screen
+    gpu.iDelay(500); // little delay to see what happend on screen
     gpu.fillScreen(COLOR_BLACK); // clear screen by black color
   }
 }

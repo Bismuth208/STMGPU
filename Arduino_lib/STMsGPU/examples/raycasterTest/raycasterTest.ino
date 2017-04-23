@@ -30,8 +30,10 @@ STMGPU gpu; // use software BSY check, no pin used
 
 #define PIN_NUM_COUNT 3 // total pins to read
 
-#define FPS_MIN 14  // \__ frame limit values
-#define FPS_MAX 24  // /
+#define FPS_MIN 10  // \__ frame limit values
+#define FPS_MAX 30  // /
+
+#define FPS_CALC(a) (1000/a) // 30 frames per second (1000/30 == 33)
 
 // this is need to load textures from *.tle file 
 // located on SD card - correctly
@@ -39,6 +41,10 @@ STMGPU gpu; // use software BSY check, no pin used
 #define RAM_BASE 0
 #define TLE_START 0
 #define TILE_SET_W 5 // this is width of tileSet in tiles ( one tile width == 8 pixels)
+
+#define X_POS   (50)
+#define Y_POS   (-150)
+#define LR_POS  (1)
 
 // these array need to store calibrated values X, Y, or LR
 // (center positions of sticks)
@@ -60,7 +66,8 @@ uint8_t dirArray[PIN_NUM_COUNT][2] = {
 };
 
 uint32_t lastMicros, thisMicros;
-uint32_t delayLong = 30;
+uint32_t delayLong = 18; // calibrated and tested value
+
 // ---------------------------------------------------------- //
 
 void setup() {
@@ -75,20 +82,24 @@ void setup() {
   *  8 chars max for filename, 3 chars max for file extension
   *  sGPU add *.tle extension automatically
   */
-  gpu.loadTileSet16x16("txtures", TILE_SET_W, RAM_BASE, TLE_START, MAX_TILES);
+  gpu.loadTileSet16x16("w00L00t", TILE_SET_W, RAM_BASE, TLE_START, MAX_TILES);
+  //gpu.loadTileMap("w00L00m"); // future feature
 
-  gpu.fillScreen(COLOR_DARKGREY); // make borders around render window
+  //gpu.setCamPosition(X_POS, Y_POS, LR_POS);
+  // different mods can be found in library STMsGPU.h
+  //gpu.setTextureMode(TEXTURE_MODE_1); // default value == TEXTURE_MODE_1 (16x16 tiles)
+  //gpu.setWallCollision(false); // IDCLIP == false; by default value == false
+  //gpu.setSkyFloor(COLOR_GREEN, COLOR_DARKCYAN); // set color for sky and floor
 
-  // first call for calibration center values
-  calibrateAnalogeSticks();
-
-  //gpu.loadLevelMap(MAP_X_SIZE, MAP_Y_SIZE, "lvlFileName"); // future feature
-  //gpu.setCamPosition(X_POS, Y_POS, LR_POS);  // future feature
-  //gpu.setTextureMode(MODE_X); // 16x16px or 32x32px // future feature
+  gpu.setTextColor(COLOR_WHITE, COLOR_BLACK); // for debug
 
   // say to gpu: "render single frame"
   // force render, overwise user will see something only after moving sticks
+  gpu.fillScreen(COLOR_DARKGREY); // make borders around render window
   gpu.renderFrame();
+
+  // first call for calibration center values
+  calibrateAnalogeSticks();
 }
 
 void loop() {
@@ -100,7 +111,7 @@ void loop() {
 
     // delay for frame limit, sGPU can glitch from DDoS like that
     // it also decrese input lag (i`m siriosly, this is not joke!)
-    limitFPS();
+    limitFPS(); // hmm... replace by non blocking func seems good idea...
   }
 }
 
@@ -111,19 +122,24 @@ void limitFPS(void)
   thisMicros = millis();
   uint32_t resultMicros = thisMicros - lastMicros;
     
-  uint32_t fps = 1000/resultMicros;
+  uint16_t fps = 1000/resultMicros;
  
   if(fps <= FPS_MIN) --delayLong;    //trying to get FPS_MIN fps
   if(fps >= FPS_MAX) ++delayLong;    //but not more FPS_MAX fps
 
-  delay(delayLong*2); //slow down! it`s too faast!
+  //gpu.setCursor(0, 200); // \_for debug only
+  //gpu.print(renderTime); // / in us
+  
+  //everynting is stop... this is wrong...
+  gpu.iDelay(delayLong*2); //slow down! it`s too faast!
 }
 
 void calibrateAnalogeSticks(void)
 {
-  // Before run, be shure what stiks at center position!
+  // Before run, be shure what stiks are at center position!
   for (uint8_t i = 0; i < PIN_NUM_COUNT; i++) {
     calValueXYLR[i] = getPinValue(pinsToReadXYLR[i]);
+    gpu.iDelay(50);
   }
 }
 

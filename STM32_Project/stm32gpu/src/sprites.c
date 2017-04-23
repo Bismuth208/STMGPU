@@ -10,7 +10,7 @@
 #endif
 #include <memhelper.h>
 
-#include "gpuTiles.h"
+#include "tiles.h"
 #include "sprites.h"
 
 //===========================================================================//

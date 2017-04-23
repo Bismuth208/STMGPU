@@ -25,7 +25,7 @@
 
 #include "sdLoader.h"
 #include "gpuMain.h"
-#include "gpuTiles.h"
+#include "tiles.h"
 
 
 //===========================================================================//
@@ -80,7 +80,7 @@ void startupInit(void)
 __noreturn void main(void)
 {
   startupInit();
-  
+
   init_GPU();
   sync_CPU();   /* make a sync whith a CPU */
   run_GPU();

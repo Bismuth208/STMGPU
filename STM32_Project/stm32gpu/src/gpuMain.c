@@ -13,12 +13,13 @@
 #include <gfx.h>
 #include <uart.h>
 #include <memHelper.h>
+#include <systicktimer.h>
 #include <tone.h>
 #include <raycast.h>
 
 #include "gpuMain.h"
 #include "sdLoader.h"
-#include "gpuTiles.h"
+#include "tiles.h"
 #include "sprites.h"
 #include "gui.h"
 
@@ -76,7 +77,7 @@ __noreturn void run_GPU(void)
     
     if(avaliableData) {
       
-      switch(readData8_UART1()) // read command
+      switch(waitCutByte_UART1()) // read command
       {
       // ------------------ Base ------------------ //  
         
@@ -86,7 +87,6 @@ __noreturn void run_GPU(void)
       
       case DRW_PIXEL: {
         waitCutpBuf_UART1(6);
-        
         drawPixel(cmdBuffer.par1, cmdBuffer.par2, cmdBuffer.par3);
       } break;
       
@@ -94,62 +94,52 @@ __noreturn void run_GPU(void)
       
       case FLL_RECT: {
         waitCutpBuf_UART1(10);
-        
         fillRect(cmdBuffer.par1, cmdBuffer.par2, cmdBuffer.par3, cmdBuffer.par4, cmdBuffer.par5);
       } break;
       
       case DRW_RECT: {
         waitCutpBuf_UART1(10);
-        
         drawRect(cmdBuffer.par1, cmdBuffer.par2, cmdBuffer.par3, cmdBuffer.par4, cmdBuffer.par5);
         //drawRect((gfx_t*)&cmdBuffer);
       } break;
       
       case DRW_ROUND_RECT: {
         waitCutpBuf_UART1(12);
-        
         drawRoundRect(cmdBuffer.par1, cmdBuffer.par2, cmdBuffer.par3, cmdBuffer.par4, cmdBuffer.par5, cmdBuffer.par6);
       } break;
       
       case FLL_ROUND_RECT: {
         waitCutpBuf_UART1(12);
-        
         fillRoundRect(cmdBuffer.par1, cmdBuffer.par2, cmdBuffer.par3, cmdBuffer.par4, cmdBuffer.par5, cmdBuffer.par6);
       } break;
       
       case DRW_LINE: {
         waitCutpBuf_UART1(10);
-        
         drawLine(cmdBuffer.par1, cmdBuffer.par2, cmdBuffer.par3, cmdBuffer.par4, cmdBuffer.par5);
       } break;
       
       case DRW_V_LINE: {
         waitCutpBuf_UART1(8);
-        
         drawFastVLine(cmdBuffer.par1, cmdBuffer.par2, cmdBuffer.par3, cmdBuffer.par4);
       } break;
       
       case DRW_H_LINE: {
         waitCutpBuf_UART1(8);
-        
         drawFastHLine(cmdBuffer.par1, cmdBuffer.par2, cmdBuffer.par3, cmdBuffer.par4);
       } break;
       
       case DRW_CIRCLE: {
         waitCutpBuf_UART1(8);
-        
         drawCircle(cmdBuffer.par1, cmdBuffer.par2, cmdBuffer.par3, cmdBuffer.par4);
       } break;
       
       case FLL_CIRCLE: {
         waitCutpBuf_UART1(8);
-        
         fillCircle(cmdBuffer.par1, cmdBuffer.par2, cmdBuffer.par3, cmdBuffer.par4);
       } break;
       
       case DRW_TRINGLE: {
         waitCutpBuf_UART1(14);
-        
         drawTriangle(cmdBuffer.par1, cmdBuffer.par2, cmdBuffer.par3,
                      cmdBuffer.par4, cmdBuffer.par5, cmdBuffer.par6,
                      cmdBuffer.par7);
@@ -157,7 +147,6 @@ __noreturn void run_GPU(void)
       
       case FLL_TRINGLE: {
         waitCutpBuf_UART1(14);
-        
         fillTriangle(cmdBuffer.par1, cmdBuffer.par2, cmdBuffer.par3,
                      cmdBuffer.par4, cmdBuffer.par5, cmdBuffer.par6,
                      cmdBuffer.par7);
@@ -166,7 +155,6 @@ __noreturn void run_GPU(void)
       case GET_RESOLUTION: { // maybe only one command what send something to CPU
         cmdBuffer.par1 = height();
         cmdBuffer.par2 = width();
-        
         sendArrData8_UART1(cmdBuffer.data, 4); // return screen size to CPU
       } break;
       
@@ -174,7 +162,6 @@ __noreturn void run_GPU(void)
       
       case DRW_CHAR: {
         waitCutpBuf_UART1(10);
-        
         drawChar(cmdBuffer.par1, cmdBuffer.par2, cmdBuffer.par3, cmdBuffer.par4, cmdBuffer.data[8], cmdBuffer.data[9]);
       } break;
       
@@ -190,13 +177,11 @@ __noreturn void run_GPU(void)
       
       case DRW_PRNT_POS_C: {
         waitCutpBuf_UART1(5);
-        
         printCharAt(cmdBuffer.par1, cmdBuffer.par2, cmdBuffer.data[4]);
       } break;
       
       case SET_CURSOR: {
         waitCutpBuf_UART1(4);
-        
         setCursor(cmdBuffer.par1, cmdBuffer.par2);
       } break;
       
@@ -206,7 +191,6 @@ __noreturn void run_GPU(void)
       
       case SET_TXT_CR_BG: {
         waitCutpBuf_UART1(4);
-        
         setTextColorBG(cmdBuffer.par1, cmdBuffer.par2);
       } break;
       
@@ -232,13 +216,11 @@ __noreturn void run_GPU(void)
       
       case SET_BRGHTNS_F: {
         waitCutpBuf_UART1(3);
-        
         setDispBrightnessFade(cmdBuffer.data[0], cmdBuffer.data[1], cmdBuffer.data[2]);
       };
       
       case SET_ADR_WIN: {
         waitCutpBuf_UART1(8);
-        
         setAddrWindow(cmdBuffer.par1, cmdBuffer.par2, cmdBuffer.par3, cmdBuffer.par4);
       } break;
       
@@ -248,7 +230,6 @@ __noreturn void run_GPU(void)
       
       case SET_SCRL_AREA: {
         waitCutpBuf_UART1(4);
-        
         setScrollArea(cmdBuffer.par1, cmdBuffer.par2);
       } break;
       
@@ -292,13 +273,11 @@ __noreturn void run_GPU(void)
       
       case MAK_SCRL: {
         waitCutpBuf_UART1(4);
-        
         scrollScreen(cmdBuffer.par1, cmdBuffer.par2);
       } break;
       
       case MAK_SCRL_SMTH: {
         waitCutpBuf_UART1(5);
-        
         scrollScreenSmooth(cmdBuffer.par1, cmdBuffer.par2, cmdBuffer.data[5]);
       } break;
       
@@ -341,7 +320,6 @@ __noreturn void run_GPU(void)
       
       case DRW_TLE_8: {
         waitCutpBuf_UART1(5);
-
         drawTile8x8(cmdBuffer.data);
       } break;
       
@@ -372,7 +350,6 @@ __noreturn void run_GPU(void)
       
       case DRW_TLE_16: {
         waitCutpBuf_UART1(5);
-        
         drawTile16x16(cmdBuffer.data);
       } break;
       
@@ -403,7 +380,6 @@ __noreturn void run_GPU(void)
       
       case DRW_TLE_32: {
         waitCutpBuf_UART1(5);
-        
         drawTile32x32(cmdBuffer.data);
       } break;
 #endif /* STM32F10X_HD */
@@ -426,25 +402,21 @@ __noreturn void run_GPU(void)
       
       case SET_SPR_POS: {
         waitCutpBuf_UART1(6);
-        
         setSpritePosition(cmdBuffer.par1, cmdBuffer.par2, cmdBuffer.par3);
       } break;
       
       case SET_SPR_TYPE: {
         waitCutpBuf_UART1(2);
-        
         setSpriteType(cmdBuffer.data[0], cmdBuffer.data[1]);
       } break;
       
       case SET_SPR_VISBL: {
         waitCutpBuf_UART1(2);
-        
         setSpriteVisible(cmdBuffer.data[0], cmdBuffer.data[1]);
       } break;
       
       case SET_SPR_TLE: {
         waitCutpBuf_UART1(5);
-        
         setSpriteTiles(cmdBuffer.data);
       } break;
       
@@ -458,9 +430,7 @@ __noreturn void run_GPU(void)
       
       case GET_SRP_COLISN: {
         waitCutpBuf_UART1(2);
-        
         uint8_t state = getSpriteCollision(cmdBuffer.data[0], cmdBuffer.data[1]);
-        
         sendData8_UART1(state);
       } break;
       
@@ -498,7 +468,6 @@ __noreturn void run_GPU(void)
       
       case SND_PLAY_TONE: {
         waitCutpBuf_UART1(4);
-        
         playNote_Sound(cmdBuffer.par1, cmdBuffer.par2);
       } break;
       
@@ -512,24 +481,20 @@ __noreturn void run_GPU(void)
 
       case SET_WND_CR: {
         waitCutpBuf_UART1(4);
-        
         setColorWindowGUI(cmdBuffer.par1, cmdBuffer.par2);
       } break;
       
        case SET_WND_CR_TXT: {
         waitCutpBuf_UART1(4);
-        
         setTextBGColorGUI(cmdBuffer.par1, cmdBuffer.par2);
       } break;
       
        case SET_WND_TXT_SZ: {
-        
         setGUITextSize(waitCutByte_UART1());
       } break;
       
        case DRW_WND_AT: {
         waitCutpBuf_UART1(8);
-        
         drawWindowGUI(cmdBuffer.par1, cmdBuffer.par2, cmdBuffer.par3, cmdBuffer.par4);
       } break;
       
@@ -545,22 +510,41 @@ __noreturn void run_GPU(void)
       
       
       // --------------- '3D' engine --------------- //
+      case SET_BACKGRND: {
+        waitCutpBuf_UART1(4);
+        setFloorSkyColor(cmdBuffer.par1, cmdBuffer.par2);
+      } break;
       
       case RENDER_MAP: {
         renderWalls();
       } break;
       
       case MOVE_CAMERA: {
-        moveCamera(waitCutByte_UART1());        
+        moveCamera(waitCutByte_UART1());
       } break;
       
-      /*
       case SET_CAM_POS: {
-        waitCutBuf_UART1(x);
-        
-        setCameraPosition(uint16_t posX, uint16_t posY, uint16_t angle);
+        waitCutpBuf_UART1(6);
+        setCameraPosition(cmdBuffer.par1, cmdBuffer.par2, cmdBuffer.par3);
       } break;
-      */
+      
+      case SET_RENDER_QA: {
+        serRenderQuality(waitCutByte_UART1());
+      } break;
+      
+      case SET_TEXTURE_MODE: {
+        setTextureQuality(waitCutByte_UART1());
+      } break;
+      
+      case SET_WALL_CLD: {
+        setWallCollision(waitCutByte_UART1());
+      } break;
+      
+      case GET_CAM_POS: {
+        getCamPosition(cmdBuffer.data);
+        sendArrData8_UART1(cmdBuffer.data, 6);
+      } break;
+      
       
       
       // -------------  TO DO: ---------- //
