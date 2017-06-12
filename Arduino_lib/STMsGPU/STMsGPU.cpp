@@ -780,6 +780,15 @@ bool STMGPU::getSpriteCollision(uint8_t sprNum1, uint8_t sprNum2)
 }
 
 // ----------------- SD card ---------------- //
+void STMGPU::loadPalette(const char *palleteArrName)
+{
+  cmdBuffer.cmd = LDD_USR_PAL;
+  cmdBuffer.data[1] = strlen(palleteArrName);
+  
+  sendCommand(cmdBuffer.data, 2);
+  sendCommand((void*)palleteArrName, cmdBuffer.data[1]); // send name of file
+}
+
 void STMGPU::sendBaseBMP(uint16_t x, uint16_t y, uint16_t size)
 {
   cmdBuffer.cmd = DRW_BMP_FIL;
@@ -798,14 +807,13 @@ void STMGPU::printBMP(const char *fileName)
   
 void STMGPU::printBMP(const __FlashStringHelper *str)
 {
-  uint8_t c;
+  register uint8_t c;
   PGM_P p = reinterpret_cast<PGM_P>(str);
   
   sendBaseBMP(0, 0, strlen_P(p));
-    
-  while ((c = pgm_read_byte(p)) != 0) {
+  
+  for(; (c = pgm_read_byte(p)); p++) {
     pSerial->write(c);
-    p++;
   }
 }
   
@@ -826,14 +834,13 @@ void STMGPU::printBMP(uint16_t x, uint16_t y, const char *fileName)
   
 void STMGPU::printBMP(uint16_t x, uint16_t y, const __FlashStringHelper *str)
 {
-  uint8_t c;
+  register uint8_t c;
   PGM_P p = reinterpret_cast<PGM_P>(str);
   
   sendBaseBMP(x, y, strlen_P(p));
   
-  while ((c = pgm_read_byte(p)) != 0) {
+  for(; (c = pgm_read_byte(p)); p++) {
     pSerial->write(c);
-    p++;
   }
 }
   

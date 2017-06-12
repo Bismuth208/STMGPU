@@ -303,11 +303,11 @@ class STMGPU : public Print {
   
 public:
 #if !REMOVE_HARDWARE_BSY
-  STMGPU(int8_t bsyPin);
+  STMGPU(int8_t bsyPin = -1);
 #endif
   STMGPU();
   
-  void  begin(baudSpeed_t baudRate);
+  void  begin(baudSpeed_t baudRate = BAUD_SPEED_57600) __attribute__((optimize("-O2")));
   void  iDelay(uint16_t duty);
 
 // ------------------ Base ------------------ //
@@ -344,7 +344,7 @@ public:
   //uint8_t getRotation(void);
   
 #if USE_GPU_RETURN_RESOLUTION
-  void getResolution(void);
+  void getResolution(void)  __attribute__((optimize("-O2")));
   int16_t width(void)  __attribute__((always_inline)) {return _width;}
   int16_t height(void) __attribute__((always_inline)) {return _height;}
 #else
@@ -370,7 +370,7 @@ public:
         setTextWrap(bool wrap),
         cp437(bool cp);
   
-  virtual size_t write(uint8_t);
+  virtual size_t write(uint8_t) __attribute__((optimize("-O2")));
   
   //virtual size_t print(const char[]);
   
@@ -396,11 +396,11 @@ public:
        writeWordData(uint16_t c);
   
 // ------------------- Tile ----------------- //
-  void sendTileData(uint8_t tileType, int16_t posX, int16_t posY, uint8_t tileNum);
+  void sendTileData(uint8_t tileType, int16_t posX, int16_t posY, uint8_t tileNum) __attribute__((optimize("-O2")));
   void loadTileBase(uint8_t tileType, const char *tileSetArrName, uint8_t tileSetW,
-                            uint8_t ramTileNum, uint8_t tileNum);
+                            uint8_t ramTileNum, uint8_t tileNum) __attribute__((optimize("-O2")));
   void loadTileBase(uint8_t tileType, const char *tileSetArrName, uint8_t tileSetW,
-                    uint8_t ramTileBase, uint8_t tileMin, uint8_t tileMax);
+                    uint8_t ramTileBase, uint8_t tileMin, uint8_t tileMax) __attribute__((optimize("-O2")));
   // ---- tile 8x8 ---- //
   void loadTile8x8(const char *tileSetArrName, uint8_t tileSetW,
                             uint8_t ramTileNum, uint8_t tileNum);
@@ -434,8 +434,7 @@ public:
   void setSpritePosition(uint8_t sprNum, uint16_t posX, uint16_t posY);
   void setSpriteType(uint8_t sprNum, uint8_t type);
   void setSpriteVisible(uint8_t sprNum, uint8_t state);
-  void setSpriteTiles(uint8_t sprNum, uint8_t tle1, uint8_t tle2,
-                      uint8_t tle3, uint8_t tle4);
+  void setSpriteTiles(uint8_t sprNum, uint8_t tle1, uint8_t tle2, uint8_t tle3, uint8_t tle4);
   void setSpritesAutoRedraw(uint8_t state);
   void drawSprite(uint8_t sprNum);
   void drawSprite(uint8_t sprNum, uint16_t posX, uint16_t posY);
@@ -443,7 +442,8 @@ public:
   
   
 // ----------------- SD card ---------------- //
-  void sendBaseBMP(uint16_t x, uint16_t y, uint16_t size); // Little help
+  void loadPalette(const char *palleteArrName);
+  void sendBaseBMP(uint16_t x, uint16_t y, uint16_t size) __attribute__((optimize("-O2"))); // Little help
   void printBMP(const char *fileName);
   void printBMP(const __FlashStringHelper* str);
   void printBMP(uint16_t x, uint16_t y, const String &str);
@@ -487,7 +487,7 @@ private:
   HardwareSerial *pSerial; // because different boards have different serial ports
 #endif
   
-  void sendCommand(void *buf, uint8_t size);
+  void sendCommand(void *buf, uint8_t size) __attribute__((optimize("-O2")));
   
   // more RAM used but little faster, less ROM used and less problems whith stack
   cmdBuffer_t cmdBuffer;

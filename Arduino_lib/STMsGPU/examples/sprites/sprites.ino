@@ -85,6 +85,7 @@ void drawRandSprites(void)
 
 void setup() {
   // different speeds can be found in library STMsGPU.h
+  // if call gpu.begin() without param speed will be BAUD_SPEED_57600
   gpu.begin(BAUD_SPEED_1M); // BAUD_SPEED_1M = 1,000,000 bod/s
 
   /* load MAX_TILES tiles to sGPU's RAM at RAM_BASE position in it's RAM,

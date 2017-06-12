@@ -229,124 +229,7 @@ void matrixScreen(void)
   }
 }
 
-// ---------------------------- GFX TESTs ------------------- //
-void testHLinesHelp(uint16_t x0, uint16_t y0, uint16_t y1)
-{
-  for(int16_t x1=0; x1 < TFT_W; x1+=6) {
-    gpu.drawLine(x0, y0, x1, y1, COLOR_YELLOW);
-  }
-}
-
-void testVLinesHelp(uint16_t x0, uint16_t y0, uint16_t x1)
-{
-  for(int16_t y1=0; y1 < TFT_H; y1+=6) {
-    gpu.drawLine(x0, y0, x1, y1, COLOR_YELLOW);
-  }
-}
-
-void testlines(void)
-{
-  testHLinesHelp(0, 0, TFT_H);
-  testVLinesHelp(0, 0, TFT_W);
-
-  gpu.fillScreen(COLOR_BLACK);
-  testHLinesHelp(TFT_W, 0, TFT_H);
-  testVLinesHelp(TFT_W, 0, 0);
-
-  gpu.fillScreen(COLOR_BLACK);
-  testHLinesHelp(0, TFT_H, 0);
-  testVLinesHelp(0, TFT_H, TFT_W);
-
-  gpu.fillScreen(COLOR_BLACK);
-  testHLinesHelp(TFT_W, TFT_H, 0);
-  testVLinesHelp(TFT_W, TFT_H, 0);
-}
-
-void testfastlines(void)
-{
-  for (int16_t y=0; y < TFT_H; y+=5) {
-    gpu.drawFastHLine(0, y, TFT_W, COLOR_RED);
-  }
-  for (int16_t x=0; x < TFT_W; x+=5) {
-    gpu.drawFastVLine(x, 0, TFT_H, COLOR_BLUE);
-  }
-}
-
-void testdrawrects(void)
-{
-  for (int16_t x=0; x < TFT_W; x+=6) {
-    gpu.drawRect(((TFT_W/2) - (x/2)), ((TFT_H/2) -((x/2))), x, x, COLOR_GREEN);
-  }
-}
-
-void testfillrects(void)
-{
-  for (int16_t x=TFT_H-1; x > 6; x-=6) {
-    gpu.fillRect(TFT_W/2 - x/2, TFT_H/2 - x/2 , x, x, COLOR_YELLOW);
-    gpu.drawRect(TFT_W/2 - x/2, TFT_H/2 - x/2 , x, x, COLOR_MAGENTA);
-  }
-}
-
-void testdrawcircles(void)
-{
-  for (int16_t x=0; x < TFT_W; x+= (BASE_RADIUS<<1)) {
-    for (int16_t y=0; y < TFT_H; y+= (BASE_RADIUS<<1)) {
-      gpu.drawCircle(x, y, BASE_RADIUS, COLOR_WHITE);
-    }
-  }
-}
-
-void testfillcircles(void)
-{
-  for (int16_t x=BASE_RADIUS; x < TFT_W; x+= (BASE_RADIUS<<1)) {
-    for (int16_t y=BASE_RADIUS; y < TFT_H; y+= (BASE_RADIUS<<1)) {
-      gpu.fillCircle(x, y, BASE_RADIUS, COLOR_BLUE);
-    }
-  }
-
-  testdrawcircles();
-}
-
-void testtriangles(void)
-{
-  int color = 0xF800;
-  int t;
-  int w = TFT_W/2;
-  int x = TFT_H-1;
-  int y = 0;
-  int z = TFT_W;
-
-  for(t = 0 ; t <= 20; t+=1) {
-    gpu.drawTriangle(w, y, y, x, z, x, color);
-    x-=4;
-    y+=4;
-    z-=4;
-    color+=100;
-  }
-}
-
-void testroundrects(void)
-{
-  uint16_t color = 100;
-
-  for(uint8_t t = 0 ; t <= 4; t++) {
-    int x = 0;
-    int y = 0;
-    int w = TFT_W-2;
-    int h = TFT_H-2;
-    for(uint8_t i = 0 ; i <= 16; i++) {
-      gpu.drawRoundRect(x, y, w, h, 5, color);
-      x+=2;
-      y+=3;
-      w-=4;
-      h-=6;
-      color+=1100;
-    }
-    color+=100;
-  }
-}
-
-void testdrawtext(void)
+void drawText(void)
 {
   gpu.setCursor(0, 0);
   gpu.setTextWrap(true);
@@ -371,6 +254,7 @@ void testdrawtext(void)
 // ---------------------------------------------------------- //
 void setup() {
   // different speeds can be found in library STMsGPU.h
+  // if call gpu.begin() without param speed will be BAUD_SPEED_57600
   gpu.begin(BAUD_SPEED_1M); // BAUD_SPEED_1M = 1,000,000 bod/s
 }
 

@@ -9,15 +9,6 @@ Nullam aliquet ultrices massa eu hendrerit. Ut sed nisi lorem. \
 In vestibulum purus a tortor imperdiet posuere.\n\n";
 
 
-void testdrawtext(void);
-void testlines(void);
-void testfastlines(void);
-void testdrawrects(void);
-void testfillrects(void);
-void testfillcircles(void);
-void testroundrects(void);
-void testtriangles(void);
-
 void drawRandPixels(void);
 void drawRandLines(void);
 void drawRandRect(void);
@@ -28,19 +19,11 @@ void drawRandRoundFillRect(void);
 void drawRandCircle(void);
 void drawRandFillCircle(void);
 void matrixScreen(void);
+void drawText(void);
 
 
 // array wthith ponters to test functions 
 void (*pArrTestFunc[])(void) = {
-    testdrawtext,
-    testlines,
-    testfastlines,
-    //testdrawrects,
-    testfillrects,
-    testfillcircles,
-    testroundrects,
-    testtriangles,
-
     drawRandPixels,
     drawRandLines,
     drawRandRect,
@@ -50,7 +33,8 @@ void (*pArrTestFunc[])(void) = {
     //drawRandRoundFillRect,
     drawRandCircle,
     drawRandFillCircle,
-    matrixScreen
+    matrixScreen,
+    drawText
   };
 
 #define FUNC_TO_TEST_COUNT (sizeof(pArrTestFunc)/sizeof(pArrTestFunc[0]))
