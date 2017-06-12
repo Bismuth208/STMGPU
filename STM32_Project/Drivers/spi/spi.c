@@ -184,7 +184,7 @@ void init_DMA1_SPI1(void)
   CLEAR_BIT(SPI1->CR1, SPI_BaudRatePrescaler_2); // set SPI_BaudRatePrescaler_2
   
   CR1_backup_16b_PS0 = SPI1->CR1; // save DMA settings
-  SPI1->CR1 = CR1_backup_8b_PS2;       // restore
+  SPI1->CR1 = CR1_backup_8b_PS2;  // restore
   
   // Enable DMA1 channel IRQ Channel
   NVIC_InitTypeDef NVIC_InitStructure;

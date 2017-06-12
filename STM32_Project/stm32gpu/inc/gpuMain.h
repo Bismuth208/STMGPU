@@ -22,13 +22,13 @@
 #define SYNC_OK         0xCC
 
 //===========================================================================//
-#define MAX_FILL_BUF    90      // in percent, warning if buffer overfilled
-#define MIN_FILL_BUF    5
+#define MAX_FILL_BUF    85      // in percent, warning if buffer overfilled
+#define MIN_FILL_BUF    1
 
 #define CALC_BUF_FILL(a)   ((SERIAL_BUFFER_SIZE/100)*a)
 
-#define CALC_MAX_FILL_SIZE      3800    // for 95 %   \ __ and SERIAL_BUFFER_SIZE = 4096 
-#define CALC_MIN_FILL_SIZE      200     // for 5 %   /
+#define CALC_MAX_FILL_SIZE      3400    // for 85 %   \ __ and SERIAL_BUFFER_SIZE = 4096 
+#define CALC_MIN_FILL_SIZE      50     // for  1 %   /
 
 // Buffer bsy indication, CPU MUST check this pin EVERYTIME before send any command!
 // othervice, undefined behavor, can happen evething (buffer overflow, wrong commands)

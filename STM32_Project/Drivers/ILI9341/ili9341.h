@@ -208,6 +208,7 @@
 #if USE_FSMC
  #define WAIT_DMA_BSY
  #define SEND_DATA(a)      FSMC_SEND_CMD(a)
+ #define SEND_DATA16(a)    sendData16_FSMC(a)
  #define SEND_2_DATA(a,b)  FSMC_SEND_DATA32(a,b)
 
  #define SEND_ARR16_FAST(pointer, size) sendData16_Arr_FSMC(pointer, size)
@@ -219,6 +220,7 @@
 #else
  #define WAIT_DMA_BSY      wait_DMA1_SPI1_busy()
  #define SEND_DATA(a)      sendData8_SPI1(a)
+ #define SEND_DATA16(a)    sendData16_SPI1(a)
  #define SEND_2_DATA(a,b)  sendData32_SPI1(a,b)
 
  #define SEND_ARR16_FAST(pointer, size) sendData16_Fast_DMA1_SPI1(pointer, size)

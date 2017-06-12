@@ -43,13 +43,7 @@ void writeData(uint8_t c)
 
 void writeWordData(uint16_t c)
 {
-#if USE_FSMC
-  FSMC_SEND_DATA(c);
-#else
-
-  SET_DATA();
-  sendData16_SPI1(c);
-#endif
+  SEND_DATA16(c);
 }
 
 /*
@@ -262,31 +256,34 @@ void setAddrPixel(uint16_t x0, uint16_t y0)
 
 void setRotation(uint8_t m)
 {
-  writeCommand(ILI9341_MADCTL);
   uint8_t rotation = m % 4; // can't be higher than 3
+  uint8_t madctlParam = 0;
   
   switch (rotation) {
-  case 0:
-    writeData(MADCTL_MX | MADCTL_BGR);
+  case 0: {
+    madctlParam = (MADCTL_MX | MADCTL_BGR);
     _width  = ILI9341_TFTWIDTH;
     _height = ILI9341_TFTHEIGHT;
-    break;
-  case 1:
-    writeData(MADCTL_MV | MADCTL_BGR);
+  } break;
+  case 1: {
+    madctlParam = (MADCTL_MV | MADCTL_BGR);
     _width  = ILI9341_TFTHEIGHT;
     _height = ILI9341_TFTWIDTH;
-    break;
-  case 2:
-    writeData(MADCTL_MY | MADCTL_BGR);
+  } break;
+  case 2: {
+    madctlParam = (MADCTL_MY | MADCTL_BGR);
     _width  = ILI9341_TFTWIDTH;
     _height = ILI9341_TFTHEIGHT;
-    break;
-  case 3:
-    writeData(MADCTL_MX | MADCTL_MY | MADCTL_MV | MADCTL_BGR);
+  } break;
+  case 3: {
+    madctlParam = (MADCTL_MX | MADCTL_MY | MADCTL_MV | MADCTL_BGR);
     _width  = ILI9341_TFTHEIGHT;
     _height = ILI9341_TFTWIDTH;
-    break;
+  } break;
   }
+  
+  writeCommand(ILI9341_MADCTL);
+  writeData(madctlParam);
 }
 
 // how much to scroll
@@ -338,11 +335,7 @@ void setSleep(bool enable)
 
 void setIdleMode(bool mode)
 {
-  if (mode) {
-    writeCommand(ILI9341_IDLEON);
-  } else {
-    writeCommand(ILI9341_IDLEOFF);
-  }
+  writeCommand(mode ? ILI9341_IDLEON : ILI9341_IDLEOFF);
 }
 
 void setDispBrightness(uint16_t brightness)
@@ -421,9 +414,5 @@ void setAdaptiveBrightness(uint8_t value)
   b11   Moving Image
   */
   writeCommand(ILI9341_WRCABC);
-#if USE_FSMC
-  FSMC_SEND_DATA((uint16_t)((0x00<<8)|value));
-#else
-  sendData8_SPI1(value);
-#endif
+  WRITE_DATA(value);
 }

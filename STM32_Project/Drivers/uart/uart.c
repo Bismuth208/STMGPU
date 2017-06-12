@@ -11,6 +11,8 @@
 
 #define RX_AVALIABLE ( rx_buffer.head - rx_buffer.tail)
 
+#define MIN_CUT_DATA_SIZE   6
+
 // ------------------------------------------------------------ //
 
 ring_buffer_t rx_buffer = { 0, 0 };
@@ -32,19 +34,14 @@ uint16_t dataAvailable_UART1(void)
 
 uint8_t readData8_UART1(void)
 {
-  while(!RX_AVALIABLE);
   return rxBuffer[rx_buffer.tail++];
 }
 
-/*inline */void cutData(uint8_t *pDest, uint16_t size)
+inline void cutData(uint8_t *pDest, uint16_t size)
 {
-  while(size) {
+  while(size--) {
     while(!RX_AVALIABLE); // wait for something in buf
-    
-    *pDest = rxBuffer[rx_buffer.tail];
-    ++rx_buffer.tail;
-    ++pDest;
-    --size;
+    *pDest++ = rxBuffer[rx_buffer.tail++];
   }
 }
 
@@ -57,54 +54,34 @@ uint8_t waitCutByte_UART1(void)
 uint16_t waitCutWord_UART1(void)
 {
   uint16_t wordData =0;
-  
   cutData((uint8_t*)&wordData, 2);
-  
   return wordData;
 }
 
 void waitCutBuf_UART1(void *dest, uint16_t size)
 {
-  uint8_t *pDest = (uint8_t*)dest;
-  uint16_t dataToRead = rx_buffer.tail + size; // check for overflow
-  
-  // cross zero point (overflow)?
-  if(SERIAL_BUFFER_SIZE < dataToRead ) {
-    if(size > 4) { // best case for memcpy32 is 4 byte align
-      // have enough data?
-      if(RX_AVALIABLE >= size) {
-        // copy it
-        memcpy32(pDest, &rxBuffer[rx_buffer.tail], size);
-        rx_buffer.tail += size;
-        return;
-      }
-    } 
-  } 
-  
-  // nope, nope, nope, no one condition fit to us
-  cutData(pDest, size);
+  if((RX_AVALIABLE >= size) && (size >= MIN_CUT_DATA_SIZE)) {
+    if(rx_buffer.tail < SERIAL_BUFFER_SIZE) {
+      memcpy32(dest, &rxBuffer[rx_buffer.tail], size);
+      rx_buffer.tail += size;
+      return;
+    }
+  }
+  cutData(dest, size);
 }
 
 // this one use preinited pointer to end data buffer
 void waitCutpBuf_UART1(uint16_t size)
 {
-  uint16_t dataToRead = rx_buffer.tail + size; // check for overflow
-  
-  // cross zero point (overflow)?
-  if(SERIAL_BUFFER_SIZE < dataToRead ) {
-    if(size > 4) { // best case for memcpy32 is 4 byte align
-      // have enough data?
-      if(RX_AVALIABLE >= size) {
-        // copy it
-        memcpy32(pDestBuf, &rxBuffer[rx_buffer.tail], size);
-        rx_buffer.tail += size;
-        return;
-      }
+  void *dest = pDestBuf;
+  if((RX_AVALIABLE >= size) && (size >= MIN_CUT_DATA_SIZE)) {
+    if(rx_buffer.tail < SERIAL_BUFFER_SIZE) {
+      memcpy32(dest, &rxBuffer[rx_buffer.tail], size);
+      rx_buffer.tail += size;
+      return;
     }
-  } 
-  
-  // nope, nope, nope, no one condition fit to us
-  cutData(pDestBuf, size);
+  }
+  cutData(dest, size);
 }
 
 void fflush_UART1(void)

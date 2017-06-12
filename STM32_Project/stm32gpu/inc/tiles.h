@@ -55,9 +55,9 @@ uint8_t *getArrTilePointer32x32(uint8_t tileNum);
 uint8_t *getMapArrPointer(void);
 
 // draw tiles located in RAM
-void drawTile8x8(void *tile);
-void drawTile16x16(void *tile);
-void drawTile32x32(void *tile);
+void drawTile8x8(void *tileData);
+void drawTile16x16(void *tileData);
+void drawTile32x32(void *tileData);
 
 void drawBackgroundMap(void);
 

@@ -73,65 +73,36 @@ void loadDefaultPalette(void)
   //memcpy32(currentPaletteArr, STMsGPU_234palette, STMSGPU_PALETTE*2);
 }
 
-#if 0
 void loadInternalTileSet(uint8_t tileSetSize, uint8_t tileSetW, const uint8_t *pTileSet)
 {
-  uint8_t count =0;
-  uint8_t tileNum=0;
-  uint8_t tileYcnt, tileXcnt;
+  uint8_t tileYcnt, tileXcnt;    
+  uint16_t tileNumOffsetX;       // offset for new scanline
+  uint16_t offset;
+  uint8_t *pTile = NULL;
+  const uint8_t *pTileSetOffset = NULL;
   
-  uint16_t tileNumOffsetX = (tileNum % tileSetW)*TILE_8_BASE_SIZE;     // start position
-  uint16_t tileNewLineOffsetY = tileSetW*TILE_8_BASE_SIZE;       // offset for new scanline
+  // offset for new scanline
+  uint16_t tileNewLineOffsetY = tileSetW*TILE_8_BASE_SIZE-TILE_8_BASE_SIZE;
   
-  uint16_t offset = ((tileNum)  / (tileSetW)) * (tileSetW * TILE_ARR_8X8_SIZE);
-  
-  for(; tileNum <= tileSetSize; tileNum++) {
+  for(uint8_t tileNum=0; tileNum <= tileSetSize; tileNum++) {
     
-    for(tileYcnt = 0; tileYcnt < TILE_8_BASE_SIZE; tileYcnt++) { // Y
-      for(tileXcnt =0; tileXcnt < TILE_8_BASE_SIZE; tileXcnt++) { // X
-        tileArr8x8[tileNum][count] = pTileSet[tileNumOffsetX + tileXcnt + offset]; // read single line in X pos
-        ++count;
-      }
-      offset += tileNewLineOffsetY;
-    }
+    pTile = tileArr8x8[tileNum];  // get RAM pointer where place tile data
     
-    count =0;
-    offset = ((tileNum)  / (tileSetW)) * (tileSetW * TILE_ARR_8X8_SIZE);
     tileNumOffsetX = (tileNum % tileSetW)*TILE_8_BASE_SIZE;     // start position
     
-  }
-}
-#else
-
-void loadInternalTileSet(uint8_t tileSetSize, uint8_t tileSetW, const uint8_t *pTileSet)
-{
-  for(uint8_t tileNum=0; tileNum <= tileSetSize; tileNum++) {
-    loadTile8x8(tileNum, tileSetW, tileArr8x8[tileNum], pTileSet);
-  }
-  
-}
-#endif
-
-#if 1
-void loadTile8x8(uint8_t tileNum, uint8_t tileSetW, uint8_t *pTile, const uint8_t *pTileSet)
-{
-  uint8_t count =0;
-  uint8_t tileYcnt, tileXcnt;
-  
-  uint16_t tileNumOffsetX = (tileNum % tileSetW)*TILE_8_BASE_SIZE;     // start position
-  uint16_t tileNewLineOffsetY = tileSetW*TILE_8_BASE_SIZE;       // offset for new scanline
-  
-  uint16_t offset = ((tileNum)  / (tileSetW)) * (tileSetW * TILE_ARR_8X8_SIZE);
-
-  for(tileYcnt = 0; tileYcnt < TILE_8_BASE_SIZE; tileYcnt++) { // Y
-    for(tileXcnt =0; tileXcnt < TILE_8_BASE_SIZE; tileXcnt++) { // X
-      pTile[count] = pTileSet[tileNumOffsetX + tileXcnt + offset]; // read single line in X pos
-      ++count;
+    offset = ((tileNum)  / (tileSetW)) * (tileSetW * TILE_ARR_8X8_SIZE); 
+    
+    pTileSetOffset = &pTileSet[tileNumOffsetX + offset];  // set pointer to beginning of tile
+    
+    for(tileYcnt = 0; tileYcnt < TILE_8_BASE_SIZE; tileYcnt++) {  // Y
+      for(tileXcnt =0; tileXcnt < TILE_8_BASE_SIZE; tileXcnt++) { // X
+        *pTile++ = *pTileSetOffset++; // read single line in X pos
+      }
+      pTileSetOffset += tileNewLineOffsetY; // make new line
     }
-    offset += tileNewLineOffsetY;
   }
 }
-#endif
+
 // -------------------------------------------------------- //
 
 // return the pointer to given tile array number
@@ -144,6 +115,7 @@ uint8_t *getArrTilePointer16x16(uint8_t tileNum)
 {
   return tileArr16x16[tileNum];
 }
+
 #ifdef STM32F10X_HD
 uint8_t *getArrTilePointer32x32(uint8_t tileNum)
 {
@@ -156,13 +128,13 @@ uint8_t *getMapArrPointer(void)
   return mainBackGround;
 }
 
-void drawTile8x8(void *tile)
+void drawTile8x8(void *tileData)
 {
-  uint16_t *pTile = (uint16_t *)tile;
+  uint16_t *pTileData = (uint16_t *)tileData;
   
-  int16_t posX = *pTile++;
-  int16_t posY = *pTile++;
-  uint8_t tileNum = *pTile;
+  int16_t posX = *pTileData++;
+  int16_t posY = *pTileData++;
+  uint8_t tileNum = *pTileData;
   
   // little trick, if tile same, just redraw it
   if(lastTileNum8x8 != tileNum) { // same tile number?
@@ -181,13 +153,13 @@ void drawTile8x8(void *tile)
   SEND_ARR16_FAST(lastTile8x8, TILE_ARR_8X8_SIZE);
 }
 
-void drawTile16x16(void *tile)
+void drawTile16x16(void *tileData)
 {
-  uint16_t *pTile = (uint16_t *)tile;
+  uint16_t *pTileData = (uint16_t *)tileData;
   
-  int16_t posX = *pTile++;
-  int16_t posY = *pTile++;
-  uint8_t tileNum = *pTile++;
+  int16_t posX = *pTileData++;
+  int16_t posY = *pTileData++;
+  uint8_t tileNum = *pTileData++;
   
   // little trick, if tile same, just redraw it
   if(lastTileNum16x16 != tileNum) {
@@ -208,13 +180,13 @@ void drawTile16x16(void *tile)
 
 
 #ifdef STM32F10X_HD
-void drawTile32x32(void *tile)
+void drawTile32x32(void *tileData)
 {
-  uint16_t *pTile = (uint16_t *)tile;
+  uint16_t *pTileData = (uint16_t *)tileData;
   
-  int16_t posX = *pTile++;
-  int16_t posY = *pTile++;
-  uint8_t tileNum = *pTile++;
+  int16_t posX = *pTileData++;
+  int16_t posY = *pTileData++;
+  uint8_t tileNum = *pTileData++;
   
   // little trick, if tile same, just redraw it
   if(lastTileNum32x32 != tileNum) {
@@ -236,28 +208,39 @@ void drawTile32x32(void *tile)
 
 // -------------------------------------------------------- //
 
+// Draw only 8x8 tiled background
 void drawBackgroundMap(void)
 {
-  uint8_t tileX, tileY;
+  int16_t posX, posY;
   uint16_t tileMapCount =0;
-  
-  struct tile_t {
-    uint16_t posX;
-    uint16_t posY;
-    uint8_t tileNum;
-  } tile;
+  uint8_t tileX, tileY;
+  uint8_t tileNum;
+  uint8_t *pTileArr = NULL;
   
   for(tileY=0; tileY < BACKGROUND_SIZE_H; tileY++) {
     for(tileX=0; tileX < BACKGROUND_SIZE_W; tileX++) {
       
-      tile.posX = ( tileX * TILE_8_BASE_SIZE );
-      tile.posY = ( tileY * TILE_8_BASE_SIZE );
-      tile.tileNum = mainBackGround[tileMapCount];
+      posX = ( tileX * TILE_8_BASE_SIZE );
+      posY = ( tileY * TILE_8_BASE_SIZE );
+      tileNum = mainBackGround[tileMapCount];
       
-      drawTile8x8(&tile);
-      //printChar(tile.tileNum+48);
+      // little trick, if tile same, just redraw it
+      if(lastTileNum8x8 != tileNum) { // same tile number?
+        
+        pTileArr = &tileArr8x8[tileNum][0]; // get pointer by *pTile tile number
+        lastTileNum8x8 = tileNum; // apply last tile number
+        
+        // convert colors from indexes in current palette to RGB565 color space
+        for(uint16_t count =0; count < TILE_ARR_8X8_SIZE; count++) {
+          lastTile8x8[count] = currentPaletteArr[*pTileArr++];
+        }
+      }
+      
+      // on oscilloscope this one reduce few uS
+      setSqAddrWindow(posX, posY, TILE_8x8_WINDOW_SIZE);
+      SEND_ARR16_FAST(lastTile8x8, TILE_ARR_8X8_SIZE);
+      
       ++tileMapCount;
     }
   }
-  //setCursor(0,0);
 }

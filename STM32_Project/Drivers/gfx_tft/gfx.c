@@ -567,6 +567,9 @@ void drawChar(int16_t x, int16_t y, uint16_t fgcolor, uint16_t bgcolor, uint8_t 
          ((y + 8 * size - 1) < 0))   // Clip top   TODO: this is not correct
     return;
   
+  if(size > 5) // protection from charBuffer overflow
+    return;
+  
   if(!_cp437 && (c >= 176)) c++; // Handle 'classic' charset behavior
   
   if (fgcolor == bgcolor) {
@@ -746,7 +749,8 @@ void setTextWrap(bool w)
 // with the erroneous character indices.  By default, the library uses the
 // original 'wrong' behavior and old sketches will still work.  Pass 'true'
 // to this function to use correct CP437 character values in your code.
-void cp437(bool x) {
+void cp437(bool x)
+{
   _cp437 = x;
 }
 
@@ -765,11 +769,7 @@ int16_t height(void)
 
 void pushColor(uint16_t color)
 {
-#if USE_FSMC
-  sendData16_FSMC(color);
-#else
-  sendData16_SPI1(color);
-#endif /* USE_FSMC */
+  SEND_DATA16(color);
 }
 
 void drawPixel(int16_t x, int16_t y, uint16_t color)
@@ -777,12 +777,7 @@ void drawPixel(int16_t x, int16_t y, uint16_t color)
   if((x < 0) || (x >= _width) || (y < 0) || (y >= _height)) return;
   
   setAddrPixel(x, y);
-  
-#if USE_FSMC
-  sendData16_FSMC(color);
-#else
-  sendData16_SPI1(color);
-#endif /* USE_FSMC */
+  SEND_DATA16(color);
 }
 
 /*

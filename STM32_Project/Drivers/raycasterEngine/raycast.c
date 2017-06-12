@@ -161,9 +161,8 @@ void castRay(float x, float y, float angle, uint16_t slicePosX, slice_t *result)
       y += yNext_y;
     }
     
-    //textureId =  level[ (uint16_t)(blockX + MAP_WIDTH * blockY)];
     textureId =  pLevel[ (uint16_t)(blockX + MAP_WIDTH * blockY)];
-  } while(textureId == 0);
+  } while(textureId == 0); // really need some protection for map limit...
   
   // -1 mean normal number in tile RAM, in RAM tiles are located from 0
   // i.e. 0(no texture) not allowed
@@ -403,7 +402,7 @@ void setTextureQuality(int8_t quality)
 
 void setWallCollision(bool state)
 {
-  checkWallCollision = state; 
+  checkWallCollision = state;
 }
 
 // in future will be replaced by texture id;

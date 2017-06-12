@@ -1,5 +1,5 @@
-#ifndef FONTS_H
-#define FONTS_H
+#ifndef _FONTS_H
+#define _FONTS_H
 
 // -------------------- Standard ASCII 5x7 font ---------------------------- //
 // defines ascii characters 0x00-0xFF (0-255)
@@ -524,4 +524,4 @@ const unsigned char font5x7RUS[] = {
         0x08, 0x54, 0x34, 0x14, 0x7c //я        0xBF
 };
 
-#endif  /* FONTS_H */
+#endif  /* _FONTS_H */
