@@ -39,12 +39,12 @@ int main(void)
   *  8 chars max for filename, 3 chars max for file extension
   *  sGPU add *.tle extension automatically
   */
-  gpuSDLoadTileSet8x8(tileFileName, TILE_SET_W-1, RAM_BASE, TLE_START, MAX_TILES);
+  gpuLoadTileSet8x8(tileFileName, TILE_SET_W-1, RAM_BASE, TLE_START, MAX_TILES);
 
   // sGPU add *.map extension automatically.
-  gpuSDLoadTileMap(mapFileName);
+  gpuLoadTileMap(mapFileName);
 
-  gpuDrawBackgroundMap();
+  gpuDrawTileMap();
 
   for(;;) {  }
   return 0;

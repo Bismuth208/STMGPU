@@ -2,8 +2,8 @@
 #include <string.h>
 
 #include <systicktimer.h>
-
 #include <uart.h>
+
 #include <STMsGPU_c.h>
 
 #include "gpuTest.h"
@@ -375,19 +375,19 @@ void testdrawtext(void)
 
   gpuSetTextSize(1);
   gpuSetTextColor(COLOR_WHITE);
-  gpuPrintPGR(Loremipsum);
+  gpuPrint_P(Loremipsum);
 
   gpuSetTextSize(2);
   gpuSetTextColor(COLOR_YELLOW);
-  gpuPrintPGR(textSize2);
+  gpuPrint_P(textSize2);
 
   gpuSetTextSize(3);
   gpuSetTextColor(COLOR_RED);
-  gpuPrintPGR(textSize3);
+  gpuPrint_P(textSize3);
 
   gpuSetTextSize(4);
   gpuSetTextColor(COLOR_GREEN);
-  gpuPrintPGR(textSize4);
+  gpuPrint_P(textSize4);
 }
 
 // ---------------------------------------------------------- //

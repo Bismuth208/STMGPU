@@ -9,7 +9,6 @@
  *
  */
 
-#include <stdarg.h>
 #include <string.h>
 #include <stdbool.h>
 #include <stdlib.h>
@@ -39,10 +38,12 @@
 static cmdBuffer_t cmdBuffer;
 //static uint8_t cmdBufferStr[MAX_TEXT_SIZE];
 
+#if USE_GPU_RETURN_RESOLUTION
 // at sync, sGPU return it`s LCD resolution,
 // but you can ask sGPU once again
 static int16_t _width  = 0;
 static int16_t _height = 0;
+#endif
 
 // ------------------------------------------------------------------------------------ //
 
@@ -52,7 +53,7 @@ void sync_gpu(uint32_t baud)
 
   bool syncEstablished = false;
 
-#if USE_BSY_PIN
+#if !REMOVE_HARDWARE_BSY
   // setup GPU bsy pin
   CHK_GPU_BSY_DDRX &=~ (1 << CHK_GPU_BSY_PXY); // set as input
   CHK_GPU_BSY_PORTX |= (1 << CHK_GPU_BSY_PXY); // pull-up
@@ -69,6 +70,7 @@ void sync_gpu(uint32_t baud)
     if(serialRead() == SYNC_OK) {
       syncEstablished = true;
       
+#if USE_GPU_RETURN_RESOLUTION
       while(serialAvailable() < 3); // wait for resolution
       // get _width
       cmdBuffer.data[1] = serialRead();
@@ -81,6 +83,7 @@ void sync_gpu(uint32_t baud)
       _height = cmdBuffer.par2;
       
       serialClear();
+#endif
     }
   }
 }
@@ -92,7 +95,7 @@ void sync_gpu(uint32_t baud)
  */
 void sendCommand(void *buf, uint8_t size)
 {
-#if USE_BSY_PIN // harware protection
+#if !REMOVE_HARDWARE_BSY // harware protection
   while(CHK_GPU_BSY_PIN); // wait untill GPU buffer will ready
 #else // software protection
   if(serialRead() == BSY_MSG_CODE_WAIT) {
@@ -107,6 +110,11 @@ void sendCommand(void *buf, uint8_t size)
 
 
 // ------------------ Base ------------------ //
+void gpuSwReset(void)
+{
+  cmdBuffer.cmd = GPU_SW_RESET;
+  sendCommand(cmdBuffer.data, 1);
+}
 
 void gpuDrawPixel(int16_t x, int16_t y, uint16_t color)
 {
@@ -262,6 +270,7 @@ void gpuFillTriangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2,
   sendCommand(cmdBuffer.data, 15);
 }
 
+#if USE_GPU_RETURN_RESOLUTION
 void gpuGetResolution(void)
 {
   serialClear();
@@ -279,15 +288,32 @@ void gpuGetResolution(void)
   _height = cmdBuffer.par2;
 }
 
+int16_t gpuWidth(void)
+{
+  return _width;
+}
+
 int16_t gpuHeight(void)
 {
   return _height;
 }
 
+#else
+
+void getResolution(void)
+{
+}
+
 int16_t gpuWidth(void)
 {
-  return _width;
+  return GPU_LCD_W;
 }
+
+int16_t gpuHeight(void)
+{
+  return GPU_LCD_H;
+}
+#endif
 
 // --------------- Font/Print --------------- //
 
@@ -363,8 +389,17 @@ void gpuPrint(const char *str)
   sendCommand((void*)str, cmdBuffer.data[1]);
 }
 
+void gpuPrintLen(const char *str, uint16_t size)
+{
+  cmdBuffer.cmd = DRW_PRNT;
+  cmdBuffer.data[1] = size;
+  
+  sendCommand(cmdBuffer.data, 2);
+  sendCommand((void*)str, size);
+}
+
 // make a DDoS to GPU's buffer...
-void gpuPrintPGR(const char *str)
+void gpuPrint_P(const char *str)
 {
   uint16_t strSize = strlen_P(str);
   
@@ -384,7 +419,7 @@ void gpuPrintChar(uint8_t c)
   sendCommand(cmdBuffer.data, 2);
 }
 
-void gpuPrintCharPos(int16_t x, int16_t y, uint8_t c)
+void gpuPrintCharAt(int16_t x, int16_t y, uint8_t c)
 {
   cmdBuffer.cmd = DRW_PRNT_POS_C;
   cmdBuffer.par1 = x;
@@ -526,9 +561,20 @@ void gpuWriteWordData(uint16_t c)
 }
 
 // ------------------- Tile ----------------- //
-void gpuSDLoadTile8x8(const char *tileSetArrName, uint8_t tileSetW, uint8_t ramTileNum, uint8_t tileNum)
+void sendTileData(uint8_t tileType, int16_t posX, int16_t posY, uint8_t tileNum)
 {
-  cmdBuffer.cmd = LDD_TLE_8;
+  cmdBuffer.cmd = tileType;
+  cmdBuffer.par1 = posX;
+  cmdBuffer.par2 = posY;
+  cmdBuffer.data[5] = tileNum;
+  
+  sendCommand(cmdBuffer.data, 6);
+}
+
+void loadTileBase(uint8_t tileType, const char *tileSetArrName, uint8_t tileSetW,
+                          uint8_t ramTileNum, uint8_t tileNum)
+{
+  cmdBuffer.cmd = tileType;
   cmdBuffer.data[1] = strlen(tileSetArrName);
   cmdBuffer.data[2] = tileSetW;
   cmdBuffer.data[3] = ramTileNum;
@@ -538,9 +584,10 @@ void gpuSDLoadTile8x8(const char *tileSetArrName, uint8_t tileSetW, uint8_t ramT
   sendCommand((void*)tileSetArrName, cmdBuffer.data[1]); // send name of file
 }
 
-void gpuSDLoadTileSet8x8(const char *tileSetArrName, uint8_t tileSetW, uint8_t ramTileBase, uint8_t tileMin, uint8_t tileMax)
+void loadTilesBase(uint8_t tileType, const char *tileSetArrName, uint8_t tileSetW,
+                          uint8_t ramTileBase, uint8_t tileMin, uint8_t tileMax)
 {
-  cmdBuffer.cmd = LDD_TLES_8;
+  cmdBuffer.cmd = tileType;
   cmdBuffer.data[1] = strlen(tileSetArrName);
   cmdBuffer.data[2] = tileSetW;
   cmdBuffer.data[3] = ramTileBase;
@@ -551,17 +598,55 @@ void gpuSDLoadTileSet8x8(const char *tileSetArrName, uint8_t tileSetW, uint8_t r
   sendCommand((void*)tileSetArrName, cmdBuffer.data[1]); // send name of file
 }
 
-void gpuDrawTile8x8(int16_t posX, int16_t posY, uint8_t tileNum)
+// ---- tile 8x8 ---- //
+void gpuLoadTile8x8(const char *tileSetArrName, uint8_t tileSetW, uint8_t ramTileNum, uint8_t tileNum)
 {
-  cmdBuffer.cmd = DRW_TLE_8;
-  cmdBuffer.par1 = posX;
-  cmdBuffer.par2 = posY;
-  cmdBuffer.data[5] = tileNum;
-  
-  sendCommand(cmdBuffer.data, 6);
+  loadTileBase(LDD_TLE_8, tileSetArrName, tileSetW, ramTileNum, tileNum);
 }
 
-void gpuSDLoadTileMap(const char *fileName)
+void gpuLoadTileSet8x8(const char *tileSetArrName, uint8_t tileSetW, uint8_t ramTileBase, uint8_t tileMin, uint8_t tileMax)
+{
+  loadTilesBase(LDD_TLES_8, tileSetArrName, tileSetW, ramTileBase, tileMin, tileMax);
+}
+
+void gpuDrawTile8x8(int16_t posX, int16_t posY, uint8_t tileNum)
+{
+  sendTileData(DRW_TLE_8, posX, posY, tileNum);
+}
+
+// ---- tile 16x16 ---- //
+void gpuLoadTile16x16(const char *tileSetArrName, uint8_t tileSetW, uint8_t ramTileNum, uint8_t tileNum)
+{
+  loadTileBase(LDD_TLE_16, tileSetArrName, tileSetW, ramTileNum, tileNum);
+}
+
+void gpuLoadTileSet16x16(const char *tileSetArrName, uint8_t tileSetW, uint8_t ramTileBase, uint8_t tileMin, uint8_t tileMax)
+{
+  loadTilesBase(LDD_TLES_16, tileSetArrName, tileSetW, ramTileBase, tileMin, tileMax);
+}
+
+void gpuDrawTile16x16(int16_t posX, int16_t posY, uint8_t tileNum)
+{
+  sendTileData(DRW_TLE_16, posX, posY, tileNum);
+}
+
+// ---- tile 32x32 ---- //
+void gpuLoadTile32x32(const char *tileSetArrName, uint8_t tileSetW, uint8_t ramTileNum, uint8_t tileNum)
+{
+  loadTileBase(LDD_TLE_32, tileSetArrName, tileSetW, ramTileNum, tileNum);
+}
+
+void gpuLoadTileSet32x32(const char *tileSetArrName, uint8_t tileSetW, uint8_t ramTileBase, uint8_t tileMin, uint8_t tileMax)
+{
+  loadTilesBase(LDD_TLES_32, tileSetArrName, tileSetW, ramTileBase, tileMin, tileMax);
+}
+
+void gpuDrawTile32x32(int16_t posX, int16_t posY, uint8_t tileNum)
+{
+  sendTileData(DRW_TLE_32, posX, posY, tileNum);
+}
+
+void gpuLoadTileMap(const char *fileName)
 {
   cmdBuffer.cmd = LDD_TLE_MAP;
   cmdBuffer.data[1] = strlen(fileName);
@@ -570,7 +655,7 @@ void gpuSDLoadTileMap(const char *fileName)
   sendCommand((void*)fileName, cmdBuffer.data[1]); // send name of file
 }
 
-void gpuDrawBackgroundMap(void)
+void gpuDrawTileMap(void)
 {
   cmdBuffer.cmd = DRW_TLE_MAP;
   
@@ -634,6 +719,17 @@ void gpuDrawSprite(uint8_t sprNum)
   sendCommand(cmdBuffer.data, 2);
 }
 
+// in future i fix that...
+void gpuDrawSpriteAt(uint8_t sprNum, uint16_t posX, uint16_t posY)
+{
+  gpuSetSpritePosition(sprNum, posX, posY);
+  
+  cmdBuffer.cmd = DRW_SPR;
+  cmdBuffer.data[1] = sprNum;
+  
+  sendCommand(cmdBuffer.data, 2);
+}
+
 bool gpuGetSpriteCollision(uint8_t sprNum1, uint8_t sprNum2)
 {
   cmdBuffer.cmd = GET_SRP_COLISN;
@@ -649,7 +745,7 @@ bool gpuGetSpriteCollision(uint8_t sprNum1, uint8_t sprNum2)
 
 
 // ---------------- SD card ----------------- //
-void gpuSDLoadPalette(const char *palleteArrName)
+void gpuLoadPalette(const char *palleteArrName)
 {
   cmdBuffer.cmd = LDD_USR_PAL;
   cmdBuffer.data[1] = strlen(palleteArrName);
@@ -658,26 +754,36 @@ void gpuSDLoadPalette(const char *palleteArrName)
   sendCommand((void*)palleteArrName, cmdBuffer.data[1]); // send name of file
 }
 
-void gpuSDPrintBMP(const char *fileName)
-{
-  cmdBuffer.cmd = DRW_BMP_FIL;
-  cmdBuffer.par1 = 0;
-  cmdBuffer.par2 = 0;
-  cmdBuffer.data[5] = strlen(fileName);
-  
-  sendCommand(cmdBuffer.data, 6);
-  sendCommand((void*)fileName, cmdBuffer.data[5]); // send name of file
-}
-
-void gpuSDPrintBMPat(uint16_t x, uint16_t y, const char *fileName)
+void sendBaseBMP(uint16_t x, uint16_t y, uint16_t size)
 {
   cmdBuffer.cmd = DRW_BMP_FIL;
   cmdBuffer.par1 = x;
   cmdBuffer.par2 = y;
-  cmdBuffer.data[5] = strlen(fileName);
+  cmdBuffer.data[5] = size;
   
   sendCommand(cmdBuffer.data, 6);
+}
+
+void gpuPrintBMP(const char *fileName)
+{
+  sendBaseBMP(0, 0, strlen(fileName));
   sendCommand((void*)fileName, cmdBuffer.data[5]); // send name of file
+}
+
+void gpuPrintBMPat(uint16_t x, uint16_t y, const char *fileName)
+{
+  sendBaseBMP(x, y, strlen(fileName));
+  sendCommand((void*)fileName, cmdBuffer.data[5]); // send name of file
+}
+
+// ------------------ Sound ----------------- //
+void gpuPlayNote(uint16_t freq, uint16_t duration)
+{
+  cmdBuffer.cmd = SND_PLAY_TONE;
+  cmdBuffer.par1 = freq;
+  cmdBuffer.par2 = duration;
+  
+  sendCommand(cmdBuffer.data, 5);
 }
 
 // --------------- GUI commands -------------- //
@@ -732,7 +838,7 @@ void gpuDrawTextWindowGUI(int16_t posX, int16_t posY,
   sendCommand((void*)text, cmdBuffer.par5);
 }
 
-void gpuDrawPGRTextWindowGUI(int16_t posX, int16_t posY,
+void gpuDrawTextWindowGUI_P(int16_t posX, int16_t posY,
                              int16_t w, int16_t h, const char *text)
 {
   cmdBuffer.cmd = DRW_WND_TXT;
@@ -749,36 +855,68 @@ void gpuDrawPGRTextWindowGUI(int16_t posX, int16_t posY,
   }
 }
 
-// -------------------- ___ ---------------------- //
-
-#if 0
-// some type of overdrive in C
-// hi 4 nibles is type of func
-// low 4 nibbles is how much params
-void gpuSDLoadTile(const char *fileName, uint8_t fnNum, ...)
+// --------------- '3D' engine --------------- //
+void gpuRenderFrame(void)
 {
-  uint8_t params[4];
-  
-  va_list argptr;
-  va_start (argptr, fnNum);
+  // yep... only 1 byte. I make this for protect sGPU from DDoS.
+  cmdBuffer.cmd = RENDER_MAP;
+  sendCommand(cmdBuffer.data, 1);
+}
 
-  for(uint8_t count =0; count < (fnNum&0x0F); count++) {
-    params[count] = va_arg (argptr,  uint8_t);
-  }
-  va_end(argptr);
+void gpuMoveCamera(uint8_t direction)
+{
+  cmdBuffer.cmd = MOVE_CAMERA;
+  cmdBuffer.data[1] = direction;
   
-  switch (fnNum & 0xF0)
-  {
-    case 1:{
-      gpuSDLoadTileFromSet8x8(fileName, params[0], params[1], params[2]);
-    } break;
-    case 2:{
-      gpuSDLoadTileSet8x8(fileName, params[0],  params[1], params[2], params[3]);
-    } break;
-    default: break;
+  sendCommand(cmdBuffer.data, 2);
+}
+
+void gpuSetCamPosition(uint16_t posX, uint16_t posY, uint16_t angle)
+{
+  cmdBuffer.cmd = SET_CAM_POS;
+  cmdBuffer.par1 = posX;
+  cmdBuffer.par2 = posY;
+  cmdBuffer.par3 = angle;
+  
+  sendCommand(cmdBuffer.data, 7);
+}
+
+void gpuSetWallCollision(bool state)
+{
+  cmdBuffer.cmd = SET_WALL_CLD;
+  cmdBuffer.data[1] = state;
+  
+  sendCommand(cmdBuffer.data, 2);
+}
+
+void gpuGetCamPosition(uint16_t *pArrPos)
+{
+  cmdBuffer.cmd = GET_CAM_POS;
+  sendCommand(cmdBuffer.data, 1);
+  
+  while(serialAvailable < 6) { // wait for: posX, posY and angle
+    pArrPos[0] = serialRead();
+    pArrPos[0] |= serialRead()<<8;
+    
+    pArrPos[1] = serialRead();
+    pArrPos[1] |= serialRead()<<8;
+    
+    pArrPos[2] = serialRead();
+    pArrPos[2] |= serialRead()<<8;
   }
 }
-#endif
+
+void gpuSetSkyFloor(uint16_t sky, uint16_t floor)
+{
+  cmdBuffer.cmd = SET_BACKGRND;
+  cmdBuffer.par1 = sky;
+  cmdBuffer.par2 = floor;
+  
+  sendCommand(cmdBuffer.data, 5);
+}
+
+
+// -------------------- ___ ---------------------- //
 
 // Pass 8-bit (each) R,G,B, get back 16-bit packed color
 uint16_t color565(uint8_t r, uint8_t g, uint8_t b)
@@ -786,8 +924,45 @@ uint16_t color565(uint8_t r, uint8_t g, uint8_t b)
   return ((r & 0xF8) << 8) | ((g & 0xFC) << 3) | (b >> 3);
 }
 
-//void drawBitmap(int16_t x, int16_t y, const uint8_t *bitmap, int16_t w, int16_t h, uint16_t color);
-//void drawBitmapBG(int16_t x, int16_t y, const uint8_t *bitmap, int16_t w, int16_t h, uint16_t color, uint16_t bg);
+// Draw a 1-bit image (bitmap) at the specified (x,y) position from the
+// provided bitmap buffer (must be PROGMEM memory) using the specified
+// foreground color (unset bits are transparent).
+void gpuDrawBitmap(int16_t x, int16_t y, const uint8_t *bitmap,
+                        int16_t w, int16_t h, uint16_t color)
+{
+  
+  int16_t i, j, byteWidth = (w + 7) / 8;
+  uint8_t byte;
+  
+  for(j=0; j<h; j++) {
+    for(i=0; i<w; i++) {
+      if(i & 7) byte <<= 1;
+      else      byte   = pgm_read_byte(bitmap + j * byteWidth + i / 8);
+      if(byte & 0x80) gpuDrawPixel(x+i, y+j, color);
+    }
+  }
+}
+
+// Draw a 1-bit image (bitmap) at the specified (x,y) position from the
+// provided bitmap buffer (must be PROGMEM memory) using the specified
+// foreground (for set bits) and background (for clear bits) colors.
+void gpuDrawBitmapBG(int16_t x, int16_t y, const uint8_t *bitmap,
+                        int16_t w, int16_t h, uint16_t color, uint16_t bg)
+{
+  
+  int16_t i, j, byteWidth = (w + 7) / 8;
+  uint8_t byte;
+  
+  for(j=0; j<h; j++) {
+    for(i=0; i<w; i++ ) {
+      if(i & 7) byte <<= 1;
+      else      byte   = pgm_read_byte(bitmap + j * byteWidth + i / 8);
+      if(byte & 0x80) gpuDrawPixel(x+i, y+j, color);
+      else            gpuDrawPixel(x+i, y+j, bg);
+    }
+  }
+}
+
 void gpuDrawXBitmap(int16_t x, int16_t y, const uint8_t *bitmap, int16_t w, int16_t h, uint16_t color)
 {
   int16_t i, j, byteWidth = (w + 7) / 8;

@@ -1,16 +1,7 @@
 #include <avr/pgmspace.h>
 
-#define MAX_SPEED 1 
-
-// can save ROM and increase speed, but its unfair!
-// use it if you know end resolution
-#if MAX_SPEED
- #define TFT_W 320
- #define TFT_H 240
-#else
- #define TFT_W gpuWidth()
- #define TFT_H gpuHeight()
-#endif /* MAX_SPEED */
+#define TFT_W gpuWidth()
+#define TFT_H gpuHeight()
 
 #define TEST_SAMPLE_SIZE 2000
 #define TEST_SAMPLE_SCREENS 2

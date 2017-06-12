@@ -45,7 +45,7 @@ void gpuLoadTiles(void)
   *  8 chars max for filename, 3 chars max for file extension
   *  sGPU add *.tle extension automatically
   */
-  gpuSDLoadTileSet8x8(tileFileName, TILE_SET_W-1, RAM_BASE, TLE_START, MAX_TILES);
+  gpuLoadTileSet8x8(tileFileName, TILE_SET_W-1, RAM_BASE, TLE_START, MAX_TILES);
 }
 
 // --------------------------------------------------------- //
@@ -121,7 +121,7 @@ int main(void)
     for (uint8_t count = 0; count < testsCount; count++) {
       pArrTestFunc[count]();  // exec test function
 
-       _delayMS(1000);  // actual 500 // little delay to see what happend on screen
+      _delayMS(1000);  // actual 500 // little delay to see what happend on screen
       gpuFillScreen(COLOR_BLACK);  // clear screen by black color
     }
   }

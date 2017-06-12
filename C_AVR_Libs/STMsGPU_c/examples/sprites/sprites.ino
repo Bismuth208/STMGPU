@@ -13,17 +13,8 @@
  */
 
 // --------------------------------------------------------- //
-#define MAX_SPEED 1 
-
-// can save ROM and increase speed, but its unfair!
-// use it if you know end resolution
-#if MAX_SPEED
- #define TFT_W 320
- #define TFT_H 240
-#else
- #define TFT_W gpuWidth()
- #define TFT_H gpuHeight()
-#endif /* MAX_SPEED */
+#define TFT_W gpuWidth()
+#define TFT_H gpuHeight()
 
 #define TEST_SAMPLE_SIZE    300
 #define TEST_SAMPLE_SCREENS 20 // this is equal to 24000 tiles
@@ -66,7 +57,7 @@ void gpuLoadTiles(void)
   *  8 chars max for filename, 3 chars max for file extension
   *  sGPU add *.tle extension automatically
   */
-  gpuSDLoadTileSet8x8(tileFileName, TILE_SET_W-1, RAM_BASE, TLE_START, MAX_TILES);
+  gpuLoadTileSet8x8(tileFileName, TILE_SET_W-1, RAM_BASE, TLE_START, MAX_TILES);
 }
 
 void gpuMakeSprites(void)

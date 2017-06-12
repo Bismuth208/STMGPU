@@ -35,9 +35,9 @@
 // SMTH - SMOOTH
 
 // ------------------ Base ------------------ //
-//#define NOT_USED         0x00
+//#define NOT_USED        0x00
 #define FLL_SCR         0x01
-//#define NOT_USED          0x02
+#define GPU_SW_RESET    0x02
 #define DRW_PIXEL       0x03
 
 // ------------- Primitives/GFX ------------- //
@@ -70,10 +70,9 @@
 //#define NOT_USED        0x1C
 //#define NOT_USED        0x1D
 //#define NOT_USED        0x1E
-//#define NOT_USED        0x1F
-
 
 // ---------------- Low Level --------------- //
+#define SET_BRGHTNS_F   0x1F    // setDispBrightnessFade()
 #define SET_ADR_WIN     0x20
 #define SET_ROTATION    0x21
 #define SET_SCRL_AREA   0x22
@@ -138,20 +137,22 @@
 // ----------------- SD card ---------------- //
 #define LDD_USR_PAL     0x50    // load user palette from SD card
 #define DRW_BMP_FIL     0x51    // draw bmp file located on SD card
-//#define NOT_USED        0x52
+#define LDD_SND_FIL     0x52    // load sound file
 //#define NOT_USED        0x53
 //#define NOT_USED        0x54
 //#define NOT_USED        0x55
 //#define NOT_USED        0x56
 //#define NOT_USED        0x57
-//#define NOT_USED        0x58
+//#define NOT_USED        0x58 // make screenshot to SD card
 //#define NOT_USED        0x59
 //#define NOT_USED        0x5A
 //#define NOT_USED        0x5B
+
+// ------------------ Sound ----------------- //
 //#define NOT_USED        0x5C
 //#define NOT_USED        0x5D
-//#define NOT_USED        0x5E
-//#define NOT_USED        0x5F
+#define SND_PLAY_TONE   0x5E
+#define SND_PLAY_BUF    0x5F
 
 
 // --------------- GUI commands -------------- //
@@ -161,19 +162,22 @@
 #define DRW_WND_AT      0x63    // draw window at position
 #define DRW_WND_TXT     0x64    // draw window whith text
 //#define DRW_BTN_NUM     0x65    // draw numerated buttons
-//#define NOT_USED        0x66
+
+
+// --------------- '3D' engine --------------- //
+#define SET_BACKGRND      0x66
 //#define NOT_USED        0x67
-//#define NOT_USED        0x68
-//#define NOT_USED        0x69
-//#define NOT_USED        0x6A
-//#define NOT_USED        0x6B
-//#define NOT_USED        0x6C
-//#define NOT_USED        0x6D
-//#define NOT_USED        0x6E
-//#define NOT_USED        0x6F
+#define RENDER_MAP        0x68  // render walls
+#define MOVE_CAMERA       0x69
+#define SET_CAM_POS       0x6A  // set current camera position
+//#define RENDER_BCKGRND    0x6B  // render background; sky, floor
+#define SET_RENDER_QA     0x6C  // set render quality
+#define SET_TEXTURE_MODE  0x6D  // 16x16 or 32x32(pro only)
+#define SET_WALL_CLD      0x6E  // set wall collision state
+#define GET_CAM_POS       0x6F  // get current camera position
 
 // ---------------- NOT_USED ---------------- //
-// -------------- 0x60 - 0xFF --------------- //
+// -------------- 0x70 - 0xFF --------------- //
 
 
 // Color definitions
@@ -184,8 +188,8 @@
 #define COLOR_MAROON      0x7800      // 128,   0,   0
 #define COLOR_PURPLE      0x780F      // 128,   0, 128
 #define COLOR_OLIVE       0x7BE0      // 128, 128,   0
-#define COLOR_LIGHTGREY   0xC618      // 192, 192, 192
 #define COLOR_DARKGREY    0x7BEF      // 128, 128, 128
+#define COLOR_LIGHTGREY   0xC618      // 192, 192, 192
 #define COLOR_BLUE        0x001F      //   0,   0, 255
 #define COLOR_GREEN       0x07E0      //   0, 255,   0
 #define COLOR_CYAN        0x07FF      //   0, 255, 255
@@ -195,6 +199,38 @@
 #define COLOR_ORANGE      0xFD20      // 255, 165,   0
 #define COLOR_YELLOW      0xFFE0      // 255, 255,   0
 #define COLOR_WHITE       0xFFFF      // 255, 255, 255
+
+
+// ------------------------------------------------------------------- //
+/*
+ * WARNING!
+ * THIS IS REALLY DENGEROUS DEFINE!
+ *
+ * It's remove check for BSY pin!
+ * This define created for reduce ROM size and RAM,
+ * also increase speed of code execution by little.
+ *
+ */
+#define REMOVE_HARDWARE_BSY  1
+// ------------------------------------------------------------------- //
+// ------------------------------------------------------------------- //
+/*
+ * WARNING!
+ * THIS IS ALSO REALLY DENGEROUS DEFINE!
+ *
+ * It's remove check for returning resolution!
+ * This define created for reduce ROM size and RAM,
+ * also increase speed of code execution by little.
+ *
+ */
+#define USE_GPU_RETURN_RESOLUTION  0
+
+// Describe end resolution of LCD/TFT if its known
+#if !USE_GPU_RETURN_RESOLUTION
+#define GPU_LCD_W   320
+#define GPU_LCD_H   240
+#endif
+// ------------------------------------------------------------------- //
 
 // ------------------------------------------------------------------- //
 
@@ -215,6 +251,20 @@
 #define SPR_1X2_32 9
 #define SPR_2X1_32 10
 #define SPR_2X2_32 11
+
+// ------------------------------------------------------------------- //
+// Move direction defines for 3D
+#define MOVE_UP            0x01
+#define MOVE_DOWN          0x02
+#define MOVE_LEFT          0x04
+#define MOVE_RIGHT         0x08
+#define MOVE_CLOCKWISE_R   0x10
+#define MOVE_CLOCKWISE_L   0x20
+
+// definitions for texture sizes
+#define TEXTURE_MODE_0     0  // 8x8 tiles
+#define TEXTURE_MODE_1     1  // 16x16 tiles
+#define TEXTURE_MODE_2     2  // 32x32 tiles (only PRO version!)
 
 // ------------------------------------------------------------------- //
 
@@ -246,11 +296,18 @@ extern "C" {
   } baudSpeed_t;
   
   // ------------------------------------------------------------------- //
+  // This is really awesome and powerfull tool!
+  // but it is not ready...
+  //void printg(char *format, ...);
+  //void printg_P(const char *format, ...);
+  
+  // ------------------------------------------------------------------- //
   
   void sync_gpu(uint32_t baud);
   void sendCommand(void *buf, uint8_t size);
   
   // ------------------ Base ------------------ //
+  void swReset(void);
   void gpuDrawPixel(int16_t x, int16_t y, uint16_t color);
   void gpuFillScreen(uint16_t color);
   
@@ -271,8 +328,8 @@ extern "C" {
   void gpuScroll(uint16_t lines, uint16_t yStart);
   void gpuScrollSmooth(uint16_t lines, uint16_t yStart, uint8_t wait);
   
-  //void drawBitmap(int16_t x, int16_t y, const uint8_t *bitmap, int16_t w, int16_t h, uint16_t color);
-  //void drawBitmapBG(int16_t x, int16_t y, const uint8_t *bitmap, int16_t w, int16_t h, uint16_t color, uint16_t bg);
+  void drawBitmap(int16_t x, int16_t y, const uint8_t *bitmap, int16_t w, int16_t h, uint16_t color);
+  void drawBitmapBG(int16_t x, int16_t y, const uint8_t *bitmap, int16_t w, int16_t h, uint16_t color, uint16_t bg);
   void gpuDrawXBitmap(int16_t x, int16_t y, const uint8_t *bitmap, int16_t w, int16_t h, uint16_t color);
   
   uint16_t color565(uint8_t r, uint8_t g, uint8_t b);
@@ -294,9 +351,9 @@ extern "C" {
   void gpuSetCp437(bool cp);
   
   void gpuPrint(const char *str);
-  void gpuPrintPGR(const char *str);
+  void gpuPrint_P(const char *str);
   void gpuPrintChar(uint8_t c);
-  void gpuPrintCharPos(int16_t x, int16_t y, uint8_t c);
+  void gpuPrintCharAt(int16_t x, int16_t y, uint8_t c);
   
   // ---------------- Low Level --------------- //
   void gpuSetAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
@@ -315,15 +372,28 @@ extern "C" {
   void gpuWriteWordData(uint16_t c);
   
   // ------------------- Tile ----------------- //
-  void gpuSDLoadTile8x8(const char *tileSetArrName, uint8_t tileSetW,
-                     uint8_t ramTileNum, uint8_t tileNum);
-  void gpuSDLoadTileSet8x8(const char *tileSetArrName, uint8_t tileSetW,
-                        uint8_t ramTileBase, uint8_t tileMin, uint8_t tileMax);
+  // ---- tile 8x8 ---- //
+  void gpuLoadTile8x8(const char *tileSetArrName, uint8_t tileSetW,
+                   uint8_t ramTileNum, uint8_t tileNum);
+  void gpuLoadTileSet8x8(const char *tileSetArrName, uint8_t tileSetW,
+                      uint8_t ramTileBase, uint8_t tileMin, uint8_t tileMax);
   void gpuDrawTile8x8(int16_t posX, int16_t posY, uint8_t tileNum);
   
-  //void SDLoadTile(const char *fileName, uint8_t fnNum, ...);
+  // ---- tile 16x16 ---- //
+  void gpuLoadTile16x16(const char *tileSetArrName, uint8_t tileSetW,
+                     uint8_t ramTileNum, uint8_t tileNum);
+  void gpuLoadTileSet16x16(const char *tileSetArrName, uint8_t tileSetW,
+                        uint8_t ramTileBase, uint8_t tileMin, uint8_t tileMax);
+  void gpuDrawTile16x16(int16_t posX, int16_t posY, uint8_t tileNum);
+  // ---- tile 32x32 ---- //
+  void gpuLoadTile32x32(const char *tileSetArrName, uint8_t tileSetW,
+                     uint8_t ramTileNum, uint8_t tileNum);
+  void gpuLoadTileSet32x32(const char *tileSetArrName, uint8_t tileSetW,
+                        uint8_t ramTileBase, uint8_t tileMin, uint8_t tileMax);
+  void gpuDrawTile32x32(int16_t posX, int16_t posY, uint8_t tileNum);
   
-  void gpuSDLoadTileMap(const char *fileName);
+  
+  void gpuLoadTileMap(const char *fileName);
   void gpuDrawBackgroundMap(void);
   
   // ----------------- Sprite ----------------- //
@@ -333,13 +403,16 @@ extern "C" {
   void gpuSetSpriteTiles(uint8_t sprNum, uint8_t tle1, uint8_t tle2, uint8_t tle3, uint8_t tle4);
   void gpuSetSpritesAutoRedraw(uint8_t state);
   void gpuDrawSprite(uint8_t sprNum);
-  
+  void gpuDrawSpriteAt(uint8_t sprNum, uint16_t posX, uint16_t posY);
   bool gpuGetSpriteCollision(uint8_t sprNum1, uint8_t sprNum2);
   
   // ---------------- SD card ----------------- //
-  void gpuSDLoadPalette(const char *palleteArrName);
-  void gpuSDPrintBMP(const char* fileName);
-  void gpuSDPrintBMPat(uint16_t x, uint16_t y, const char* fileName);
+  void gpuLoadPalette(const char *palleteArrName);
+  void gpuPrintBMP(const char* fileName);
+  void gpuPrintBMPat(uint16_t x, uint16_t y, const char* fileName);
+  
+  // ------------------ Sound ----------------- //
+  void gpuPlayNote(uint16_t freq, uint16_t duration);
   
   // --------------- GUI commands -------------- //
   void gpuSetTextSizeGUI(uint8_t size);
@@ -349,8 +422,18 @@ extern "C" {
   void gpuDrawWindowGUI(int16_t posX, int16_t posY, int16_t w, int16_t h);
   void gpuDrawTextWindowGUI(int16_t posX, int16_t posY,
                      int16_t w, int16_t h, const char *text);
-  void gpuDrawPGRTextWindowGUI(int16_t posX, int16_t posY,
+  void gpuDrawTextWindowGUI_P(int16_t posX, int16_t posY,
                      int16_t w, int16_t h, const char *text);
+  
+  // --------------- '3D' engine --------------- //
+  void gpuRenderFrame(void);
+  void gpuMoveCamera(uint8_t direction);
+  void gpuSetCamPosition(uint16_t posX, uint16_t posY, uint16_t angle);
+  void gpuSetWallCollision(bool state);
+  void gpuGetCamPosition(uint16_t *pArrPos);
+  // in future will be replaced by texture id;
+  // also it will be ranamed to setFloorSkyTexture
+  void gpuSetSkyFloor(uint16_t sky, uint16_t floor);
   
   
   // ------------------------------------------------------------------- //

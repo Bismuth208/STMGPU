@@ -1,6 +1,6 @@
 #include <systicktimer.h>
-
 #include <uart.h>
+
 #include <STMsGPU_c.h>
 
 /* BE CAREFULL!! USED ONLY HARDWARE SERIAL PORT!!
@@ -9,10 +9,6 @@
  * moreover arduino libs here totally not supported!
  */
 
-// ---------------------------------------------------------- //
-const uint8_t bmpFileName1[] = "tree1";
-const uint8_t bmpFileName2[] = "tree2";
-const uint8_t bmpFileName3[] = "tree3";
 // ---------------------------------------------------------- //
 
 int main(void)
@@ -26,12 +22,10 @@ int main(void)
 
   for(;;) {
     // sGPU add *.bmp extension automatically
-    // at current moment sopported only BMP24 (whith no alpha channel)!
-  	gpuSDPrintBMPat(0, 20, bmpFileName1);
-    gpuSDPrintBMP(bmpFileName2);
-    gpuSDPrintBMP(bmpFileName3);
-
-    gpuFillScreen(COLOR_BLACK);
+    // at current moment sopported only BMP16 and BMP24 (whith no alpha channel)!
+  	gpuPrintBMPat(0, 0, "tree1");
+    gpuPrintBMP("tree2");
+    gpuPrintBMP("tree36");
   }
 
   return 0;
