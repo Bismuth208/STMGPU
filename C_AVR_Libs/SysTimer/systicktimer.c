@@ -4,6 +4,11 @@
 
 #include "systicktimer.h"
 
+#ifndef  F_CPU
+#define  F_CPU 16000000UL
+#warning "F_CPU difined here"
+#endif
+
 #define clockCyclesPerMicrosecond() ( F_CPU / 1000000L )
 #define clockCyclesToMicroseconds(a) ( (a) / clockCyclesPerMicrosecond() )
 #define microsecondsToClockCycles(a) ( (a) * clockCyclesPerMicrosecond() )

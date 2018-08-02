@@ -26,10 +26,8 @@ void drawRamTileSet32x32(void);
 void fillScreenByTiles(void);
 
 // this is pointers to test functions
-void (*pArrExecGFXFunc[])(void) = {
+void (*testFuctions[])(void) = {
     testDrawTiles,
     drawRamTileSet32x32,
     fillScreenByTiles,
   };
-
-#define FUNC_TO_TEST_COUNT (sizeof(pArrExecGFXFunc)/sizeof(pArrExecGFXFunc[0]))

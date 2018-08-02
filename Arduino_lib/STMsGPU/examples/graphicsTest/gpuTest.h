@@ -23,7 +23,7 @@ void drawText(void);
 
 
 // array wthith ponters to test functions 
-void (*pArrTestFunc[])(void) = {
+void (*testFuctions[])(void) = {
     drawRandPixels,
     drawRandLines,
     drawRandRect,
@@ -36,8 +36,6 @@ void (*pArrTestFunc[])(void) = {
     matrixScreen,
     drawText
   };
-
-#define FUNC_TO_TEST_COUNT (sizeof(pArrTestFunc)/sizeof(pArrTestFunc[0]))
 
 // --------------------------------------------------------- //
 /* in library STMsGPU.h exist define USE_GPU_RETURN_RESOLUTION

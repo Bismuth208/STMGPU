@@ -23,10 +23,8 @@ void drawRamTileSet8x8(void);
 void fillScreenByTiles(void);
 
 // this is pointers to test functions
-void (*pArrTestFunc[])(void) = {
+void (*testFuctions[])(void) = {
     testDrawTiles,
     drawRamTileSet8x8,
     fillScreenByTiles,
   };
-
-#define FUNC_TO_TEST_COUNT (sizeof(pArrTestFunc)/sizeof(pArrTestFunc[0]))

@@ -1,5 +1,6 @@
 # STMGPU
 *2D software GPU for Arduino (or PC)*
+![Logo ](pics/logoGPU.png "Logo")
 ***
 
 Today a lot of code is written for *AVR(~~Arduino~~)*, and we all know limitations of these *MCUs*,  

@@ -35,7 +35,7 @@
 STMGPU gpu; // use software BSY check, no pin used
 
 // --------------------------------------------------------- //
-void (*pArrTestFunc[])(void) = {
+void (*testFuctions[])(void) = {
   testFillScreen,
   testText,
   testLines,
@@ -49,8 +49,6 @@ void (*pArrTestFunc[])(void) = {
   testFilledRoundRects,
   testRotation
 };
-
-#define FUNC_TO_TEST_COUNT (sizeof(pArrTestFunc)/sizeof(pArrTestFunc[0]))
 // --------------------------------------------------------- //
 
 void setup() {
@@ -60,11 +58,9 @@ void setup() {
 
 void loop(void)
 {
-  uint8_t testsCount = FUNC_TO_TEST_COUNT;
-
-  for (uint8_t count = 0; count < testsCount; count++) {
+  for(auto &func : testFuctions) {
     gpu.fillScreen(COLOR_BLACK);
-    pArrTestFunc[count](); // exec test function
+    func(); // exec test function
 
     // little delay to see what happend on screen
     //gpu.iDelay(500); // reque less ROM space and equal to delay()
@@ -83,24 +79,24 @@ void testText()
 {
   gpu.setCursor(0, 0);
   gpu.setTextColor(COLOR_WHITE);  gpu.setTextSize(1);
-  gpu.println("Hello World!");
+  gpu.println(F("Hello World!"));
   gpu.setTextColor(COLOR_YELLOW); gpu.setTextSize(2);
   gpu.println(1234.56);
   gpu.setTextColor(COLOR_RED);    gpu.setTextSize(3);
   gpu.println(0xDEADBEEF, HEX);
   gpu.println();
   gpu.setTextColor(COLOR_GREEN);  gpu.setTextSize(5);
-  gpu.println("Groop");
+  gpu.println(F("Groop"));
   gpu.setTextSize(2);
-  gpu.println("I implore thee,");
+  gpu.println(F("I implore thee,"));
   gpu.setTextSize(1);
-  gpu.println("my foonting turlingdromes.");
-  gpu.println("And hooptiously drangle me");
-  gpu.println("with crinkly bindlewurdles,");
-  gpu.println("Or I will rend thee");
-  gpu.println("in the gobberwarts");
-  gpu.println("with my blurglecruncheon,");
-  gpu.println("see if I don't!");
+  gpu.println(F("my foonting turlingdromes."));
+  gpu.println(F("And hooptiously drangle me"));
+  gpu.println(F("with crinkly bindlewurdles,"));
+  gpu.println(F("Or I will rend thee"));
+  gpu.println(F("in the gobberwarts"));
+  gpu.println(F("with my blurglecruncheon,"));
+  gpu.println(F("see if I don't!"));
 }
 
 void testHLinesHelp(uint16_t x0, uint16_t y0, uint16_t y1)

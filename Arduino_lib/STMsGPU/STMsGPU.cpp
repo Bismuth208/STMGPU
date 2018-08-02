@@ -43,11 +43,7 @@
 #if !REMOVE_HARDWARE_BSY
 STMGPU::STMGPU(int8_t bsyPin):_bsyPin(bsyPin)
 {
-  if(bsyPin) {
-    _useHardwareBsy = true;
-  } else {
-    _useHardwareBsy = false;
-  }
+  _useHardwareBsy = bsyPin ? true : false;
 }
 
 STMGPU::STMGPU():_useHardwareBsy(false) {}
@@ -139,6 +135,22 @@ void STMGPU::sendCommand(void *buf, uint8_t size)
   pSerial->write((uint8_t*)buf, size);
 }
 
+void STMGPU::sendCommand(uint8_t cmd, uint8_t i, ...)
+{
+  cmdBuffer.cmd = cmd;
+  auto pArr = (uint16_t*)&cmdBuffer.data[1];
+
+  va_list vl;
+  va_start(vl, i);
+
+  for(uint8_t n=0; n<i; n++) {
+    *pArr++ = va_arg(vl, int16_t);
+  }
+  va_end(vl);
+
+  sendCommand(cmdBuffer.data, (i<<1)+1);
+}
+
 // reque less ROM space and almost equal* to delay()
 // *(no yeld() and less precition)
 void STMGPU::iDelay(uint16_t duty)
@@ -164,6 +176,7 @@ void STMGPU::drawPixel(int16_t x, int16_t y, uint16_t color)
   cmdBuffer.par3 = color;
 
   sendCommand(cmdBuffer.data, 7);
+  // sendCommand(DRW_PIXEL, 3, x, y, color);
 }
 
 void STMGPU::fillScreen(uint16_t color)
@@ -172,6 +185,7 @@ void STMGPU::fillScreen(uint16_t color)
   cmdBuffer.par1 = color;
 
   sendCommand(cmdBuffer.data, 3);
+  // sendCommand(FLL_SCR, 1, color);
 }
 
 // ------------- Primitives/GFX ------------- //
@@ -186,6 +200,7 @@ void STMGPU::fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color
   cmdBuffer.par5 = color;
 
   sendCommand(cmdBuffer.data, 11);
+  // sendCommand(FLL_RECT, 5, x, y, w, h, color);
 }
 
 void STMGPU::drawRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color)
@@ -198,6 +213,7 @@ void STMGPU::drawRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color
   cmdBuffer.par5 = color;
 
   sendCommand(cmdBuffer.data, 11);
+  // sendCommand(DRW_RECT, 5, x, y, w, h, color);
 }
 
 void STMGPU::drawRoundRect(int16_t x, int16_t y, int16_t w, int16_t h, int16_t radius, uint16_t color)
@@ -211,6 +227,7 @@ void STMGPU::drawRoundRect(int16_t x, int16_t y, int16_t w, int16_t h, int16_t r
   cmdBuffer.par6 = color;
   
   sendCommand(cmdBuffer.data, 13);
+  // sendCommand(DRW_ROUND_RECT, 6, x, y, w, h, radius, color);
 }
 
 void STMGPU::fillRoundRect(int16_t x, int16_t y, int16_t w, int16_t h, int16_t radius, uint16_t color)
@@ -224,6 +241,7 @@ void STMGPU::fillRoundRect(int16_t x, int16_t y, int16_t w, int16_t h, int16_t r
   cmdBuffer.par6 = color;
   
   sendCommand(cmdBuffer.data, 13);
+  // sendCommand(FLL_ROUND_RECT, 6, x, y, w, h, radius, color);
 }
 
 void STMGPU::drawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint16_t color)
@@ -236,6 +254,7 @@ void STMGPU::drawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint16_t c
   cmdBuffer.par5 = color;
 
   sendCommand(cmdBuffer.data, 11);
+  // sendCommand(DRW_LINE, 5, x0, y0, x1, y1, color);
 }
 
 void STMGPU::drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color)
@@ -247,6 +266,7 @@ void STMGPU::drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color)
   cmdBuffer.par4 = color;
 
   sendCommand(cmdBuffer.data, 9);
+  // sendCommand(DRW_LINE, 4, x, y, h, color);
 }
 
 void STMGPU::drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color)
@@ -258,6 +278,7 @@ void STMGPU::drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color)
   cmdBuffer.par4 = color;
 
   sendCommand(cmdBuffer.data, 9);
+  // sendCommand(DRW_H_LINE, 4, x, y, w, color);
 }
 
 void STMGPU::drawCircle(int16_t x, int16_t y, int16_t r, uint16_t color)
@@ -269,6 +290,7 @@ void STMGPU::drawCircle(int16_t x, int16_t y, int16_t r, uint16_t color)
   cmdBuffer.par4 = color;
 
   sendCommand(cmdBuffer.data, 9);
+  // sendCommand(DRW_CIRCLE, 4, x, y, r, color);
 }
 
 void STMGPU::fillCircle(int16_t x, int16_t y, int16_t r, uint16_t color)
@@ -280,6 +302,7 @@ void STMGPU::fillCircle(int16_t x, int16_t y, int16_t r, uint16_t color)
   cmdBuffer.par4 = color;
 
   sendCommand(cmdBuffer.data, 9);
+  // sendCommand(FLL_CIRCLE, 4, x, y, r, color);
 }
 
 void STMGPU::drawTriangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t color)
@@ -294,6 +317,7 @@ void STMGPU::drawTriangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_
   cmdBuffer.par7 = color;
 
   sendCommand(cmdBuffer.data, 15);
+  // sendCommand(DRW_TRINGLE, 7, x0, y0, x1, y1, x2, y2, color);
 }
 
 void STMGPU::fillTriangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t color)
@@ -308,6 +332,7 @@ void STMGPU::fillTriangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_
   cmdBuffer.par7 = color;
 
   sendCommand(cmdBuffer.data, 15);
+  // sendCommand(FLL_TRINGLE, 7, x0, y0, x1, y1, x2, y2, color);
 }
 
 #if USE_GPU_RETURN_RESOLUTION
@@ -364,6 +389,7 @@ void STMGPU::setCursor(int16_t x, int16_t y)
   cmdBuffer.par2 = y;
 
   sendCommand(cmdBuffer.data, 5);
+  // sendCommand(SET_CURSOR, 2, x, y);
 }
 
 void STMGPU::setTextColor(uint16_t color)
@@ -381,6 +407,7 @@ void STMGPU::setTextColor(uint16_t color, uint16_t bg)
   cmdBuffer.par2 = bg;
 
   sendCommand(cmdBuffer.data, 5);
+  // sendCommand(SET_TXT_CR_BG, 2, color, bg);
 }
 
 void STMGPU::setTextSize(uint8_t size)
@@ -389,6 +416,7 @@ void STMGPU::setTextSize(uint8_t size)
   cmdBuffer.data[1] = size;
   
   sendCommand(cmdBuffer.data, 2);
+  // sendCommand(SET_TXT_SIZE, 1, size);
 }
 
 void STMGPU::setTextWrap(bool wrap)
@@ -397,6 +425,7 @@ void STMGPU::setTextWrap(bool wrap)
   cmdBuffer.data[1] = wrap;
   
   sendCommand(cmdBuffer.data, 2);
+  // sendCommand(SET_TXT_WRAP, 1, wrap);
 }
 
 void STMGPU::cp437(bool cp)
@@ -405,6 +434,7 @@ void STMGPU::cp437(bool cp)
   cmdBuffer.data[1] = cp;
   
   sendCommand(cmdBuffer.data, 2);
+  // sendCommand(SET_TXT_WRAP, 1, cp);
 }
   
 #if 0
@@ -428,6 +458,7 @@ void STMGPU::printAt(int16_t x, int16_t y,  char c)
   cmdBuffer.par3 = c;
   
   sendCommand(cmdBuffer.data, 6);
+  // sendCommand(DRW_PRNT_POS_C, 3, x, y, c);
 }
 
 void STMGPU::printAt(int16_t x, int16_t y, const char *str)
@@ -995,6 +1026,17 @@ void STMGPU::setSkyFloor(uint16_t sky, uint16_t floor)
   
   sendCommand(cmdBuffer.data, 5);
 }
+
+// ------------------ Debug ----------------- //
+void STMGPU::setDebugGPIOState(bool state)
+{
+  cmdBuffer.cmd = SET_DBG_GPIO_PIN;
+  cmdBuffer.data[1] = state;
+  
+  sendCommand(cmdBuffer.data, 2);
+}
+
+
 // -------------------- ___ ---------------------- //
 
 // Pass 8-bit (each) R,G,B, get back 16-bit packed color

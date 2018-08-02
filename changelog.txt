@@ -1,3 +1,9 @@
+v.0.1.7 - STM32 side:
+       - move project from IAR to System Workbench(sw4stm32);
+       - little refactor;
+    - Arduino side:
+       - little refactor;
+
 v.0.1.6 - STM32 side:           
 		   - add highly optimised raycaster engine;
 		   - add sound generation;

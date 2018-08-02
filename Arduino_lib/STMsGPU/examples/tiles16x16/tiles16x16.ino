@@ -107,10 +107,8 @@ void setup() {
 
 
 void loop() {
-  uint8_t testsCount = FUNC_TO_TEST_COUNT;
-
-  for (uint8_t count = 0; count < testsCount; count++) {
-    pArrExecGFXFunc[count](); // exec test function
+  for(auto &func : testFuctions) {
+    func(); // exec test function
 
     gpu.iDelay(500); // little delay to see what happend on screen
     gpu.fillScreen(COLOR_BLACK); // clear screen by black color
