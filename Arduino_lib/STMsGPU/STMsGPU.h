@@ -108,7 +108,7 @@
 // definitions for texture sizes
 #define TEXTURE_MODE_0     0  // 8x8 tiles
 #define TEXTURE_MODE_1     1  // 16x16 tiles
-#define TEXTURE_MODE_2     2  // 32x32 tiles (only PRO version!)
+#define TEXTURE_MODE_2     2  // 32x32 tiles (only Mini2 and PRO versions!)
 
 // ------------------------------------------------------------------- //
 // DO NOT REMOVE THIS PRAGMA DIRECTIVE!!
@@ -151,8 +151,7 @@ public:
   void  iDelay(uint16_t duty);
 
 // ------------------ Base ------------------ //
-  void  swReset(void),
-        drawPixel(int16_t x, int16_t y, uint16_t color),
+  void  drawPixel(int16_t x, int16_t y, uint16_t color),
         fillScreen(uint16_t color);
    
 // ------------- Primitives/GFX ------------- //
@@ -317,7 +316,12 @@ public:
   // also it will be ranamed to setFloorSkyTexture
   void setSkyFloor(uint16_t sky, uint16_t floor);
 
-  // ------------------ Debug ----------------- //
+  // ------------------ General ----------------- //
+#if !REMOVE_HARDWARE_BSY
+  void setBusyMode(bool state);
+#endif
+  void swReset(void);
+  void pingCommand(void);
   void setDebugGPIOState(bool state);
 
   

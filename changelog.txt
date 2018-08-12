@@ -1,3 +1,11 @@
+v.0.1.8 - STM32 side:
+       - add stm32f407 as "sGPU pro" to project;
+       - total refactor to support cross MCU builds;
+    - Desktop side:
+       - add Desktop support via python and PySerial;
+    - General:
+       - add 'software reset' and 'ping' commands;
+
 v.0.1.7 - STM32 side:
        - move project from IAR to System Workbench(sw4stm32);
        - little refactor;

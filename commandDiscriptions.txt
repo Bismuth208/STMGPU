@@ -1,11 +1,11 @@
 // ------------------------- Command description -------------------- //
 
 All examples presented as byte array, which transferred FROM
-CPU to GPU by any type of interface (USART, SPI, I2C etc);
+host to sGPU by UART interface;
 
-First byte ALWAS command code!
-Variables like "uint16_t x" must be split to two bytes: "byte1 x, byte2 x",
-or GPU get command data wrong and nothing will work!
+First byte ALWAS command code byte!
+Variables like "uint16_t x" must be splited by two bytes: "byte1 x, byte2 x",
+or sGPU get command data wrong and nothing will work!
 If You using gpu_gfx API, it will made transformation automatically.
 
 

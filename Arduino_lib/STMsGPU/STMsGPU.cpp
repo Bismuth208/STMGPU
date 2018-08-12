@@ -1,10 +1,12 @@
 /*
  *
- * For STM32_GPU Project
- * Creation start: 10.04.2016 20:21 (UTC+4)
+ * For STM32_sGPU Project
+ * Created: 10.04.2016
+ * Last edit: 12.08.2018
  *
- * Created by: Antonov Alexandr (Bismuth208)
+ * author: Antonov Alexandr (Bismuth208)
  *
+ * For addition info look read.me
  *
  */
 
@@ -19,13 +21,6 @@
 #include <limits.h>
 #include "pins_arduino.h"
 #include "wiring_private.h"
-
-
-#define SYNC_SEQUENCE   0x42DD
-#define SYNC_OK         0xCC
-
-#define BSY_MSG_CODE_WAIT       0xEE
-#define BSY_MSG_CODE_READY      0xEA
 
 #define MAX_TEXT_SIZE   30
 
@@ -77,6 +72,9 @@ void STMGPU::begin(baudSpeed_t baudRate)
     digitalWrite(_bsyPin, HIGH); // pull-up; does it really need? or left HI-z?
   }
 #endif
+
+  // This command need if you don't reset sGPU and just reconnect to it
+  pSerial->write(CMD_GPU_SW_RESET); // in normal reset this command will be ignored
   
   while(!syncEstablished) {
     while(pSerial->available()==0) {
@@ -162,12 +160,6 @@ void STMGPU::iDelay(uint16_t duty)
 
 
 // ------------------ Base ------------------ //
-void STMGPU::swReset(void)
-{
-  cmdBuffer.cmd = GPU_SW_RESET;
-  sendCommand(cmdBuffer.data, 1);
-}
-
 void STMGPU::drawPixel(int16_t x, int16_t y, uint16_t color)
 {
   cmdBuffer.cmd = DRW_PIXEL;
@@ -699,7 +691,7 @@ void STMGPU::drawTile32x32(int16_t posX, int16_t posY, uint8_t tileNum)
 }
 
 // universal tile draw 8, 16, 32
-  /*
+/*
 void STMGPU::drawTile(int16_t posX, int16_t posY, uint8_t tileType, uint8_t tileNum)
 {
   cmdBuffer.cmd = DRW_TLE_U;
@@ -710,8 +702,7 @@ void STMGPU::drawTile(int16_t posX, int16_t posY, uint8_t tileType, uint8_t tile
   
   sendCommand(cmdBuffer.data, 7);
 }
-   */
-  
+*/  
 
 void STMGPU::loadTileMap(const char *fileName)
 {
@@ -806,7 +797,6 @@ bool STMGPU::getSpriteCollision(uint8_t sprNum1, uint8_t sprNum2)
   sendCommand(cmdBuffer.data, 3);
   
   while(!pSerial->available() ); // wait for state
-  
   return pSerial->read();
 }
 
@@ -884,8 +874,7 @@ void STMGPU::playNote(uint16_t freq, uint16_t duration)
   
   sendCommand(cmdBuffer.data, 5);
 }
-  
-  
+
 // --------------- GUI commands -------------- //
 void STMGPU::setTextSizeGUI(uint8_t size)
 {
@@ -1027,7 +1016,41 @@ void STMGPU::setSkyFloor(uint16_t sky, uint16_t floor)
   sendCommand(cmdBuffer.data, 5);
 }
 
-// ------------------ Debug ----------------- //
+// ------------------ General ----------------- //
+#if !REMOVE_HARDWARE_BSY
+// software or hardware
+void STMGPU::setBusyMode(bool state)
+{
+  cmdBuffer.cmd = BSY_SELECT;
+  cmdBuffer.data[1] = state;
+
+  _useHardwareBsy = state ? true : false;
+  
+  sendCommand(cmdBuffer.data, 2);
+}
+#endif
+
+void STMGPU::pingCommand(void)
+{
+  cmdBuffer.cmd = CMD_GPU_PING;
+  sendCommand(cmdBuffer.data, 1);
+
+  bool waitPingAnswer = true;
+  while(waitPingAnswer) {
+      while(pSerial->available()==0);
+
+      if(pSerial->read() == GPU_MSG_CODE_PING) {
+        waitPingAnswer = false;
+    }
+  }
+}
+
+void STMGPU::swReset(void)
+{
+  cmdBuffer.cmd = CMD_GPU_SW_RESET;
+  sendCommand(cmdBuffer.data, 1);
+}
+
 void STMGPU::setDebugGPIOState(bool state)
 {
   cmdBuffer.cmd = SET_DBG_GPIO_PIN;

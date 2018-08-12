@@ -1,14 +1,14 @@
 // ------------------------- General Description -------------------- //
 #Tiles:
--	up to 70 tiles 8x8 (160 on PRO ver.);
--	up to 10 tiles 16x16 (80 on PRO ver.);
--	up to 10 tiles 32x32 (only on PRO ver.);
+-	up to 80 tiles 8x8 (*1);
+-	up to 10 tiles 16x16 (*1);
+-	up to 10 tiles 32x32 (*2);
 -	add tiles;
 -	delete tiles;
 -	draw tiles;
 
 #Sprites
--	up to 56 sprites ( 63 only on PRO ver. )
+-	up to 45 sprites (*1);
 -	tiles grouping to sprite (up to 4 tiles);
 -	any colors per sprite from palette of 80 colors or user loaded (max 256);
 -	check spites collision;
@@ -22,31 +22,29 @@
 -	tiles;
 -	sprites;
 -	background;
--	GUI*;
+-	GUI (*3);
 
 #Interface:
 -	USART to interface GPU (9600, 57600, 115200, 1M);
 -	SPI2 to interface SD card;
--	Paralel (8080) to interface LCD (only on PRO ver.)*;
--	SPI1 to interface LCD (Mini and PRO ver.);
+-	Paralel (8080) to interface LCD (*2);
+-	SPI1 to interface LCD (*4);
 
 #Input GPU buffer:
--	at least 200 commands (depend on size of commands);
+-	for at least 200 commands (*5);
 
 #Data packet size:
 -	CMD consume 1 byte;
--	DATA consume max 6*uint16_t bytes;
+-	DATA can consume up to 6*uint16_t bytes;
 
-#MCU:
--	Mini ver.	64 Flash, 20 RAM;
--	Pro ver.	512 Flash, 64 RAM;
+#Board (MCU):
+- sGPU Mini:   Blue-Pill (STM32F103C8T6) 64k Flash, 20k RAM;
+- sGPU Mini_2: Mini STM32 Dev. board (STM32F103VET6) 512k Flash, 64k RAM;
+-	sGPU Pro:	   Black nrf2104 (STM32F407VET6) 1Mb Flash, 192k RAM;
 
-#DMA supported by:
--	Mini ver.	64 Flash, 20 RAM;
--	Pro ver.	512 Flash, 64 RAM;
-
-#FSMC:
--	only on Pro ver.  512 Flash, 64 RAM;
-
-* - not yet ready;
-** - PRO ver. is STM32F103VET6, Mini is STM32F103C8T6;
+// -------------------------- List of exeptions --------------------- //
+*1 - much more on "Mini_2" and "Pro" versions
+*2 - only on Mini_2 and PRO versions
+*3 - not yet ready;
+*4 - can be configured insted of paralel interface only on Mini_2 and PRO versions
+*5 - depend on size of commands and type of sGPU

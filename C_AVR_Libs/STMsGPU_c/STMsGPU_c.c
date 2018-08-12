@@ -1,9 +1,10 @@
 /*
  *
- * For STM32_GPU Project
- * Creation start: 10.04.2016 20:21 (UTC+4)
+ * For STM32_sGPU Project
+ * Created: 10.04.2016
+ * Last edit: 12.08.2018
  *
- * Created by: Antonov Alexandr (Bismuth208)
+ * author: Antonov Alexandr (Bismuth208)
  *
  * For addition info look read.me
  *
@@ -24,12 +25,6 @@
 #include <systicktimer.h>
 
 #include "STMsGPU_c.h"
-
-#define SYNC_SEQUENCE   0x42DD
-#define SYNC_OK         0xCC
-
-#define BSY_MSG_CODE_WAIT       0xEE
-#define BSY_MSG_CODE_READY      0xEA
 
 #define MAX_TEXT_SIZE   30
 
@@ -110,12 +105,6 @@ void sendCommand(void *buf, uint8_t size)
 
 
 // ------------------ Base ------------------ //
-void gpuSwReset(void)
-{
-  cmdBuffer.cmd = GPU_SW_RESET;
-  sendCommand(cmdBuffer.data, 1);
-}
-
 void gpuDrawPixel(int16_t x, int16_t y, uint16_t color)
 {
   cmdBuffer.cmd = DRW_PIXEL;
@@ -915,6 +904,46 @@ void gpuSetSkyFloor(uint16_t sky, uint16_t floor)
   sendCommand(cmdBuffer.data, 5);
 }
 
+// ------------------ General ----------------- //
+#if !REMOVE_HARDWARE_BSY
+// software or hardware
+void setBusyMode(bool state)
+{
+  cmdBuffer.cmd = BSY_SELECT;
+  cmdBuffer.data[1] = state;
+  
+  sendCommand(cmdBuffer.data, 2);
+}
+#endif
+
+void pingCommand(void)
+{
+  cmdBuffer.cmd = CMD_GPU_PING;
+  sendCommand(cmdBuffer.data, 1);
+
+  bool waitPingAnswer = true;
+  while(waitPingAnswer) {
+      while(serialAvailable()==0);
+
+      if(serialRead() == GPU_MSG_CODE_PING) {
+        waitPingAnswer = false;
+    }
+  }
+}
+
+void swReset(void)
+{
+  cmdBuffer.cmd = CMD_GPU_SW_RESET;
+  sendCommand(cmdBuffer.data, 1);
+}
+
+void setDebugGPIOState(bool state)
+{
+  cmdBuffer.cmd = SET_DBG_GPIO_PIN;
+  cmdBuffer.data[1] = state;
+  
+  sendCommand(cmdBuffer.data, 2);
+}
 
 // -------------------- ___ ---------------------- //
 
