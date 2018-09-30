@@ -170,7 +170,7 @@ void init_DMA1_SPI1(void)
             DMA_MemoryDataSize_HalfWord |       // .DMA_MemoryDataSize
             DMA_Priority_VeryHigh |             // .DMA_Priority
             DMA_M2M_Disable |                   // .DMA_M2M
-            DMA_IT_TC );                        // enable interupt
+            DMA_IT_TC );                        // enable interrupt
                  
   /* Clear MEM2MEM, PL, MSIZE, PSIZE, MINC, PINC, CIRC and DIR bits */
   MODIFY_REG(DMA1_Channel3->CCR, CCR_CLEAR_Mask, tmpreg); // apply new settings
@@ -180,9 +180,9 @@ void init_DMA1_SPI1(void)
   SPI1->CR2 |= SPI_I2S_DMAReq_Tx;               // enable DMA IRQ on Tx SPI1
   CR1_backup_8b_PS2 = SPI1->CR1;       // save current settings
   SPI1->CR1 |= SPI_DataSize_16b;        // set dataSize halfword (16 bit)
-  /* DMA works propertly with higier speed,
+  /* DMA works properly with higher speed,
   * that is why we can use max speed.
-  * If F_CPU = 72, then SPI = 36 mbit/s
+  * If F_CPU = 72, then SPI = 36 Mbit/s
   * (according reference manual)
   */
   CLEAR_BIT(SPI1->CR1, SPI_BaudRatePrescaler_2); // set SPI_BaudRatePrescaler_2

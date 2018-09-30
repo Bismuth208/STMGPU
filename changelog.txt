@@ -1,3 +1,13 @@
+v.0.1.9 - STM32 side:
+       - add FSMC;
+       - fix wrong calculation of avaliable data in UART buffer;
+    - Desktop side:
+       - add more examples;
+       - refactor according to PEP8;
+    - General:
+       - add re-sync with "Host" systems;
+       - move all libs to "Host Libs";
+
 v.0.1.8 - STM32 side:
        - add stm32f407 as "sGPU pro" to project;
        - total refactor to support cross MCU builds;

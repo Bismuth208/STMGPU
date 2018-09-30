@@ -62,6 +62,8 @@
 #define GPU_INTERFACE_GET_P_BUFFER_DATA(size)          waitCutpBuf_UART1(size)
 #define GPU_INTERFACE_GET_BUFFER_DATA(ptr, size)       waitCutBuf_UART1(ptr, size)
 
+#define GPU_INTERFACE_FFLUSH()                fflush_UART1()
+
 //===========================================================================//
 #define T_GPU_VERSION   "Build: " __DATE__" " __TIME__ " \n"
 

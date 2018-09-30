@@ -19,7 +19,7 @@ add GUI commands:
 
 add command execution from .csv file;
 add loading sound patterns from SD card;
-add FSMC;
+add DMA for FSMC;
 
 improve speed of raycaster;
 reduce ROM and RAM usage for Arduino lib version even more;
@@ -27,7 +27,6 @@ reduce ROM and RAM usage for Arduino lib version even more;
 /* in nearly future */
 
 add drawing text from SD card;
-add re-sync with CPU;
 rotate tiles (matrix transformation);
 reduce registers and stack usage by minimise number of params to func (struct);
 

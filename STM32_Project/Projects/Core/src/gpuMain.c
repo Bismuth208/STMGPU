@@ -66,6 +66,7 @@ void setBusyStatus(uint8_t status)
 __attribute__((noreturn)) void run_GPU(void)
 {
   uint16_t avaliableData =0;
+//  cmdBuffer_t *pCMD = 0;
 
   for(;;) {
     avaliableData = GPU_INTERFACE_GET_AVALIABLE_DATA();
@@ -101,7 +102,6 @@ __attribute__((noreturn)) void run_GPU(void)
       case DRW_RECT: {
         GPU_INTERFACE_GET_P_BUFFER_DATA(10);
         drawRect(cmdBuffer.par1, cmdBuffer.par2, cmdBuffer.par3, cmdBuffer.par4, cmdBuffer.par5);
-        //drawRect((gfx_t*)&cmdBuffer);
       } break;
       
       case DRW_ROUND_RECT: {
@@ -208,7 +208,7 @@ __attribute__((noreturn)) void run_GPU(void)
       
       /*
       case SET_TXT_FONT: {
-        setTextFont(waitCutByte_UART1());
+        setTextFont(GPU_INTERFACE_GET_DATA_8());
       } break;
       */
       
@@ -314,7 +314,7 @@ __attribute__((noreturn)) void run_GPU(void)
         GPU_INTERFACE_GET_P_BUFFER_DATA(5);
         drawTile8x8(cmdBuffer.data);
 
-//        pcmdBuffer = waitCutPtrBuf_UART1(&cmdBuffer->data, 5);
+//        pcmdBuffer = GPU_INTERFACE_GET_P_BUFFER_DATA(&cmdBuffer->data, 5);
 //        drawTile8x8(pcmdBuffer->data);
       } break;
       
@@ -450,8 +450,8 @@ __attribute__((noreturn)) void run_GPU(void)
       
       /*
       case LDD_SND_FIL: {
-        waitCutBuf_UART1(cmdBufferStr, waitCutByte_UART1()); // get file name
-        
+      // get file name
+        GPU_INTERFACE_GET_BUFFER_DATA(cmdBufferStr, GPU_INTERFACE_GET_DATA_8());
         SDLoadSoundPattern(cmdBufferStr);
       } break;
       */      
@@ -577,7 +577,7 @@ __attribute__((noreturn)) void run_GPU(void)
       } break;
 
       default: {
-        fflush_UART1();
+    	  GPU_INTERFACE_FFLUSH();
         // TO DO:
         // make sync;
         // buffer error alert

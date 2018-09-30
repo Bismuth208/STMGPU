@@ -12,9 +12,9 @@
 
 // ------------------------------------------------------------ //
 
-#define RX_AVALIABLE ( rx_buffer.head - rx_buffer.tail)
+#define RX_AVALIABLE   (((uint16_t)(SERIAL_BUFFER_SIZE + rx_buffer.head - rx_buffer.tail)) % SERIAL_BUFFER_SIZE)
 
-#define MIN_CUT_DATA_SIZE   6
+#define MIN_CUT_DATA_SIZE   3
 
 // ------------------------------------------------------------ //
 
@@ -37,7 +37,7 @@ uint16_t dataAvailable_UART1(void)
 
 uint8_t readData8_UART1(void)
 {
-  return rxBuffer[rx_buffer.tail++];
+  return rxBuffer[rx_buffer.tail++]; // no calculation need, just overflow
 }
 
 void cutData(uint8_t *pDest, uint16_t size)
@@ -87,18 +87,20 @@ void waitCutpBuf_UART1(uint16_t size)
 }
 
 // in theory returning pointer is faster than memcpy32
-//void waitCutPtrBuf_UART1(void *dest, uint16_t size)
-//{
-//  if((RX_AVALIABLE >= size) && (size >= MIN_CUT_DATA_SIZE)) {
-//      if(rx_buffer.tail < ((SERIAL_BUFFER_SIZE-1) - size)) {
-//	  uint16_t pos = rx_buffer.tail;
-//	  rx_buffer.tail += size;
-//	  dest = &rxBuffer[pos];
-//      }
-//  }
-//  // not enough data or near to end of buffer
-//  cutData(dest, size);
-//}
+void *waitCutPtrBuf_UART1(uint16_t size)
+{
+  void *dest = &pDestBuf;
+  if((RX_AVALIABLE >= size) && (size >= MIN_CUT_DATA_SIZE)) {
+      if(rx_buffer.tail < ((SERIAL_BUFFER_SIZE-1) - size)) {
+		dest = &rxBuffer[rx_buffer.tail];
+		rx_buffer.tail += size;
+		return dest;
+      }
+  }
+  // not enough data or near to end of buffer
+  cutData(dest, size);
+  return dest;
+}
 
 void fflush_UART1(void)
 {
@@ -162,7 +164,7 @@ void init_UART1(uint32_t baud)
   USART_InitStruct.USART_BaudRate            = baud;
   USART_InitStruct.USART_WordLength          = USART_WordLength_8b;
   USART_InitStruct.USART_StopBits            = USART_StopBits_1;
-  USART_InitStruct.USART_Parity              = USART_Parity_No ;
+  USART_InitStruct.USART_Parity              = USART_Parity_No;
   USART_InitStruct.USART_HardwareFlowControl = USART_HardwareFlowControl_None;
   USART_InitStruct.USART_Mode                = (USART_Mode_Rx | USART_Mode_Tx);
   

@@ -19,7 +19,7 @@
 #define TILE_SHOW_W 3
 #define TILE_SHOW_H 3
 
-#define TLE_32X32_SIZE 32 // this is single tile size, each tile 8x8 in px
+#define TLE_32X32_SIZE 32 // this is single tile size, each tile 32x32 in px
 
 void testDrawTiles(void);
 void drawRamTileSet32x32(void);

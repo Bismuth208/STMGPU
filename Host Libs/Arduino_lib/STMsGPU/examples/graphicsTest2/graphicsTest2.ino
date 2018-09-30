@@ -35,38 +35,6 @@
 STMGPU gpu; // use software BSY check, no pin used
 
 // --------------------------------------------------------- //
-void (*testFuctions[])(void) = {
-  testFillScreen,
-  testText,
-  testLines,
-  testFastLines,
-  testRects,
-  testFilledRects,
-  testFilledCircles,
-  testTriangles,
-  testFilledTriangles,
-  testRoundRects,
-  testFilledRoundRects,
-  testRotation
-};
-// --------------------------------------------------------- //
-
-void setup() {
-  // different speeds can be found in library STMsGPU.h
-  gpu.begin(BAUD_SPEED_1M); // BAUD_SPEED_1M = 1,000,000 bod/s
-}
-
-void loop(void)
-{
-  for(auto &func : testFuctions) {
-    gpu.fillScreen(COLOR_BLACK);
-    func(); // exec test function
-
-    // little delay to see what happend on screen
-    //gpu.iDelay(500); // reque less ROM space and equal to delay()
-  }
-}
-
 void testFillScreen()
 {
   gpu.fillScreen(COLOR_RED);
@@ -267,4 +235,36 @@ void testRotation(void)
     testText();
   }
   gpu.setRotation(1);
+}
+
+// --------------------------------------------------------- //
+void (*testFuctions[])(void) = {
+  testFillScreen,
+  testText,
+  testLines,
+  testFastLines,
+  testRects,
+  testFilledRects,
+  testFilledCircles,
+  testTriangles,
+  testFilledTriangles,
+  testRoundRects,
+  testFilledRoundRects,
+  testRotation
+};
+
+void setup() {
+  // different speeds can be found in library STMsGPU.h
+  gpu.begin(BAUD_SPEED_1M); // BAUD_SPEED_1M = 1,000,000 bod/s
+}
+
+void loop(void)
+{
+  for(auto &func : testFuctions) {
+    gpu.fillScreen(COLOR_BLACK);
+    func(); // exec test function
+
+    // little delay to see what happend on screen
+    //gpu.iDelay(500); // reque less ROM space and equal to delay()
+  }
 }

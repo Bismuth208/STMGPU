@@ -1,24 +1,46 @@
 #ifndef _FSMCDRV_H
 #define _FSMCDRV_H
 
+
 // ------------------------- FSMC GPIO ------------------------- //
 
 // maybe i'll add something here in future...
 
 
+// ------------------------------------------------------- //
+
+#define FSMC_REG_ADDR  0x60000000
+#define FSMC_DATA_ADDR 0x60080000  // FSMC_A18; PD13
+
+#define LCD_REG      (*(__IO uint16_t*)(FSMC_REG_ADDR))
+#define LCD_DATA     (*(__IO uint16_t*)(FSMC_DATA_ADDR))
+
+
+// ------------------------------------------------------- //
+#define DMA_FSMC_STREAM     DMA1_Stream0
+#define DMA_FSMC_CH         DMA_Channel_0
+#define DMA_FSMC_IQR        DMA1_Stream0_IRQn
+#define DMA_FSMC_IRQ_HANLER DMA1_Stream0_IRQHandler
+#define DMA_FSMC_RCC        RCC_AHB1Periph_DMA1
+
 // ----------------------- FSMC Base func ---------------------- //
 
 void init_FSMC(void);
-void sendData8_FSMC(uint8_t data);
-void sendArr8_FSMC(void *data, uint32_t size);
-void sendData16_FSMC(uint16_t data);
+
+void writeCommand_FSMC(uint16_t index);
+void writeCommandData_FSMC(uint16_t data);
+
+//void sendData8_FSMC(uint8_t data);
+//void sendData16_FSMC(uint16_t data);
 void sendData32_FSMC(uint16_t data0, uint16_t data1);
+void sendArr8_FSMC(void *data, uint32_t size);
 void sendArr16_FSMC(void *data, uint32_t size);
 void repeatData16_FSMC(uint16_t data, uint32_t size);
 
 
-void writeCommandData_FSMC(uint16_t data);
-void writeCommand_FSMC(uint16_t index);
+#define sendData8_FSMC(data) (LCD_DATA = (uint8_t)data)
+#define sendData16_FSMC(data) (LCD_DATA = (uint16_t)data)
+//#define sendData32_FSMC(data0, data1) (LCD_DATA = (uint16_t)data0; LCD_DATA = (uint16_t)data1)
 
 // -------------------------- FSMC DMA ------------------------- //
 // not yet ready :(
@@ -28,9 +50,10 @@ void writeCommand_FSMC(uint16_t index);
  * By check this flag in while(), it provide protection for sending data;
  * Protection what all data will send to TFT correctly!
  */
-// #define wait_DMA_FSMC_busy() while(READ_BIT(DMAX_ChannelY->CCR, DMA_CCR1_EN))
-#define wait_DMA_FSMC_busy() while(DMA_GetCmdStatus(DMA1_Stream0) != (uint32_t)RESET)
+// #define wait_DMA_FSMC_busy() while(DMA2_Stream0->CR & (uint32_t)DMA_SxCR_EN)
+//#define wait_DMA_FSMC_busy() while(DMA_GetCmdStatus(DMA2_Stream0) == ENABLE)
 
+void wait_DMA_FSMC_busy(void);
 
 void init_DMA_FSMC(void);
 void sendData16_DMA_FSMC(void *data, uint32_t transferSize);

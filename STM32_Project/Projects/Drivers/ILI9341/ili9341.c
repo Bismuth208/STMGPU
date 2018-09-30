@@ -98,6 +98,7 @@ void initTFT_GPIO()
 }
 #endif
 
+// TODO: on Pro version add backlight control
 void init_LCDBacklight()
 {
 #if defined(STM32F10X_MD) || defined(STM32F10X_HD)
@@ -145,24 +146,22 @@ void initLCD(void)
 {
 #if USE_FSMC
   init_FSMC();
-//  init_DMA_FSMC(); // not yet ready
+  init_DMA_FSMC(); //TODO: make it work!!!
 #else
   init_SPI1();
   init_DMA1_SPI1();
 #endif
 #if defined(STM32F10X_MD) || defined(STM32F10X_HD)
   initTFT_GPIO();
-#endif
-  
-  init_LCDBacklight();
-  
+
   SET_TFT_RES_LOW;
   GRAB_TFT_CS;   // maybe remove this? And connect CS to Vcc?
   SET_TFT_DC_HI; // set data
   
-#if defined(STM32F10X_MD) || defined(STM32F10X_HD)
   hardRstTFT();
 #endif
+
+  init_LCDBacklight();
   execCommands(initSequence);
 }
 
@@ -189,7 +188,7 @@ void setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1)
 // square window
 void setSqAddrWindow(uint16_t x0, uint16_t y0, uint16_t size)
 {
-  WAIT_DMA_BSY;              // wait untill DMA transfer end
+  WAIT_DMA_BSY;              // wait until DMA transfer end
   
   WRITE_CMD(ILI9341_CASET);  // Column addr set
   
@@ -208,7 +207,7 @@ void setSqAddrWindow(uint16_t x0, uint16_t y0, uint16_t size)
 
 void setVAddrWindow(uint16_t x0, uint16_t y0, uint16_t y1)
 {
-  WAIT_DMA_BSY;              // wait untill DMA transfer end
+  WAIT_DMA_BSY;              // wait until DMA transfer end
   
   WRITE_CMD(ILI9341_CASET);  // Column addr set
   
@@ -227,7 +226,7 @@ void setVAddrWindow(uint16_t x0, uint16_t y0, uint16_t y1)
 
 void setHAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1)
 {
-  WAIT_DMA_BSY;              // wait untill DMA transfer end
+  WAIT_DMA_BSY;              // wait until DMA transfer end
   
   WRITE_CMD(ILI9341_CASET); // Column addr set
   
@@ -246,7 +245,7 @@ void setHAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1)
 
 void setAddrPixel(uint16_t x0, uint16_t y0)
 { 
-  WAIT_DMA_BSY;              // wait untill DMA transfer end
+  WAIT_DMA_BSY;              // wait until DMA transfer end
   
   WRITE_CMD(ILI9341_CASET);  // Column addr set
   

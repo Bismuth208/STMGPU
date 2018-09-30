@@ -35,7 +35,7 @@ void sync_CPU(void)
       if(GPU_INTERFACE_GET_DATA_8() == 0x42) {
         if(GPU_INTERFACE_GET_DATA_8() == 0xDD) {
           
-          fflush_UART1();
+          GPU_INTERFACE_FFLUSH();
           syncEstablished = true;
          
           print(T_OK T_TFT_SIZE);
@@ -44,7 +44,7 @@ void sync_CPU(void)
           cmdBuffer.par1 = _width;
           cmdBuffer.par2 = _height;
           
-          sendData8_UART1(SYNC_OK);  // sequence right, answer to CPU
+          GPU_INTERFACE_SEND_DATA_8(SYNC_OK);  // sequence right, answer to CPU
           GPU_INTERFACE_SEND_ARR_DATA_8(cmdBuffer.data, 4); // send resolution
           
           print(T_OK T_GPU_START);

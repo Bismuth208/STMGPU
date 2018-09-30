@@ -9,13 +9,6 @@
 #if defined(STM32F40XX) || defined(STM32F10X_HD)
 // ------------------------------------------------------- //
 
-#define FSMC_REG_ADDR  0x60000000
-#define FSMC_DATA_ADDR 0x60080000  // FSMC_A18; PD13
-
-#define LCD_REG      (*(__IO uint16_t*)(FSMC_REG_ADDR))
-#define LCD_DATA     (*(__IO uint16_t*)(FSMC_DATA_ADDR))
-
-// ------------------------------------------------------- //
 // DMA can`t send more than 65535 bytes
 #define MAX_DMA_REQUEST 0xFFFF
 
@@ -119,55 +112,58 @@ __inline void writeCommandData_FSMC(uint16_t data)
   LCD_DATA = data&0xff;
 }
 
-__inline void sendData8_FSMC(uint8_t data)
+//__inline void sendData8_FSMC(uint8_t data)
+//{
+//  LCD_DATA = data;
+//}
+
+//__inline void sendData16_FSMC(uint16_t data)
+//{
+//  LCD_DATA = data;
+//}
+
+__inline void sendData32_FSMC(uint16_t data0, uint16_t data1)
 {
-  LCD_DATA = data;
+	LCD_DATA = data0>>8;
+    LCD_DATA = data0&0xff;
+    LCD_DATA = data1>>8;
+	LCD_DATA = data1&0xff;
 }
 
 void sendArr8_FSMC(void *data, uint32_t size)
 {
   uint8_t *pData = (uint8_t*)data;
-  do {
-      LCD_DATA = *pData++;
-  } while (--size);
+  while (size--) {
+    LCD_DATA = *pData++;
+  }
 }
 
-__inline void sendData16_FSMC(uint16_t data)
-{
-  LCD_DATA = data;
-}
 
 void sendArr16_FSMC(void *data, uint32_t size)
 {
   uint16_t *pData = (uint16_t*)data;
-  do {
-      LCD_DATA = *pData++;
-  } while (--size);
-}
-
-__inline void sendData32_FSMC(uint16_t data0, uint16_t data1)
-{
-  LCD_DATA = data0;
-  LCD_DATA = data1; 
+  while (size--) {
+    LCD_DATA = *pData++;
+  }
 }
 
 void repeatData16_FSMC(uint16_t data, uint32_t size)
 {
-  do {
-      LCD_DATA = data;
-  } while (--size);
+  while (size--) {
+    LCD_DATA = data;
+  }
 }
 
 
 // ------------------------------------------------------- //
 void init_DMA_FSMC(void)
 {
-  RCC_AHB1PeriphResetCmd(RCC_AHB1Periph_DMA1, ENABLE);
+  RCC_AHB1PeriphResetCmd(DMA_FSMC_RCC, ENABLE);
 
   DMA_InitTypeDef DMA_FSMC_settings;
   DMA_FSMC_settings.DMA_BufferSize = 0;
-  DMA_FSMC_settings.DMA_Channel = DMA_Channel_0;
-  DMA_FSMC_settings.DMA_DIR = DMA_DIR_MemoryToMemory;
+  DMA_FSMC_settings.DMA_Channel = DMA_FSMC_CH;
+  DMA_FSMC_settings.DMA_DIR = DMA_DIR_MemoryToPeripheral; //DMA_DIR_MemoryToMemory;
   DMA_FSMC_settings.DMA_FIFOMode = DMA_FIFOMode_Disable;
   DMA_FSMC_settings.DMA_FIFOThreshold = DMA_FIFOThreshold_Full;
   DMA_FSMC_settings.DMA_Memory0BaseAddr = 0;
@@ -175,22 +171,23 @@ void init_DMA_FSMC(void)
   DMA_FSMC_settings.DMA_MemoryDataSize = DMA_MemoryDataSize_HalfWord;
   DMA_FSMC_settings.DMA_MemoryInc = DMA_MemoryInc_Disable;
   DMA_FSMC_settings.DMA_Mode = DMA_Mode_Normal;
-  DMA_FSMC_settings.DMA_PeripheralBaseAddr = (uint32_t)FSMC_DATA_ADDR;
+  DMA_FSMC_settings.DMA_PeripheralBaseAddr = (uint32_t)&LCD_DATA;
   DMA_FSMC_settings.DMA_PeripheralBurst = DMA_PeripheralBurst_Single;
   DMA_FSMC_settings.DMA_PeripheralDataSize = DMA_PeripheralDataSize_HalfWord;
   DMA_FSMC_settings.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
-  DMA_FSMC_settings.DMA_Priority = DMA_Priority_VeryHigh;
+  DMA_FSMC_settings.DMA_Priority = DMA_Priority_High;
 
-  DMA_Init(DMA1_Stream0, &DMA_FSMC_settings);
-  DMA_ITConfig(DMA1_Stream0, DMA_IT_TC, ENABLE);
+  DMA_ITConfig(DMA_FSMC_STREAM, DMA_IT_TC, ENABLE);
+  DMA_Init(DMA_FSMC_STREAM, &DMA_FSMC_settings);
 
   // Enable DMA1 channel IRQ Channel
   NVIC_InitTypeDef NVIC_InitStructure;
-  NVIC_InitStructure.NVIC_IRQChannel = DMA1_Stream0_IRQn;
+  NVIC_InitStructure.NVIC_IRQChannel = DMA_FSMC_IQR;
   NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
   NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
   NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
   NVIC_Init(&NVIC_InitStructure);
+  NVIC_EnableIRQ(DMA_FSMC_IQR);
 }
 
 // There is no way to change that flag fast, except slow DMA_Init()
@@ -210,7 +207,7 @@ void DMA_MemoryIncrementConfig(DMA_Stream_TypeDef* DMAy_Streamx, FunctionalState
 
 void setMemoryBaseAddr_DMA_FSMC(void *addr)
 {
-  DMA_MemoryTargetConfig(DMA1_Stream0, (uint32_t) addr, DMA_Memory_0);
+  DMA_MemoryTargetConfig(DMA_FSMC_STREAM, (uint32_t) addr, DMA_Memory_0);
 }
 
 void repeatData16_DMA_FSMC(uint16_t color, uint32_t transferSize)
@@ -218,16 +215,16 @@ void repeatData16_DMA_FSMC(uint16_t color, uint32_t transferSize)
   dataBuffer = color;   // store data or, you can lost it
 
   if(transferSize > MAX_DMA_REQUEST) {
-      DMA_SetCurrDataCounter(DMA1_Stream0, MAX_DMA_REQUEST); // DMA_SetCurrDataCounter
+      DMA_SetCurrDataCounter(DMA_FSMC_STREAM, MAX_DMA_REQUEST); // DMA_SetCurrDataCounter
       data_left = (transferSize - MAX_DMA_REQUEST);
   } else {
-      DMA_SetCurrDataCounter(DMA1_Stream0, transferSize);   // set how much data to transfer
+      DMA_SetCurrDataCounter(DMA_FSMC_STREAM, transferSize);   // set how much data to transfer
   }
 
   // apply DMA_MemoryBaseAddr
-  DMA_MemoryTargetConfig(DMA1_Stream0, (uint32_t) &dataBuffer, DMA_Memory_0);
-  DMA_MemoryIncrementConfig(DMA1_Stream0, DISABLE);
-  DMA_Cmd(DMA1_Stream0, ENABLE); // shot DMA to transfer;
+  setMemoryBaseAddr_DMA_FSMC((void*)&dataBuffer);
+  DMA_MemoryIncrementConfig(DMA_FSMC_STREAM, DISABLE);
+  DMA_Cmd(DMA_FSMC_STREAM, ENABLE); // shot DMA to transfer;
 }
 
 /*
@@ -241,17 +238,17 @@ void repeatData16_DMA_FSMC(uint16_t color, uint32_t transferSize)
 void sendData16_DMA_FSMC(void *data, uint32_t transferSize)
 {
   if(transferSize > MAX_DMA_REQUEST) {
-      DMA_SetCurrDataCounter(DMA1_Stream0, MAX_DMA_REQUEST);  // DMA_SetCurrDataCounter
+      DMA_SetCurrDataCounter(DMA_FSMC_STREAM, MAX_DMA_REQUEST);  // DMA_SetCurrDataCounter
       data_left = (transferSize - MAX_DMA_REQUEST);
   } else {
-      DMA_SetCurrDataCounter(DMA1_Stream0, transferSize);     // set how much data to transfer
+      DMA_SetCurrDataCounter(DMA_FSMC_STREAM, transferSize);     // set how much data to transfer
 //      data_left = 0;
   }
 
   //apply DMA_MemoryBaseAddr; enable memory increment; shot DMA to transfer;
-  DMA_MemoryTargetConfig(DMA1_Stream0, (uint32_t)data, DMA_Memory_0);
-  DMA_MemoryIncrementConfig(DMA1_Stream0, ENABLE);
-  DMA_Cmd(DMA1_Stream0, ENABLE);
+  setMemoryBaseAddr_DMA_FSMC(data);
+  DMA_MemoryIncrementConfig(DMA_FSMC_STREAM, ENABLE);
+  DMA_Cmd(DMA_FSMC_STREAM, ENABLE);
 }
 
 /*
@@ -260,33 +257,41 @@ void sendData16_DMA_FSMC(void *data, uint32_t transferSize)
 void sendData16_Fast_DMA_FSMC(void *data, uint16_t transferSize)
 {
   // set how much data to transfer
-  DMA_SetCurrDataCounter(DMA1_Stream0, transferSize);
+  DMA_SetCurrDataCounter(DMA_FSMC_STREAM, transferSize);
 
   //apply DMA_MemoryBaseAddr; enable memory increment; shot DMA to transfer;
-  DMA_MemoryTargetConfig(DMA1_Stream0, (uint32_t)data, DMA_Memory_0);
-  DMA_MemoryIncrementConfig(DMA1_Stream0, ENABLE);
-  DMA_Cmd(DMA1_Stream0, ENABLE);
+  setMemoryBaseAddr_DMA_FSMC(data);
+  DMA_MemoryIncrementConfig(DMA_FSMC_STREAM, ENABLE);
+  DMA_Cmd(DMA_FSMC_STREAM, ENABLE);
 }
 
-void DMA1_Stream0_IRQHandler(void)
+void wait_DMA_FSMC_busy(void)
 {
-  if(DMA_GetITStatus(DMA1_Stream0, DMA_IT_TCIF0) == (uint32_t)SET) {
-    DMA_ClearITPendingBit(DMA1_Stream0, DMA_IT_TCIF0);   // clear interrupt
+//	while(DMA_GetFlagStatus(DMA_FSMC_STREAM, DMA_FLAG_TCIF0) != SET);
+//	DMA_ClearFlag(DMA_FSMC_STREAM, DMA_FLAG_TCIF0);
+
+	while(DMA_GetCmdStatus(DMA_FSMC_STREAM) != DISABLE);
+}
+
+void DMA_FSMC_IRQ_HANLER(void)
+{
+  if(DMA_GetITStatus(DMA_FSMC_STREAM, DMA_IT_TCIF0)) {
+    DMA_ClearITPendingBit(DMA_FSMC_STREAM, DMA_IT_TCIF0);   // clear interrupt
 
     if(data_left) {  // all pixels transfered?
-      DMA_Cmd(DMA1_Stream0, DISABLE);
+      DMA_Cmd(DMA_FSMC_STREAM, DISABLE);
 
       if(data_left > MAX_DMA_REQUEST) {         // left something?
-	DMA_SetCurrDataCounter(DMA1_Stream0, MAX_DMA_REQUEST); // DMA_SetCurrDataCounter
-	data_left -= MAX_DMA_REQUEST;
+	    DMA_SetCurrDataCounter(DMA_FSMC_STREAM, MAX_DMA_REQUEST); // DMA_SetCurrDataCounter
+	    data_left -= MAX_DMA_REQUEST;
       } else {                                 // nope, this is last shoot
-	DMA_SetCurrDataCounter(DMA1_Stream0, data_left);      // DMA_SetCurrDataCounter
-	data_left = 0;
+	    DMA_SetCurrDataCounter(DMA_FSMC_STREAM, data_left);      // DMA_SetCurrDataCounter
+	    data_left = 0;
       }
-      DMA_Cmd(DMA1_Stream0, ENABLE);  // shot DMA to transfer;
+      DMA_Cmd(DMA_FSMC_STREAM, ENABLE);  // shot DMA to transfer;
     } else {   // nope, end of transmission
-      DMA_MemoryIncrementConfig(DMA1_Stream0, DISABLE);
-      DMA_Cmd(DMA1_Stream0, DISABLE);
+      DMA_MemoryIncrementConfig(DMA_FSMC_STREAM, DISABLE);
+      DMA_Cmd(DMA_FSMC_STREAM, DISABLE);
     }
   }
 }

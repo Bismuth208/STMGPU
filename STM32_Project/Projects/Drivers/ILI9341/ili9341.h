@@ -161,10 +161,11 @@
 
 // Cross defines to simplify code
 #if USE_FSMC
- #define WAIT_DMA_BSY      //wait_DMA_FSMC_busy()
+ #define WAIT_DMA_BSY
+// #define WAIT_DMA_BSY      wait_DMA_FSMC_busy()
  #define SEND_DATA(a)      sendData16_FSMC(a)
  #define SEND_DATA16(a)    sendData16_FSMC(a)
- #define SEND_2_DATA(a,b)  writeCommandData_FSMC(a); writeCommandData_FSMC(b);
+ #define SEND_2_DATA(a,b)   sendData32_FSMC(a,b);
 
  #define SEND_ARR16_FAST(pointer, size)   sendArr16_FSMC(pointer, size);
  #define REPEAT_DATA16(data, size)        repeatData16_FSMC(data, size);

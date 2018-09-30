@@ -1,0 +1,16 @@
+{
+  "name": "STMsGPU",
+  "description": "library for sGPU coprocessor",
+  "keywords": "TFT, uart, STM32",
+  "authors": {
+    "name": "Antonov Alexandr (Bismuth208)",
+    "url": "https://github.com/Bismuth208/"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Bismuth208/STMGPU.git"
+  },
+  "version": "0.1.7",
+  "framework": "arduino",
+  "platforms": "any"
+}

@@ -55,6 +55,7 @@ void waitCutpBuf_UART1(uint16_t size);
 void waitCutBuf_UART1(void *dest, uint16_t size);
 
 //void waitCutPtrBuf_UART1(void *dest, uint16_t size);
+void *waitCutPtrBuf_UART1(uint16_t size);
 // --------------------------------------------------//
 
 #endif // _UART_H
