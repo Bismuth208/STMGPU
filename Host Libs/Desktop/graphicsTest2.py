@@ -36,11 +36,10 @@ gpu = sGPU()
 def testFillScreen():
     t = time.time()
 
-    gpu.fillScreen(COLOR_BLACK)
-    gpu.fillScreen(COLOR_RED)
-    gpu.fillScreen(COLOR_GREEN)
-    gpu.fillScreen(COLOR_BLUE)
-    gpu.fillScreen(COLOR_BLACK)
+    for color in [COLOR_BLACK, COLOR_RED, 
+            COLOR_GREEN, COLOR_BLUE, 
+            COLOR_BLACK]:
+        gpu.fillScreen(color)
 
     gpu.pingCommand()
     return time.time()-t
