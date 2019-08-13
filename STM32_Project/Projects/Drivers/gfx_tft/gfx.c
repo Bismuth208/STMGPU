@@ -824,7 +824,7 @@ void drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color)
 void fillScreen(uint16_t color)
 {
   setAddrWindow(0, 0, _width-1, _height-1);
-  REPEAT_DATA16(color, _width * _height);
+  REPEAT_DATA16(color, ILI9341_TFTWIDTH * ILI9341_TFTHEIGHT);
 }
 
 // converts 8-bit (each) R,G,B, to rgb565

@@ -23,7 +23,8 @@ void initFSMC_GPIO(void)
   // FSMC_D4, FSMC_D5, FSMC_D6, FSMC_D7, FSMC_D8, FSMC_D9, FSMC_D10, FSMC_D11, FSMC_D12
   gpio.GPIO_Mode = GPIO_Mode_AF;
   gpio.GPIO_OType = GPIO_OType_PP;
-  gpio.GPIO_Pin = GPIO_Pin_7 | GPIO_Pin_8 | GPIO_Pin_9 | GPIO_Pin_10 | GPIO_Pin_11 | GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15;
+  gpio.GPIO_Pin = GPIO_Pin_7 | GPIO_Pin_8 | GPIO_Pin_9 | GPIO_Pin_10
+      | GPIO_Pin_11 | GPIO_Pin_12 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15;
   gpio.GPIO_PuPd = GPIO_PuPd_NOPULL;
   gpio.GPIO_Speed = GPIO_High_Speed;
   GPIO_Init(GPIOE, &gpio);
@@ -39,7 +40,9 @@ void initFSMC_GPIO(void)
   GPIO_PinAFConfig(GPIOE, GPIO_PinSource15, GPIO_AF_FSMC);
 
   // FSMC_D2, FSMC_D3, FSMC_NOE, FSMC_NWE, FSMC_NE1, FSMC_D13, FSMC_D14, FSMC_D15, FSMC_A18, FSMC_D0, FSMC_D1
-  gpio.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_4 | GPIO_Pin_5 | GPIO_Pin_7 | GPIO_Pin_8 | GPIO_Pin_9 | GPIO_Pin_10 | GPIO_Pin_13 | GPIO_Pin_14 | GPIO_Pin_15;
+  gpio.GPIO_Pin = GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_4 | GPIO_Pin_5 | GPIO_Pin_7
+      | GPIO_Pin_8 | GPIO_Pin_9 | GPIO_Pin_10 | GPIO_Pin_13 | GPIO_Pin_14
+      | GPIO_Pin_15;
   GPIO_Init(GPIOD, &gpio);
 
   GPIO_PinAFConfig(GPIOD, GPIO_PinSource0, GPIO_AF_FSMC);
@@ -85,7 +88,7 @@ void initFSMC_Module(void)
   fsmcInitType.FSMC_WaitSignalActive = FSMC_WaitSignalActive_BeforeWaitState;
   fsmcInitType.FSMC_WaitSignalPolarity = FSMC_WaitSignalPolarity_Low;
   fsmcInitType.FSMC_WrapMode = FSMC_WrapMode_Disable;
-  fsmcInitType.FSMC_WriteBurst = FSMC_WriteBurst_Enable;
+  fsmcInitType.FSMC_WriteBurst = FSMC_WriteBurst_Disable;
   fsmcInitType.FSMC_WriteOperation = FSMC_WriteOperation_Enable;
   fsmcInitType.FSMC_WriteTimingStruct = &fsmcTimings;
 
@@ -108,8 +111,16 @@ __inline void writeCommand_FSMC(uint16_t index)
 
 __inline void writeCommandData_FSMC(uint16_t data)
 {
-  LCD_DATA = data>>8;
-  LCD_DATA = data&0xff;
+  LCD_DATA = data >> 8;
+  LCD_DATA = data & 0xff;
+}
+
+__inline void writeCommandData32_FSMC(uint16_t data0, uint16_t data1)
+{
+  LCD_DATA = data0 >> 8;
+  LCD_DATA = data0 & 0xff;
+  LCD_DATA = data1 >> 8;
+  LCD_DATA = data1 & 0xff;
 }
 
 //__inline void sendData8_FSMC(uint8_t data)
@@ -124,24 +135,29 @@ __inline void writeCommandData_FSMC(uint16_t data)
 
 __inline void sendData32_FSMC(uint16_t data0, uint16_t data1)
 {
-	LCD_DATA = data0>>8;
-    LCD_DATA = data0&0xff;
-    LCD_DATA = data1>>8;
-	LCD_DATA = data1&0xff;
+  LCD_DATA = data0;
+  LCD_DATA = data1;
 }
 
 void sendArr8_FSMC(void *data, uint32_t size)
 {
-  uint8_t *pData = (uint8_t*)data;
+  uint8_t *pData = (uint8_t*) data;
   while (size--) {
     LCD_DATA = *pData++;
   }
 }
 
-
 void sendArr16_FSMC(void *data, uint32_t size)
 {
-  uint16_t *pData = (uint16_t*)data;
+  uint16_t *pData = (uint16_t*) data;
+  while (size >= 4) {
+    LCD_DATA = *pData++;
+    LCD_DATA = *pData++;
+    LCD_DATA = *pData++;
+    LCD_DATA = *pData++;
+    size -= 4;
+  }
+
   while (size--) {
     LCD_DATA = *pData++;
   }
@@ -149,33 +165,44 @@ void sendArr16_FSMC(void *data, uint32_t size)
 
 void repeatData16_FSMC(uint16_t data, uint32_t size)
 {
+  while (size >= 4) {
+    LCD_DATA = data;
+    LCD_DATA = data;
+    LCD_DATA = data;
+    LCD_DATA = data;
+    size -= 4;
+  }
+
   while (size--) {
     LCD_DATA = data;
   }
 }
 
-
 // ------------------------------------------------------- //
 void init_DMA_FSMC(void)
 {
-  RCC_AHB1PeriphResetCmd(DMA_FSMC_RCC, ENABLE);
+  RCC_AHB1PeriphClockCmd(DMA_FSMC_RCC, ENABLE);
+
+  DMA_DeInit( DMA_FSMC_STREAM);
+  while (DMA_GetCmdStatus( DMA_FSMC_STREAM) != DISABLE)
+    ;
 
   DMA_InitTypeDef DMA_FSMC_settings;
-  DMA_FSMC_settings.DMA_BufferSize = 0;
+  DMA_FSMC_settings.DMA_BufferSize = 1;
   DMA_FSMC_settings.DMA_Channel = DMA_FSMC_CH;
-  DMA_FSMC_settings.DMA_DIR = DMA_DIR_MemoryToPeripheral; //DMA_DIR_MemoryToMemory;
-  DMA_FSMC_settings.DMA_FIFOMode = DMA_FIFOMode_Disable;
+  DMA_FSMC_settings.DMA_DIR = DMA_DIR_MemoryToMemory;
+  DMA_FSMC_settings.DMA_FIFOMode = DMA_FIFOMode_Enable;
   DMA_FSMC_settings.DMA_FIFOThreshold = DMA_FIFOThreshold_Full;
   DMA_FSMC_settings.DMA_Memory0BaseAddr = 0;
   DMA_FSMC_settings.DMA_MemoryBurst = DMA_MemoryBurst_Single;
-  DMA_FSMC_settings.DMA_MemoryDataSize = DMA_MemoryDataSize_HalfWord;
+  DMA_FSMC_settings.DMA_MemoryDataSize = DMA_MemoryDataSize_Word;
   DMA_FSMC_settings.DMA_MemoryInc = DMA_MemoryInc_Disable;
   DMA_FSMC_settings.DMA_Mode = DMA_Mode_Normal;
-  DMA_FSMC_settings.DMA_PeripheralBaseAddr = (uint32_t)&LCD_DATA;
+  DMA_FSMC_settings.DMA_PeripheralBaseAddr = (uint32_t) &LCD_DATA;
   DMA_FSMC_settings.DMA_PeripheralBurst = DMA_PeripheralBurst_Single;
-  DMA_FSMC_settings.DMA_PeripheralDataSize = DMA_PeripheralDataSize_HalfWord;
+  DMA_FSMC_settings.DMA_PeripheralDataSize = DMA_PeripheralDataSize_Word;
   DMA_FSMC_settings.DMA_PeripheralInc = DMA_PeripheralInc_Disable;
-  DMA_FSMC_settings.DMA_Priority = DMA_Priority_High;
+  DMA_FSMC_settings.DMA_Priority = DMA_Priority_Medium;
 
   DMA_ITConfig(DMA_FSMC_STREAM, DMA_IT_TC, ENABLE);
   DMA_Init(DMA_FSMC_STREAM, &DMA_FSMC_settings);
@@ -183,25 +210,25 @@ void init_DMA_FSMC(void)
   // Enable DMA1 channel IRQ Channel
   NVIC_InitTypeDef NVIC_InitStructure;
   NVIC_InitStructure.NVIC_IRQChannel = DMA_FSMC_IQR;
-  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 1;
-  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 1;
+  NVIC_InitStructure.NVIC_IRQChannelPreemptionPriority = 2;
+  NVIC_InitStructure.NVIC_IRQChannelSubPriority = 0;
   NVIC_InitStructure.NVIC_IRQChannelCmd = ENABLE;
   NVIC_Init(&NVIC_InitStructure);
-  NVIC_EnableIRQ(DMA_FSMC_IQR);
 }
 
 // There is no way to change that flag fast, except slow DMA_Init()
 // So, i add new one function with syntax like SPL API
-void DMA_MemoryIncrementConfig(DMA_Stream_TypeDef* DMAy_Streamx, FunctionalState NewState)
+void DMA_MemoryIncrementConfig(DMA_Stream_TypeDef* DMAy_Streamx,
+    FunctionalState NewState)
 {
   /* Check the parameters */
   assert_param(IS_DMA_ALL_PERIPH(DMAy_Streamx));
   assert_param(IS_FUNCTIONAL_STATE(NewState));
 
   if (NewState == ENABLE) {
-      DMAy_Streamx->CR |= (uint32_t)DMA_SxCR_MINC;  //DMA_MemoryInc_Enable;
+    DMAy_Streamx->CR |= (uint32_t) DMA_SxCR_MINC;  //DMA_MemoryInc_Enable;
   } else {
-      DMAy_Streamx->CR &= ~(uint32_t)DMA_SxCR_MINC; //DMA_MemoryInc_Disable;
+    DMAy_Streamx->CR &= ~(uint32_t) DMA_SxCR_MINC; //DMA_MemoryInc_Disable;
   }
 }
 
@@ -214,17 +241,19 @@ void repeatData16_DMA_FSMC(uint16_t color, uint32_t transferSize)
 {
   dataBuffer = color;   // store data or, you can lost it
 
-  if(transferSize > MAX_DMA_REQUEST) {
-      DMA_SetCurrDataCounter(DMA_FSMC_STREAM, MAX_DMA_REQUEST); // DMA_SetCurrDataCounter
-      data_left = (transferSize - MAX_DMA_REQUEST);
+  if (transferSize > MAX_DMA_REQUEST) {
+    DMA_SetCurrDataCounter(DMA_FSMC_STREAM, MAX_DMA_REQUEST); // DMA_SetCurrDataCounter
+    data_left = (transferSize - MAX_DMA_REQUEST);
   } else {
-      DMA_SetCurrDataCounter(DMA_FSMC_STREAM, transferSize);   // set how much data to transfer
+    DMA_SetCurrDataCounter(DMA_FSMC_STREAM, transferSize); // set how much data to transfer
   }
 
   // apply DMA_MemoryBaseAddr
-  setMemoryBaseAddr_DMA_FSMC((void*)&dataBuffer);
+  setMemoryBaseAddr_DMA_FSMC((void*) &dataBuffer);
   DMA_MemoryIncrementConfig(DMA_FSMC_STREAM, DISABLE);
   DMA_Cmd(DMA_FSMC_STREAM, ENABLE); // shot DMA to transfer;
+  while ((DMA_GetCmdStatus(DMA_FSMC_STREAM) != ENABLE))
+    ;
 }
 
 /*
@@ -237,11 +266,11 @@ void repeatData16_DMA_FSMC(uint16_t color, uint32_t transferSize)
  */
 void sendData16_DMA_FSMC(void *data, uint32_t transferSize)
 {
-  if(transferSize > MAX_DMA_REQUEST) {
-      DMA_SetCurrDataCounter(DMA_FSMC_STREAM, MAX_DMA_REQUEST);  // DMA_SetCurrDataCounter
-      data_left = (transferSize - MAX_DMA_REQUEST);
+  if (transferSize > MAX_DMA_REQUEST) {
+    DMA_SetCurrDataCounter(DMA_FSMC_STREAM, MAX_DMA_REQUEST); // DMA_SetCurrDataCounter
+    data_left = (transferSize - MAX_DMA_REQUEST);
   } else {
-      DMA_SetCurrDataCounter(DMA_FSMC_STREAM, transferSize);     // set how much data to transfer
+    DMA_SetCurrDataCounter(DMA_FSMC_STREAM, transferSize); // set how much data to transfer
 //      data_left = 0;
   }
 
@@ -249,6 +278,8 @@ void sendData16_DMA_FSMC(void *data, uint32_t transferSize)
   setMemoryBaseAddr_DMA_FSMC(data);
   DMA_MemoryIncrementConfig(DMA_FSMC_STREAM, ENABLE);
   DMA_Cmd(DMA_FSMC_STREAM, ENABLE);
+  while ((DMA_GetCmdStatus(DMA_FSMC_STREAM) != ENABLE))
+    ;
 }
 
 /*
@@ -263,35 +294,44 @@ void sendData16_Fast_DMA_FSMC(void *data, uint16_t transferSize)
   setMemoryBaseAddr_DMA_FSMC(data);
   DMA_MemoryIncrementConfig(DMA_FSMC_STREAM, ENABLE);
   DMA_Cmd(DMA_FSMC_STREAM, ENABLE);
+  while ((DMA_GetCmdStatus(DMA_FSMC_STREAM) != ENABLE))
+    ;
 }
 
 void wait_DMA_FSMC_busy(void)
 {
-//	while(DMA_GetFlagStatus(DMA_FSMC_STREAM, DMA_FLAG_TCIF0) != SET);
+//	while(DMA_GetFlagStatus(DMA_FSMC_STREAM, DMA_FLAG_TCIF7) != SET);
 //	DMA_ClearFlag(DMA_FSMC_STREAM, DMA_FLAG_TCIF0);
 
-	while(DMA_GetCmdStatus(DMA_FSMC_STREAM) != DISABLE);
+  while (DMA_GetCmdStatus(DMA_FSMC_STREAM) != DISABLE)
+    ;
 }
 
 void DMA_FSMC_IRQ_HANLER(void)
 {
-  if(DMA_GetITStatus(DMA_FSMC_STREAM, DMA_IT_TCIF0)) {
-    DMA_ClearITPendingBit(DMA_FSMC_STREAM, DMA_IT_TCIF0);   // clear interrupt
+  if (DMA_GetITStatus(DMA_FSMC_STREAM, DMA_IT_TCIF7)) {
+    DMA_ClearITPendingBit(DMA_FSMC_STREAM, DMA_IT_TCIF7);   // clear interrupt
 
-    if(data_left) {  // all pixels transfered?
+    if (data_left) {  // all pixels transfered?
       DMA_Cmd(DMA_FSMC_STREAM, DISABLE);
+      while ((DMA_GetCmdStatus(DMA_FSMC_STREAM) != DISABLE))
+        ;
 
-      if(data_left > MAX_DMA_REQUEST) {         // left something?
-	    DMA_SetCurrDataCounter(DMA_FSMC_STREAM, MAX_DMA_REQUEST); // DMA_SetCurrDataCounter
-	    data_left -= MAX_DMA_REQUEST;
+      if (data_left > MAX_DMA_REQUEST) {         // left something?
+        DMA_SetCurrDataCounter(DMA_FSMC_STREAM, MAX_DMA_REQUEST); // DMA_SetCurrDataCounter
+        data_left -= MAX_DMA_REQUEST;
       } else {                                 // nope, this is last shoot
-	    DMA_SetCurrDataCounter(DMA_FSMC_STREAM, data_left);      // DMA_SetCurrDataCounter
-	    data_left = 0;
+        DMA_SetCurrDataCounter(DMA_FSMC_STREAM, data_left); // DMA_SetCurrDataCounter
+        data_left = 0;
       }
       DMA_Cmd(DMA_FSMC_STREAM, ENABLE);  // shot DMA to transfer;
+      while ((DMA_GetCmdStatus(DMA_FSMC_STREAM) != ENABLE))
+        ;
     } else {   // nope, end of transmission
       DMA_MemoryIncrementConfig(DMA_FSMC_STREAM, DISABLE);
       DMA_Cmd(DMA_FSMC_STREAM, DISABLE);
+      while ((DMA_GetCmdStatus(DMA_FSMC_STREAM) != DISABLE))
+        ;
     }
   }
 }

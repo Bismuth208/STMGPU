@@ -22,9 +22,9 @@
 #include <sdcard_spi.h>
 #include <systicktimer.h>
 #if USE_FSMC
- #include <fsmcdrv.h>
+#include <fsmcdrv.h>
 #else
- #include <spi.h>
+#include <spi.h>
 #endif
 
 #include "sdLoader.h"
@@ -33,13 +33,14 @@
 
 //===========================================================================//
 
-
 void init_GPIO_RCC(void)
 {
 #if defined(STM32F10X_MD) || defined(STM32F10X_HD)
   RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOA | RCC_APB2Periph_GPIOB, ENABLE);
 #else
-  RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_GPIOE | RCC_AHB1Periph_GPIOD | RCC_AHB1Periph_GPIOB | RCC_AHB1Periph_GPIOA, ENABLE);
+  RCC_AHB1PeriphClockCmd(
+      RCC_AHB1Periph_GPIOE | RCC_AHB1Periph_GPIOD | RCC_AHB1Periph_GPIOB
+          | RCC_AHB1Periph_GPIOA, ENABLE);
   RCC_AHB3PeriphClockCmd(RCC_AHB3Periph_FSMC, ENABLE);
 #endif
 
@@ -50,9 +51,9 @@ void init_GPIO_RCC(void)
 #ifdef STM32F10X_HD
   RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOE, ENABLE);
 
- #if USE_FSMC
+#if USE_FSMC
   RCC_APB2PeriphClockCmd(RCC_APB2Periph_GPIOC | RCC_APB2Periph_GPIOD, ENABLE);
- #endif
+#endif
 #endif
 }
 
@@ -74,7 +75,7 @@ void startupInit(void)
 
   init_GPIO_RCC();
 //  initRand();
-  initLCD();         /* initialize a ILI9341 chip */
+  initLCD(); /* initialize a ILI9341 chip */
 
   setRotation(1); // horizontal
   loadDefaultPalette();
@@ -91,7 +92,7 @@ int main(void) // __noreturn void
   startupInit();
 
   init_GPU();
-  sync_CPU();   /* make a sync whith a CPU */
+  sync_CPU(); /* make a sync whith a CPU */
   run_GPU();
 }
 //-----------------------------------------------------------------------------//

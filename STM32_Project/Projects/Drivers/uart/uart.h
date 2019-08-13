@@ -19,27 +19,40 @@
 #endif
 // --------------------------------------------------//
 
+#define USART1_USE_PROTOCOL_V0
+//#define USART1_USE_PROTOCOL_V1 // DMA Rx feature was added
+
+// --------------------------------------------------//
+
 #pragma pack(push, 1)
-typedef struct {
+typedef struct
+{
   // just overflow, no check and additional code need
-  uint16_t head         :SERIAL_BUFFER_BITS;
-  uint16_t align1       :(16 - SERIAL_BUFFER_BITS);     // not used
-  uint16_t tail         :SERIAL_BUFFER_BITS;
-  uint16_t align2       :(16 - SERIAL_BUFFER_BITS);     // not used
+  uint16_t head :SERIAL_BUFFER_BITS;
+  uint16_t align1 :(16 - SERIAL_BUFFER_BITS);     // not used
+  uint16_t tail :SERIAL_BUFFER_BITS;
+  uint16_t align2 :(16 - SERIAL_BUFFER_BITS);     // not used
 } ring_buffer_t;
 #pragma pack(pop)
 
-
-typedef enum {
+typedef enum
+{
   UART_BAUD_9600 = 9600,
   UART_BAUD_57600 = 57600,
   UART_BAUD_115200 = 115200,
-  UART_BAUD_1M = 1000000 
+  UART_BAUD_1M = 1000000
 } baudSpeed_t;
 
 // --------------------------------------------------//
 
+#if USART1_USE_PROTOCOL_V1
+uint8_t ucSearchSyncSeq(void);
+void fflush_buffer_USART1(void);
 
+void vCallbackFrom_USART1_IRQ(void);
+#endif
+
+// --------------------------------------------------//
 
 void init_UART1(uint32_t baud);
 void setBufferPointer_UART1(void *pBuf);

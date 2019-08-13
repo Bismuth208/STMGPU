@@ -28,7 +28,7 @@ All this allow to use *Host* even like *AVR ATtiny* family, isn't cool huh?
 
 Also code for *STM32* was writed in *System Workbench(sw4stm32)* with *SPL* to get maximum of hardware!
 
-#####To see how does it work check [this link](https://www.youtube.com/channel/UCDXVQ9ZfQl8Ddeu_3qiwSiA "My YouTube channel")
+####Benchmarks on Desktop via Python [this link](https://github.com/Bismuth208/STMGPU/tree/master/Host%20Libs/Desktop "Go, check it!")
 
 ***
 ##### Used *MCU* for *sGPU*:
@@ -57,47 +57,8 @@ Also code for *STM32* was writed in *System Workbench(sw4stm32)* with *SPL* to g
   * [STM32_GPU_Mini_GPIO_Pinout.png](/STM32_Project/STM32F103C8T6_pinout.png)
   * [STM32_GPU_Pro_GPIO_Pinout.png](/STM32_Project/STM32F407VET6_pinout.png)
 
-***
-###Tests results over Bluetooth on Desktop and 57600 baudrate
-#####*sGPU Pro:*
-```
-Benchmark               Time (milliseconds)
-FillScreen              : 63
-Text                    : 101
-Lines                   : 854
-Horiz/Vert Lines        : 213
-Rectangles (outline)    : 101
-Rectangles (filled)     : 187
-Circles (filled)        : 326
-Circles (outline)       : 373
-Triangles (outline)     : 92
-Triangles (filled)      : 148
-Rounded rects (outline) : 151
-Rounded rects (filled)  : 128
-Rotation                : 504
-Done!
-```
-
-#####*sGPU Mini:*
-```
-Benchmark               Time (milliseconds)
-FillScreen              : 172
-Text                    : 107
-Lines                   : 1089
-Horiz/Vert Lines        : 206
-Rectangles (outline)    : 103
-Rectangles (filled)     : 414
-Circles (filled)        : 351
-Circles (outline)       : 373
-Triangles (outline)     : 98
-Triangles (filled)      : 252
-Rounded rects (outline) : 133
-Rounded rects (filled)  : 458
-Rotation                : 601
-Done!
-```
 
 > ##### :exclamation: ATTENTION! :exclamation:
-> ###### * This project is still unstable and not ready for production! :beetle:
-> ###### * Any changes in main protocol are possible at any time,
-> ###### * and no backward capability is guaranteed!
+> ##### * This project is still unstable and not ready for production! :beetle:
+> ##### * Any changes in main protocol are possible at any time,
+> ##### * and no backward capability is guaranteed!
