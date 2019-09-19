@@ -408,7 +408,7 @@ void SDPrintBMP(uint16_t x, uint16_t y, void *fileName)
   
   bmpCore_t bmpHeader; // base header info
   
-  if((x >= width()) || (y >= height())) return;
+  if((x >= _ulWidth) || (y >= _ulHeight)) return;
   
   if(openSDFile(fileName, T_BMP_SET_EXT_NAME) == FR_OK) {
     // read core header info
@@ -434,8 +434,8 @@ void SDPrintBMP(uint16_t x, uint16_t y, void *fileName)
         // Crop area to be loaded
         w = bmpWidth;
         h = bmpHeight;
-        if ((x + w - 1) >= width())  w = width() - x;
-        if ((y + h - 1) >= height()) h = height() - y;
+        if ((x + w - 1) >= _ulWidth)  w = _ulWidth - x;
+        if ((y + h - 1) >= _ulHeight) h = _ulHeight - y;
         
         // Set TFT address window to clipped image bounds
         setAddrWindow(x, y, x + w - 1, y + h - 1);

@@ -12,7 +12,7 @@
 
 uint32_t dmaDataBuf;                   // for single storage
 
-inline void memcpy8(void *dst, void const *src, size_t len)
+__attribute__((optimize("O2"))) void memcpy8(void *dst, void const *src, size_t len)
 {
   uint8_t *pDst = (uint8_t *) dst;
   uint8_t const *pSrc = (uint8_t const *) src;
@@ -23,7 +23,7 @@ inline void memcpy8(void *dst, void const *src, size_t len)
 }
 
 // The modified-GNU algorithm
-void memcpy32(void *dst, void const *src, size_t len)
+__attribute__((optimize("O2"))) void memcpy32(void *dst, void const *src, size_t len)
 {
   uint32_t *plDst = (uint32_t *) dst;
   uint32_t const *plSrc = (uint32_t const *) src;
@@ -42,7 +42,7 @@ void memcpy32(void *dst, void const *src, size_t len)
 }
 
 // set by block in 4 bytes only!
-void memset32(void *dst, uint32_t src, size_t len)
+__attribute__((optimize("O2"))) void memset32(void *dst, uint32_t src, size_t len)
 {
   uint32_t *plDst = (uint32_t *) dst;
 

@@ -62,8 +62,8 @@ void sync_CPU(void)
           print(T_OK T_TFT_SIZE);
 
           // return screen size to CPU
-          cmdBuffer.par1 = _width;
-          cmdBuffer.par2 = _height;
+          cmdBuffer.par1 = (uint16_t) _ulWidth;
+          cmdBuffer.par2 = (uint16_t) _ulHeight;
 
           GPU_INTERFACE_SEND_DATA_8(SYNC_OK);  // sequence right, answer to CPU
           GPU_INTERFACE_SEND_ARR_DATA_8(cmdBuffer.data, 4); // send resolution

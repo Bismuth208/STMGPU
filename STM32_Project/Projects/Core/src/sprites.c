@@ -150,47 +150,40 @@ uint8_t getTleNumberCount(uint8_t sprNum)
   return value;
 }
 
-void drawSprite(uint8_t sprNum)
+void drawSprite(uint32_t ulSprtNum)
 {
-  if(spriteArr[sprNum].visible) {
+  if(spriteArr[ulSprtNum].visible) {
+    uint32_t offset = getTileOffsetSize(ulSprtNum);
+    uint32_t numberOfTiles = getTleNumberCount(ulSprtNum);
+    Tile_t xTile;
     
-    struct tile_t {
-      uint16_t posX;
-      uint16_t posY;
-      uint8_t tileNum;
-    } tile;
-    
-    uint8_t offset = getTileOffsetSize(sprNum);
-    uint8_t numberOfTiles = getTleNumberCount(sprNum);
-    
-    for(uint8_t tleCount=0; tleCount < numberOfTiles; tleCount++) {
-      
-      tile.tileNum = spriteArr[sprNum].tle[tleCount];
+    for(uint32_t tleCount=0; tleCount < numberOfTiles; tleCount++) {
+      xTile.ulIndex = spriteArr[ulSprtNum].tle[tleCount];
       
       switch(tleCount)
       {
       case 0: {
-        tile.posX = spriteArr[sprNum].posX;
-        tile.posY = spriteArr[sprNum].posY;
+        xTile.ulPosX = spriteArr[ulSprtNum].posX;
+        xTile.ulPosY = spriteArr[ulSprtNum].posY;
       } break;
       
       case 1: {
-        tile.posX = spriteArr[sprNum].posX + offset;
-        tile.posY = spriteArr[sprNum].posY;
+        xTile.ulPosX = spriteArr[ulSprtNum].posX + offset;
+        xTile.ulPosY = spriteArr[ulSprtNum].posY;
       } break;
       
       case 2: {
-        tile.posX = spriteArr[sprNum].posX;
-        tile.posY = spriteArr[sprNum].posY + offset;
+        xTile.ulPosX = spriteArr[ulSprtNum].posX;
+        xTile.ulPosY = spriteArr[ulSprtNum].posY + offset;
       } break;
       
       case 3: {
-        tile.posX = spriteArr[sprNum].posX + offset;
-        tile.posY = spriteArr[sprNum].posY + offset;
+        xTile.ulPosX = spriteArr[ulSprtNum].posX + offset;
+        xTile.ulPosY = spriteArr[ulSprtNum].posY + offset;
       } break;
       }
       
-      drawTile8x8(&tile);
+      drawTile8x8(&xTile);
     }
   }
 }

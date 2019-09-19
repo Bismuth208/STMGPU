@@ -78,16 +78,16 @@ void loadDefaultPalette(void)
 
 void loadInternalTileSet(uint8_t tileSetSize, uint8_t tileSetW, const uint8_t *pTileSet)
 {
-  uint8_t tileYcnt, tileXcnt;    
-  uint16_t tileNumOffsetX;       // offset for new scanline
-  uint16_t offset;
+  uint32_t tileYcnt, tileXcnt;
+  uint32_t tileNumOffsetX;       // offset for new scanline
+  uint32_t offset;
   uint8_t *pTile = NULL;
   const uint8_t *pTileSetOffset = NULL;
   
   // offset for new scanline
-  uint16_t tileNewLineOffsetY = tileSetW*TILE_8_BASE_SIZE-TILE_8_BASE_SIZE;
+  uint32_t tileNewLineOffsetY = tileSetW*TILE_8_BASE_SIZE-TILE_8_BASE_SIZE;
   
-  for(uint8_t tileNum=0; tileNum <= tileSetSize; tileNum++) {
+  for(uint32_t tileNum=0; tileNum <= tileSetSize; tileNum++) {
     
     pTile = tileArr8x8[tileNum];  // get RAM pointer where place tile data
     
@@ -131,80 +131,62 @@ uint8_t *getMapArrPointer(void)
   return (uint8_t *)&mainBackGround[0];
 }
 
-void drawTile8x8(void *tileData)
+void drawTile8x8(Tile_t *pxTile)
 {
-  uint16_t *pTileData = (uint16_t *)tileData;
-  
-  int16_t posX = *pTileData++;
-  int16_t posY = *pTileData++;
-  uint8_t tileNum = *pTileData;
-  
   // little trick, if tile same, just redraw it
-  if(lastTileNum8x8 != tileNum) { // same tile number?
+  if(lastTileNum8x8 != pxTile->ulIndex) { // same tile number?
     
-    uint8_t *pTileArr = &tileArr8x8[tileNum][0]; // get pointer by *pTile tile number
-    lastTileNum8x8 = tileNum; // apply last tile number
+    uint8_t *pTileArr = &tileArr8x8[pxTile->ulIndex][0]; // get pointer by *pTile tile number
+    lastTileNum8x8 = pxTile->ulIndex; // apply last tile number
     
     // convert colors from indexes in current palette to RGB565 color space
-    for(uint16_t count =0; count < TILE_ARR_8X8_SIZE; count++) {
+    for(uint32_t count =0; count < TILE_ARR_8X8_SIZE; count++) {
       lastTile8x8[count] = currentPaletteArr[*pTileArr++];
     }
   }
   
   // on oscilloscope this one reduce few uS
-  setSqAddrWindow(posX, posY, TILE_8x8_WINDOW_SIZE);
+  setSqAddrWindow(pxTile->ulPosX, pxTile->ulPosY, TILE_8x8_WINDOW_SIZE);
   SEND_ARR16_FAST(lastTile8x8, TILE_ARR_8X8_SIZE);
 }
 
-void drawTile16x16(void *tileData)
+void drawTile16x16(Tile_t *pxTile)
 {
-  uint16_t *pTileData = (uint16_t *)tileData;
-  
-  int16_t posX = *pTileData++;
-  int16_t posY = *pTileData++;
-  uint8_t tileNum = *pTileData++;
-  
   // little trick, if tile same, just redraw it
-  if(lastTileNum16x16 != tileNum) {
+  if(lastTileNum16x16 != pxTile->ulIndex) {
     
-    uint8_t *pTileArr = &tileArr16x16[tileNum][0];
-    lastTileNum16x16 = tileNum;
+    uint8_t *pTileArr = &tileArr16x16[pxTile->ulIndex][0];
+    lastTileNum16x16 = pxTile->ulIndex;
     
     // convert colors from indexes in current palette to RGB565 color space
-    for(uint16_t count =0; count < TILE_ARR_16X16_SIZE; count++) {
+    for(uint32_t count =0; count < TILE_ARR_16X16_SIZE; count++) {
       lastTile16x16[count] = currentPaletteArr[*pTileArr++];
     }
   }
   
   // on oscilloscope this one reduce few uS
-  setSqAddrWindow(posX, posY, TILE_16x16_WINDOW_SIZE);
+  setSqAddrWindow(pxTile->ulPosX, pxTile->ulPosY, TILE_16x16_WINDOW_SIZE);
   SEND_ARR16_FAST(lastTile16x16, TILE_ARR_16X16_SIZE);
 }
 
 
 #if defined(STM32F10X_HD) || defined(STM32F40XX)
-void drawTile32x32(void *tileData)
+void drawTile32x32(Tile_t *pxTile)
 {
-  uint16_t *pTileData = (uint16_t *)tileData;
-  
-  int16_t posX = *pTileData++;
-  int16_t posY = *pTileData++;
-  uint8_t tileNum = *pTileData++;
-  
   // little trick, if tile same, just redraw it
-  if(lastTileNum32x32 != tileNum) {
+  if(lastTileNum32x32 != pxTile->ulIndex) {
     
-    uint8_t *pTileArr = &tileArr32x32[tileNum][0];
-    lastTileNum32x32 = tileNum;
+    uint8_t *pTileArr = &tileArr32x32[pxTile->ulIndex][0];
+    lastTileNum32x32 = pxTile->ulIndex;
     
     // convert colors from indexes in current palette to RGB565 color space
-    for(uint16_t count =0; count < TILE_ARR_32X32_SIZE; count++) {
+    for(uint32_t count =0; count < TILE_ARR_32X32_SIZE; count++) {
       lastTile32x32[count] = currentPaletteArr[*pTileArr++];
     }
   }
   
   // on oscilloscope this one reduce few uS
-  setSqAddrWindow(posX, posY, TILE_32x32_WINDOW_SIZE);
+  setSqAddrWindow(pxTile->ulPosX, pxTile->ulPosY, TILE_32x32_WINDOW_SIZE);
   SEND_ARR16_FAST(lastTile32x32, TILE_ARR_32X32_SIZE);
 }
 #endif /* STM32F10X_HD */

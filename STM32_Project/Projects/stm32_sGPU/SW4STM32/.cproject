@@ -24,7 +24,7 @@
 							<tool command="gcc" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GCCErrorParser" id="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.921360304" name="MCU GCC Compiler" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.compiler">
 								<option id="fr.ac6.managedbuild.gnu.c.compiler.option.optimization.level.177646346" name="Optimization Level" superClass="fr.ac6.managedbuild.gnu.c.compiler.option.optimization.level" useByScannerDiscovery="false" value="fr.ac6.managedbuild.gnu.c.optimization.level.none" valueType="enumerated"/>
 								<option id="gnu.c.compiler.option.debugging.level.968031175" name="Debug Level" superClass="gnu.c.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.c.debugging.level.max" valueType="enumerated"/>
-								<option id="gnu.c.compiler.option.dialect.std.498555934" name="Language standard" superClass="gnu.c.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.c.compiler.dialect.c99" valueType="enumerated"/>
+								<option id="gnu.c.compiler.option.dialect.std.498555934" name="Language standard" superClass="gnu.c.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.c.compiler.dialect.c11" valueType="enumerated"/>
 								<option id="gnu.c.compiler.option.preprocessor.def.symbols.28691629" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" useByScannerDiscovery="false" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="STM32"/>
 									<listOptionValue builtIn="false" value="STM32F1"/>
@@ -34,21 +34,21 @@
 									<listOptionValue builtIn="false" value="USE_STDPERIPH_DRIVER"/>
 								</option>
 								<option id="gnu.c.compiler.option.include.paths.153863035" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/inc&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/CMSIS/device&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/CMSIS/core&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/StdPeriph_Driver/inc&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../Core/inc&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../Drivers/FatFS&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../Drivers/systicktimer&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../Drivers/uart&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../Drivers/memory&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../Drivers/fsmcdrv&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../Drivers/spi&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../Drivers/gfx_tft&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../Drivers/ILI9341&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../Drivers/raycasterEngine&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../Drivers/sound&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../System&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../System/CMSIS/device&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../System/CMSIS/core&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../System/StdPeriph_Driver/inc&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../../Core/inc&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../../Drivers/FatFS&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../../Drivers/systicktimer&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../../Drivers/uart&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../../Drivers/memory&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../../Drivers/fsmcdrv&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../../Drivers/spi&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../../Drivers/gfx_tft&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../../Drivers/ILI9341&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../../Drivers/raycasterEngine&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../../Drivers/sound&quot;"/>
 								</option>
 								<option id="gnu.c.compiler.option.optimization.flags.556983739" name="Other optimization flags" superClass="gnu.c.compiler.option.optimization.flags" useByScannerDiscovery="false" value="" valueType="string"/>
 								<option id="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.fdata.518023488" name="Place the data in their own section (-fdata-sections)" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.fdata" useByScannerDiscovery="false" value="true" valueType="boolean"/>
@@ -64,7 +64,7 @@
 							</tool>
 							<tool command="gcc" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GLDErrorParser" id="fr.ac6.managedbuild.tool.gnu.cross.c.linker.1518636793" name="MCU GCC Linker" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.linker">
 								<option id="gnu.c.link.option.ldflags.748163824" name="Linker flags" superClass="gnu.c.link.option.ldflags" useByScannerDiscovery="false" value="--specs=nano.specs" valueType="string"/>
-								<option id="fr.ac6.managedbuild.tool.gnu.cross.c.linker.script.1292311558" name="Linker Script (-T)" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.linker.script" useByScannerDiscovery="false" value="${ProjDirPath}/configuration/LinkerScript.ld" valueType="string"/>
+								<option id="fr.ac6.managedbuild.tool.gnu.cross.c.linker.script.1292311558" name="Linker Script (-T)" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.linker.script" useByScannerDiscovery="false" value="${ProjDirPath}/LinkerScript.ld" valueType="string"/>
 								<inputType id="cdt.managedbuild.tool.gnu.c.linker.input.1633382285" superClass="cdt.managedbuild.tool.gnu.c.linker.input">
 									<additionalInput kind="additionalinputdependency" paths="$(USER_OBJS)"/>
 									<additionalInput kind="additionalinput" paths="$(LIBS)"/>
@@ -73,36 +73,12 @@
 							<tool id="fr.ac6.managedbuild.tool.gnu.cross.cpp.linker.217311709" name="MCU G++ Linker" superClass="fr.ac6.managedbuild.tool.gnu.cross.cpp.linker"/>
 							<tool id="fr.ac6.managedbuild.tool.gnu.archiver.1235059017" name="MCU GCC Archiver" superClass="fr.ac6.managedbuild.tool.gnu.archiver"/>
 							<tool command="as" commandLinePattern="${COMMAND} ${FLAGS} ${OUTPUT_FLAG} ${OUTPUT_PREFIX}${OUTPUT} ${INPUTS}" errorParsers="org.eclipse.cdt.core.GASErrorParser" id="fr.ac6.managedbuild.tool.gnu.cross.assembler.381728932" name="MCU GCC Assembler" superClass="fr.ac6.managedbuild.tool.gnu.cross.assembler">
-								<option id="gnu.both.asm.option.include.paths.1338193543" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/inc&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/CMSIS&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/StdPeriph_Driver&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../Core&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../Drivers/FatFS&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../Drivers/systicktimer&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../Drivers/uart&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../Drivers/memory&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../Drivers/fsmcdrv&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../Drivers/spi&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../Drivers/gfx_tft&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../Drivers/ILI9341&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../Drivers/raycasterEngine&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../Drivers/sound&quot;"/>
-								</option>
+								<option id="gnu.both.asm.option.include.paths.1338193543" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" useByScannerDiscovery="false" valueType="includePath"/>
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.610437047" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 								<inputType id="fr.ac6.managedbuild.tool.gnu.cross.assembler.input.497216582" superClass="fr.ac6.managedbuild.tool.gnu.cross.assembler.input"/>
 							</tool>
 						</toolChain>
 					</folderInfo>
-					<sourceEntries>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="CMSIS"/>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="Core"/>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="Drivers"/>
-						<entry excluding="src/stm32f10x_wwdg.c|src/stm32f10x_sdio.c|src/stm32f10x_pwr.c|src/stm32f10x_iwdg.c|src/stm32f10x_i2c.c|src/stm32f10x_flash.c|src/stm32f10x_exti.c|src/stm32f10x_dbgmcu.c|src/stm32f10x_dac.c|src/stm32f10x_crc.c|src/stm32f10x_cec.c|src/stm32f10x_can.c|src/stm32f10x_bkp.c" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="StdPeriph_Driver"/>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="inc"/>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="startup"/>
-					</sourceEntries>
 				</configuration>
 			</storageModule>
 			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>
@@ -126,11 +102,11 @@
 							<option id="fr.ac6.managedbuild.option.gnu.cross.mcu.1151730372" name="Mcu" superClass="fr.ac6.managedbuild.option.gnu.cross.mcu" useByScannerDiscovery="false" value="STM32F103C8Tx" valueType="string"/>
 							<option id="fr.ac6.managedbuild.option.gnu.cross.board.1714424852" name="Board" superClass="fr.ac6.managedbuild.option.gnu.cross.board" useByScannerDiscovery="false" value="Blue-Pill" valueType="string"/>
 							<targetPlatform archList="all" binaryParser="org.eclipse.cdt.core.ELF" id="fr.ac6.managedbuild.targetPlatform.gnu.cross.722242900" isAbstract="false" osList="all" superClass="fr.ac6.managedbuild.targetPlatform.gnu.cross"/>
-							<builder buildPath="${workspace_loc:/stm32_sGPU}/Release" id="fr.ac6.managedbuild.builder.gnu.cross.749499401" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Gnu Make Builder" parallelBuildOn="true" parallelizationNumber="optimal" superClass="fr.ac6.managedbuild.builder.gnu.cross"/>
+							<builder autoBuildTarget="all" buildPath="${workspace_loc:/stm32_sGPU}/Release" cleanBuildTarget="clean" enableAutoBuild="false" enableCleanBuild="true" enabledIncrementalBuild="true" id="fr.ac6.managedbuild.builder.gnu.cross.749499401" incrementalBuildTarget="all" keepEnvironmentInBuildfile="false" managedBuildOn="true" name="Gnu Make Builder" parallelBuildOn="true" parallelizationNumber="optimal" superClass="fr.ac6.managedbuild.builder.gnu.cross"/>
 							<tool id="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.469078871" name="MCU GCC Compiler" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.compiler">
 								<option id="fr.ac6.managedbuild.gnu.c.compiler.option.optimization.level.1505552758" name="Optimization Level" superClass="fr.ac6.managedbuild.gnu.c.compiler.option.optimization.level" useByScannerDiscovery="false" value="fr.ac6.managedbuild.gnu.c.optimization.level.none" valueType="enumerated"/>
 								<option id="gnu.c.compiler.option.debugging.level.477890011" name="Debug Level" superClass="gnu.c.compiler.option.debugging.level" useByScannerDiscovery="false" value="gnu.c.debugging.level.none" valueType="enumerated"/>
-								<option id="gnu.c.compiler.option.dialect.std.940336677" name="Language standard" superClass="gnu.c.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.c.compiler.dialect.c99" valueType="enumerated"/>
+								<option id="gnu.c.compiler.option.dialect.std.940336677" name="Language standard" superClass="gnu.c.compiler.option.dialect.std" useByScannerDiscovery="true" value="gnu.c.compiler.dialect.c11" valueType="enumerated"/>
 								<option id="gnu.c.compiler.option.preprocessor.def.symbols.859516795" name="Defined symbols (-D)" superClass="gnu.c.compiler.option.preprocessor.def.symbols" useByScannerDiscovery="false" valueType="definedSymbols">
 									<listOptionValue builtIn="false" value="STM32"/>
 									<listOptionValue builtIn="false" value="STM32F1"/>
@@ -139,21 +115,21 @@
 									<listOptionValue builtIn="false" value="USE_STDPERIPH_DRIVER"/>
 								</option>
 								<option id="gnu.c.compiler.option.include.paths.777788594" name="Include paths (-I)" superClass="gnu.c.compiler.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/inc&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/CMSIS/device&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/CMSIS/core&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/StdPeriph_Driver/inc&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../Core/inc&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../Drivers/FatFS&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../Drivers/systicktimer&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../Drivers/uart&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../Drivers/memory&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../Drivers/fsmcdrv&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../Drivers/spi&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../Drivers/gfx_tft&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../Drivers/ILI9341&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../Drivers/raycasterEngine&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../Drivers/sound&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../System&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../System/CMSIS/device&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../System/CMSIS/core&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../System/StdPeriph_Driver/inc&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../../Core/inc&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../../Drivers/FatFS&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../../Drivers/systicktimer&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../../Drivers/uart&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../../Drivers/memory&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../../Drivers/fsmcdrv&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../../Drivers/spi&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../../Drivers/gfx_tft&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../../Drivers/ILI9341&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../../Drivers/raycasterEngine&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../../Drivers/sound&quot;"/>
 								</option>
 								<option id="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.fdata.409686479" name="Place the data in their own section (-fdata-sections)" superClass="fr.ac6.managedbuild.tool.gnu.cross.c.compiler.fdata" useByScannerDiscovery="false" value="true" valueType="boolean"/>
 								<option id="gnu.c.compiler.option.misc.verbose.124997680" name="Verbose (-v)" superClass="gnu.c.compiler.option.misc.verbose" useByScannerDiscovery="false" value="true" valueType="boolean"/>
@@ -177,35 +153,27 @@
 							<tool id="fr.ac6.managedbuild.tool.gnu.archiver.1411168902" name="MCU GCC Archiver" superClass="fr.ac6.managedbuild.tool.gnu.archiver"/>
 							<tool id="fr.ac6.managedbuild.tool.gnu.cross.assembler.exe.release.618062327" name="MCU GCC Assembler" superClass="fr.ac6.managedbuild.tool.gnu.cross.assembler.exe.release">
 								<option id="gnu.both.asm.option.include.paths.1356241415" name="Include paths (-I)" superClass="gnu.both.asm.option.include.paths" useByScannerDiscovery="false" valueType="includePath">
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/inc&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/CMSIS&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/StdPeriph_Driver&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../Core&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../Drivers/FatFS&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../Drivers/systicktimer&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../Drivers/uart&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../Drivers/memory&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../Drivers/fsmcdrv&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../Drivers/spi&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../Drivers/gfx_tft&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../Drivers/ILI9341&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../Drivers/raycasterEngine&quot;"/>
-									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../Drivers/sound&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../System&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../System/CMSIS/device&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../System/CMSIS/core&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../System/StdPeriph_Driver/inc&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../../Core/inc&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../../Drivers/FatFS&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../../Drivers/systicktimer&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../../Drivers/uart&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../../Drivers/memory&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../../Drivers/fsmcdrv&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../../Drivers/spi&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../../Drivers/gfx_tft&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../../Drivers/ILI9341&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../../Drivers/raycasterEngine&quot;"/>
+									<listOptionValue builtIn="false" value="&quot;${ProjDirPath}/../../Drivers/sound&quot;"/>
 								</option>
 								<inputType id="cdt.managedbuild.tool.gnu.assembler.input.1672784443" superClass="cdt.managedbuild.tool.gnu.assembler.input"/>
 								<inputType id="fr.ac6.managedbuild.tool.gnu.cross.assembler.input.1618700701" superClass="fr.ac6.managedbuild.tool.gnu.cross.assembler.input"/>
 							</tool>
 						</toolChain>
 					</folderInfo>
-					<sourceEntries>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="CMSIS"/>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="Core"/>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="Drivers"/>
-						<entry excluding="src/stm32f10x_wwdg.c|src/stm32f10x_sdio.c|src/stm32f10x_pwr.c|src/stm32f10x_iwdg.c|src/stm32f10x_i2c.c|src/stm32f10x_flash.c|src/stm32f10x_exti.c|src/stm32f10x_dbgmcu.c|src/stm32f10x_dac.c|src/stm32f10x_crc.c|src/stm32f10x_cec.c|src/stm32f10x_can.c|src/stm32f10x_bkp.c" flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="StdPeriph_Driver"/>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="inc"/>
-						<entry flags="VALUE_WORKSPACE_PATH" kind="sourcePath" name="src"/>
-						<entry flags="VALUE_WORKSPACE_PATH|RESOLVED" kind="sourcePath" name="startup"/>
-					</sourceEntries>
 				</configuration>
 			</storageModule>
 			<storageModule moduleId="org.eclipse.cdt.core.externalSettings"/>

@@ -70,35 +70,31 @@ void drawSTMsGPU(void)
   // bit field? no no no, what you talking about?
   uint8_t tilesDrawed[TITLE_TLE_NUM];     // array of flags to show drawed tiles
   
-  struct tile_t {
-    uint16_t rndTileX;
-    uint16_t rndTileY;
-    uint8_t tileIndex;
-  } tile;
+  Tile_t xTile;
   
   memset(tilesDrawed, 0x01, TITLE_TLE_NUM); // 1 - need to draw, 0 - drawed
   
   while(tilesLesft) {
-    tile.rndTileX = ( randNum() % TITLE_SCREEN_W ); // from 0 to 18
-    tile.rndTileY = ( randNum() % TITLE_SCREEN_H ); // from 0 to 6
+    xTile.ulPosX = ( randNum() % TITLE_SCREEN_W ); // from 0 to 18
+    xTile.ulPosY = ( randNum() % TITLE_SCREEN_H ); // from 0 to 6
     
     // index to draw is: x + y*wide
-    tile.tileIndex = tile.rndTileX + tile.rndTileY*TITLE_SCREEN_W;
+    xTile.ulIndex = xTile.ulPosX + xTile.ulPosY * TITLE_SCREEN_W;
     
-    if(tilesDrawed[tile.tileIndex]) { // == 1, need to draw tile?
-      tilesDrawed[tile.tileIndex] = 0; // change flag to 'drawed'
+    if(tilesDrawed[xTile.ulIndex]) { // == 1, need to draw tile?
+      tilesDrawed[xTile.ulIndex] = 0; // change flag to 'drawed'
       --tilesLesft;
       
       // get tile index from tile map
-      tile.tileIndex = stmGpuTileMap[tile.tileIndex];
+      xTile.ulIndex = stmGpuTileMap[xTile.ulIndex];
       
       // reuse rndTileX and rndTileY vars to show where to draw;
       // trying to draw in centre of screen
-      tile.rndTileX = (LOGO_POS_X + (tile.rndTileX * TILE_8_BASE_SIZE));
-      tile.rndTileY = (LOGO_POS_Y + (tile.rndTileY * TILE_8_BASE_SIZE));
+      xTile.ulPosX = (LOGO_POS_X + (xTile.ulPosX * TILE_8_BASE_SIZE));
+      xTile.ulPosY = (LOGO_POS_Y + (xTile.ulPosY * TILE_8_BASE_SIZE));
       
       // draw tile
-      drawTile8x8(&tile);
+      drawTile8x8(&xTile);
       
       // make a little delay, overvise we don`t see mosaic effect (too fast)
       _delayMS(1);

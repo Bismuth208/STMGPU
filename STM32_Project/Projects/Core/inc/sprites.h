@@ -74,7 +74,7 @@ void setSpriteType(uint8_t sprNum, uint8_t type);
 void setSpriteVisible(uint8_t sprNum, uint8_t state);
 void setSpriteTiles(void *src);
 void setSpritesAutoRedraw(uint8_t state);
-void drawSprite(uint8_t sprNum);
+void drawSprite(uint32_t ulSprtNum);
 
 uint8_t getSpriteCollision(uint8_t sprNum1, uint8_t sprNum2);
 

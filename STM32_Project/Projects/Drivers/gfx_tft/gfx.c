@@ -73,14 +73,14 @@ POSSIBILITY OF SUCH DAMAGE.
 
 //-------------------------------------------------------------------------------------------//
 
-static uint8_t textsize = 1;
+static uint32_t textsize = 1;
 //static uint8_t rotation = 0;
 
 static uint16_t textcolor   = COLOR_WHITE;
 static uint16_t textbgcolor = COLOR_WHITE;
 
-static int16_t cursor_x = 0;
-static int16_t cursor_y = 0;
+static uint32_t cursor_x = 0;
+static uint32_t cursor_y = 0;
 
 static bool wrap = true;   // If set, 'wrap' text at right edge of display
 static bool _cp437 = false; // If set, use correct CP437 charset (default is off)
@@ -94,7 +94,7 @@ uint8_t currentFontNum =1;
 
 //-------------------------------------------------------------------------------------------//
 
-void drawCircle(int16_t x0, int16_t y0, int16_t r, uint16_t color)
+__attribute__((optimize("O2"))) void drawCircle(uint32_t x0, uint32_t y0, uint32_t r, uint32_t color)
 {
   if(r == 0)
     return;
@@ -120,7 +120,7 @@ void drawCircle(int16_t x0, int16_t y0, int16_t r, uint16_t color)
   } while (x <= 0);
 }
 
-void fillCircle(int16_t x0, int16_t y0, int16_t r, uint16_t color)
+__attribute__((optimize("O2"))) void fillCircle(uint32_t x0, uint32_t y0, uint32_t r, uint32_t color)
 {
   if(r == 0)
     return;
@@ -155,7 +155,7 @@ void fillCircle(int16_t x0, int16_t y0, int16_t r, uint16_t color)
   }
 }
 
-void drawCircleHelper( int16_t x0, int16_t y0, int16_t r, uint8_t cornername, uint16_t color)
+__attribute__((optimize("O2"))) void drawCircleHelper(int16_t x0, int16_t y0, int16_t r, uint8_t cornername, uint16_t color)
 {
   int16_t f     = 1 - r;
   int16_t ddF_x = 1;
@@ -192,7 +192,7 @@ void drawCircleHelper( int16_t x0, int16_t y0, int16_t r, uint8_t cornername, ui
 }
 
 // Used to do circles and roundrects
-void fillCircleHelper(int16_t x0, int16_t y0, int16_t r, uint8_t cornername, int16_t delta, uint16_t color)
+__attribute__((optimize("O2"))) void fillCircleHelper(int16_t x0, int16_t y0, int16_t r, uint8_t cornername, int16_t delta, uint16_t color)
 {
   if (r == 0)
     return;
@@ -229,7 +229,7 @@ void fillCircleHelper(int16_t x0, int16_t y0, int16_t r, uint8_t cornername, int
 }
 
 // Bresenham's algorithm
-void drawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint16_t color)
+__attribute__((optimize("O2"))) void drawLine(int32_t x0, int32_t y0, int32_t x1, int32_t y1, uint32_t color)
 {
   if (y0 == y1) {
     if (x1 > x0) {
@@ -261,21 +261,15 @@ void drawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint16_t color)
     swap(y0, y1);
   }
   
-  int16_t dx = x1 - x0;
-  int16_t dy = abs(y1 - y0);
+  int32_t dx = x1 - x0;
+  int32_t dy = abs(y1 - y0);
   
-  int16_t err = dx / 2;
-  int16_t ystep;
+  int32_t err = dx / 2;
+  int32_t ystep = (y0 < y1) ? 1 : -1;
   
-  int16_t xbegin = x0;
-  int16_t len;
-  
-  if (y0 < y1) {
-    ystep = 1;
-  } else {
-    ystep = -1;
-  }
-  
+  int32_t xbegin = x0;
+  int32_t len;
+
   if (steep) {
     for (; x0<=x1; x0++) {
       err -= dy;
@@ -317,7 +311,7 @@ void drawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint16_t color)
 }
 
 // Draw a rectangle
-void drawRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color)
+__attribute__((optimize("O2"))) void drawRect(uint32_t x, uint32_t y, uint32_t w, uint32_t h, uint32_t color)
 {  
   drawFastHLine(x, y, w, color);
   drawFastVLine(x, y, h, color);
@@ -325,19 +319,19 @@ void drawRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color)
   drawFastVLine(x+w-1, y, h, color);
 }
 
-void fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color)
+__attribute__((optimize("O2"))) void fillRect(uint32_t x, uint32_t y, uint32_t w, uint32_t h, uint32_t color)
 {
   // rudimentary clipping (drawChar w/big text requires this)
-  if((x >= _width) || (y >= _height)) return;
-  if((x + w - 1) >= _width)  w = _width  - x;
-  if((y + h - 1) >= _height) h = _height - y;
+  if((x >= _ulWidth) || (y >= _ulHeight)) return;
+  if((x + w - 1) >= _ulWidth)  w = _ulWidth  - x;
+  if((y + h - 1) >= _ulHeight) h = _ulHeight - y;
   
   setAddrWindow(x, y, x+w-1, y+h-1);
   REPEAT_DATA16(color, w*h);
 }
 
 // Draw a rounded rectangle
-void drawRoundRect(int16_t x, int16_t y, int16_t w, int16_t h, int16_t r, uint16_t color)
+__attribute__((optimize("O2"))) void drawRoundRect(int16_t x, int16_t y, int16_t w, int16_t h, int16_t r, uint16_t color)
 {
   if(r > 1) {
     // smarter version
@@ -356,7 +350,7 @@ void drawRoundRect(int16_t x, int16_t y, int16_t w, int16_t h, int16_t r, uint16
 }
 
 // Fill a rounded rectangle
-void fillRoundRect(int16_t x, int16_t y, int16_t w, int16_t h, int16_t r, uint16_t color)
+__attribute__((optimize("O2"))) void fillRoundRect(int16_t x, int16_t y, int16_t w, int16_t h, int16_t r, uint16_t color)
 {
   if(r > 1) { // if radius > 0
     // smarter version
@@ -371,7 +365,7 @@ void fillRoundRect(int16_t x, int16_t y, int16_t w, int16_t h, int16_t r, uint16
 }
 
 // Draw a triangle
-void drawTriangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t color)
+__attribute__((optimize("O2"))) void drawTriangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t color)
 {
   drawLine(x0, y0, x1, y1, color);
   drawLine(x1, y1, x2, y2, color);
@@ -379,9 +373,9 @@ void drawTriangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2, in
 }
 
 // Fill a triangle
-void fillTriangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t color) {
+__attribute__((optimize("O2"))) void fillTriangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t color) {
 
-  int16_t a, b, y, last;
+  int32_t a, b, y, last;
 
   // Sort coordinates by Y order (y2 >= y1 >= y0)
   if (y0 > y1) {
@@ -404,7 +398,7 @@ void fillTriangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2, in
     return;
   }
 
-  int16_t
+  int32_t
     dx01 = x1 - x0,
     dy01 = y1 - y0,
     dx02 = x2 - x0,
@@ -517,14 +511,14 @@ void setCurrentFont(uint8_t num)
 
 void print(const char *str)
 {
-  uint16_t size = strlen(str);
+  uint32_t size = strlen(str);
   
   while (size--) {
     printChar(*(const uint8_t *)str++);
   }
 }
 
-void printStr(void *str, uint16_t size)
+void printStr(void *str, uint32_t size)
 {  
   const uint8_t *pArr = (const uint8_t *)str;
   
@@ -533,14 +527,14 @@ void printStr(void *str, uint16_t size)
   }
 }
 
-void printCharAt(int16_t x, int16_t y, uint8_t c)
+void printCharAt(uint32_t x, uint32_t y, uint32_t c)
 {
   cursor_x = x;
   cursor_y = y;
   printChar(c);
 }
 
-void printChar(uint8_t c)
+__attribute__((optimize("O2"))) void printChar(uint32_t c)
 {
   if (c == '\n') {
     cursor_y += textsize*8;
@@ -550,11 +544,11 @@ void printChar(uint8_t c)
   } else {
     drawChar(cursor_x, cursor_y, textcolor, textbgcolor, c, textsize);
     cursor_x += textsize*6;
-    if (wrap && (cursor_y > (_height - textsize*8))) {
+    if (wrap && (cursor_y > (_ulHeight - textsize*8))) {
       cursor_y = 0;
       cursor_x += textsize*5;
     }
-    if (wrap && (cursor_x > (_width - textsize*6))) {
+    if (wrap && (cursor_x > (_ulWidth - textsize*6))) {
       cursor_y += textsize*8;
       cursor_x = 0;
     }
@@ -562,11 +556,11 @@ void printChar(uint8_t c)
 }
 
 // Draw a character
-void drawChar(int16_t x, int16_t y, uint16_t fgcolor, uint16_t bgcolor, uint8_t c, uint8_t size)
+__attribute__((optimize("O2"))) void drawChar(int16_t x, int16_t y, uint16_t fgcolor, uint16_t bgcolor, uint8_t c, uint8_t size)
 {
   // Rudimentary clipping
-  if((x >= _width)            || // Clip right
-     (y >= _height)           || // Clip bottom
+  if((x >= _ulWidth)            || // Clip right
+     (y >= _ulHeight)           || // Clip bottom
        ((x + 6 * size - 1) < 0) || // Clip left  TODO: this is not correct
          ((y + 8 * size - 1) < 0))   // Clip top   TODO: this is not correct
     return;
@@ -578,7 +572,7 @@ void drawChar(int16_t x, int16_t y, uint16_t fgcolor, uint16_t bgcolor, uint8_t 
   
   if (fgcolor == bgcolor) {
     uint8_t mask = 0x01;
-    int16_t xoff, yoff;
+    int32_t xoff, yoff;
     
     // This transparent approach is only about 20% faster
     // Don't need to clip here since the called rendering primitives all clip
@@ -698,26 +692,26 @@ void drawChar(int16_t x, int16_t y, uint16_t fgcolor, uint16_t bgcolor, uint8_t 
 
 uint16_t columns()
 {
-  return (width() / (textsize*6));
+  return (_ulWidth / (textsize*6));
 }
 
 uint16_t rows()
 {
-  return (height() / (textsize*8));
+  return (_ulHeight / (textsize*8));
 }
 
-void setCursor(int16_t x, int16_t y)
+void setCursor(uint32_t x, uint32_t y)
 {
   cursor_x = x;
   cursor_y = y;
 }
 
-int16_t getCursorX(void)
+uint32_t getCursorX(void)
 {
   return cursor_x;
 }
 
-int16_t getCursorY(void)
+uint32_t getCursorY(void)
 {
   return cursor_y;
 }
@@ -759,14 +753,14 @@ void cp437(bool x)
 }
 
 // Return the size of the display (per current rotation)
-int16_t width(void)
+uint32_t ulWidth(void)
 {
-  return _width;
+  return _ulWidth;
 }
 
-int16_t height(void)
+uint32_t ulHeight(void)
 {
-  return _height;
+  return _ulHeight;
 }
 
 /***************************************************************************/
@@ -776,9 +770,9 @@ void pushColor(uint16_t color)
   SEND_DATA16(color);
 }
 
-void drawPixel(int16_t x, int16_t y, uint16_t color)
+void drawPixel(uint32_t x, uint32_t y, uint32_t color)
 {
-  if((x < 0) || (x >= _width) || (y < 0) || (y >= _height)) return;
+  if((x < 0) || (x >= _ulWidth) || (y < 0) || (y >= _ulHeight)) return;
   
   setAddrPixel(x, y);
   SEND_DATA16(color);
@@ -801,29 +795,29 @@ uint16_t readPixel(int16_t x, int16_t y)
 }
 */
 
-void drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color)
+__attribute__((optimize("O2"))) void drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color)
 {
   // Rudimentary clipping
-  if((x >= _width) || (y >= _height)) return;
-  if((y+h) >= _height) h = _height-y;
+  if((x >= _ulWidth) || (y >= _ulHeight)) return;
+  if((y+h) >= _ulHeight) h = _ulHeight-y;
   
   setVAddrWindow(x, y, y+h);
   REPEAT_DATA16(color, h);
 }
 
-void drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color)
+__attribute__((optimize("O2"))) void drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color)
 {
   // Rudimentary clipping
-  if((x >= _width) || (y >= _height)) return;
-  if((x+w) >= _width)  w = _width-x;
+  if((x >= _ulWidth) || (y >= _ulHeight)) return;
+  if((x+w) >= _ulWidth)  w = _ulWidth-x;
   
   setHAddrWindow(x, y, x+w);
   REPEAT_DATA16(color, w);
 }
 
-void fillScreen(uint16_t color)
+__attribute__((optimize("O2"))) void fillScreen(uint32_t color)
 {
-  setAddrWindow(0, 0, _width-1, _height-1);
+  setAddrWindow(0, 0, _ulWidth-1, _ulHeight-1);
   REPEAT_DATA16(color, ILI9341_TFTWIDTH * ILI9341_TFTHEIGHT);
 }
 

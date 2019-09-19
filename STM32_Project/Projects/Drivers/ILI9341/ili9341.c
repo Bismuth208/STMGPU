@@ -22,8 +22,8 @@
 
 //-------------------------------------------------------------------------------------------//
 
-int16_t _width = ILI9341_TFTWIDTH;
-int16_t _height = ILI9341_TFTHEIGHT;
+uint32_t _ulWidth = ILI9341_TFTWIDTH;
+uint32_t _ulHeight = ILI9341_TFTHEIGHT;
 
 uint16_t curBrightnessValue = 0xff; // max value
 #if USE_USER_FUNCTION
@@ -145,7 +145,7 @@ void initLCD(void)
 {
 #if USE_FSMC
   init_FSMC();
-
+  init_DMA_FSMC(); //TODO: make it work!!!
 #else
   init_SPI1();
   init_DMA1_SPI1();
@@ -162,12 +162,10 @@ void initLCD(void)
 
   init_LCDBacklight();
   execCommands(initSequence);
-
-  init_DMA_FSMC(); //TODO: make it work!!!
 }
 
 // blow your mind
-void setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1)
+void setAddrWindow(uint32_t x0, uint32_t y0, uint32_t x1, uint32_t y1)
 {
   WAIT_DMA_BSY;              // wait untill DMA transfer end
 
@@ -187,7 +185,7 @@ void setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1)
 }
 
 // square window
-void setSqAddrWindow(uint16_t x0, uint16_t y0, uint16_t size)
+void setSqAddrWindow(uint32_t x0, uint32_t y0, uint32_t size)
 {
   WAIT_DMA_BSY;              // wait until DMA transfer end
 
@@ -206,7 +204,7 @@ void setSqAddrWindow(uint16_t x0, uint16_t y0, uint16_t size)
   SET_DATA();                // ready accept data
 }
 
-void setVAddrWindow(uint16_t x0, uint16_t y0, uint16_t y1)
+void setVAddrWindow(uint32_t x0, uint32_t y0, uint32_t y1)
 {
   WAIT_DMA_BSY;              // wait until DMA transfer end
 
@@ -225,7 +223,7 @@ void setVAddrWindow(uint16_t x0, uint16_t y0, uint16_t y1)
   SET_DATA();                // ready accept data
 }
 
-void setHAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1)
+void setHAddrWindow(uint32_t x0, uint32_t y0, uint32_t x1)
 {
   WAIT_DMA_BSY;              // wait until DMA transfer end
 
@@ -244,7 +242,7 @@ void setHAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1)
   SET_DATA();                // ready accept data
 }
 
-void setAddrPixel(uint16_t x0, uint16_t y0)
+void setAddrPixel(uint32_t x0, uint32_t y0)
 {
   WAIT_DMA_BSY;              // wait until DMA transfer end
 
@@ -263,35 +261,35 @@ void setAddrPixel(uint16_t x0, uint16_t y0)
   SET_DATA();                // ready accept data
 }
 
-void setRotation(uint8_t m)
+__attribute__((optimize("O2"))) void setRotation(uint32_t m)
 {
-  uint8_t rotation = m % 4; // can't be higher than 3
-  uint8_t madctlParam = 0;
+  uint32_t rotation = m % 4; // can't be higher than 3
+  uint32_t madctlParam = 0;
 
   switch (rotation)
   {
     case 0: {
       madctlParam = (MADCTL_MX | MADCTL_BGR);
-      _width = ILI9341_TFTWIDTH;
-      _height = ILI9341_TFTHEIGHT;
+      _ulWidth = ILI9341_TFTWIDTH;
+      _ulHeight = ILI9341_TFTHEIGHT;
     }
     break;
     case 1: {
       madctlParam = (MADCTL_MV | MADCTL_BGR);
-      _width = ILI9341_TFTHEIGHT;
-      _height = ILI9341_TFTWIDTH;
+      _ulWidth = ILI9341_TFTHEIGHT;
+      _ulHeight = ILI9341_TFTWIDTH;
     }
     break;
     case 2: {
       madctlParam = (MADCTL_MY | MADCTL_BGR);
-      _width = ILI9341_TFTWIDTH;
-      _height = ILI9341_TFTHEIGHT;
+      _ulWidth = ILI9341_TFTWIDTH;
+      _ulHeight = ILI9341_TFTHEIGHT;
     }
     break;
     case 3: {
       madctlParam = (MADCTL_MX | MADCTL_MY | MADCTL_MV | MADCTL_BGR);
-      _width = ILI9341_TFTHEIGHT;
-      _height = ILI9341_TFTWIDTH;
+      _ulWidth = ILI9341_TFTHEIGHT;
+      _ulHeight = ILI9341_TFTWIDTH;
     }
     break;
   }
@@ -319,7 +317,7 @@ void setScrollArea(uint16_t TFA, uint16_t BFA)
 uint16_t scrollScreen(uint16_t lines, uint16_t yStart)
 {
   for (uint16_t i = 0; i < lines; i++) {
-    if ((++yStart) == (_height - TFT_BOT_FIXED_AREA))
+    if ((++yStart) == (_ulHeight - TFT_BOT_FIXED_AREA))
       yStart = TFT_TOP_FIXED_AREA;
     scrollAddress(yStart);
   }
@@ -330,7 +328,7 @@ uint16_t scrollScreen(uint16_t lines, uint16_t yStart)
 uint16_t scrollScreenSmooth(uint16_t lines, uint16_t yStart, uint8_t wait)
 {
   for (uint16_t i = 0; i < lines; i++) {
-    if ((++yStart) == (_height - TFT_BOT_FIXED_AREA))
+    if ((++yStart) == (_ulHeight - TFT_BOT_FIXED_AREA))
       yStart = TFT_TOP_FIXED_AREA;
     scrollAddress(yStart);
     _delayMS(wait);

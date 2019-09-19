@@ -67,6 +67,24 @@ Rotation                : 334
 Done!
 ```
 
+#####*sGPU Mini:*
+Benchmark               Time (milliseconds)
+FillScreen              : 138
+Text                    : 90
+Lines                   : 733
+Horiz/Vert Lines        : 176
+Rectangles (outline)    : 78
+Rectangles (filled)     : 400
+Circles (filled)        : 302
+Circles (outline)       : 346
+Triangles (outline)     : 66
+Triangles (filled)      : 205
+Rounded rects (outline) : 93
+Rounded rects (filled)  : 431
+Rotation                : 403
+Done!
+
+
 ***
 ###Results over Bluetooth
 ####*sGPU Pro:*

@@ -33,21 +33,21 @@
 //-------------------------------------------------------------------------------------------//
 
 void pushColor(uint16_t color);
-void drawPixel(int16_t x, int16_t y, uint16_t color);
-void fillScreen(uint16_t color);
+void drawPixel(uint32_t x, uint32_t y, uint32_t color);
+void fillScreen(uint32_t color);
 
-void fillRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
-void drawRect(int16_t x, int16_t y, int16_t w, int16_t h, uint16_t color);
+void fillRect(uint32_t x, uint32_t y, uint32_t w, uint32_t h, uint32_t color);
+void drawRect(uint32_t x, uint32_t y, uint32_t w, uint32_t h, uint32_t color);
 
 void drawRoundRect(int16_t x0, int16_t y0, int16_t w, int16_t h, int16_t radius, uint16_t color);
 void fillRoundRect(int16_t x0, int16_t y0, int16_t w, int16_t h, int16_t radius, uint16_t color);
-void drawLine(int16_t x0, int16_t y0, int16_t x1, int16_t y1, uint16_t color);
+void drawLine(int32_t x0, int32_t y0, int32_t x1, int32_t y1, uint32_t color);
 void drawFastVLine(int16_t x, int16_t y, int16_t h, uint16_t color);
 void drawFastHLine(int16_t x, int16_t y, int16_t w, uint16_t color);
 
-void drawCircle(int16_t x0, int16_t y0, int16_t r, uint16_t color);
+void drawCircle(uint32_t x0, uint32_t y0, uint32_t r, uint32_t color);
 void drawCircleHelper(int16_t x0, int16_t y0, int16_t r, uint8_t cornername, uint16_t color);
-void fillCircle(int16_t x0, int16_t y0, int16_t r, uint16_t color);
+void fillCircle(uint32_t x0, uint32_t y0, uint32_t r, uint32_t color);
 void fillCircleHelper(int16_t x0, int16_t y0, int16_t r, uint8_t cornername, int16_t delta, uint16_t color);
 void drawTriangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t color);
 void fillTriangle(int16_t x0, int16_t y0, int16_t x1, int16_t y1, int16_t x2, int16_t y2, uint16_t color);
@@ -59,8 +59,8 @@ void drawXBitmap(int16_t x, int16_t y, const uint8_t *bitmap, int16_t w, int16_t
 uint16_t convRGBto565(uint8_t r, uint8_t g, uint8_t b);
 uint16_t conv8to16(uint8_t x);
   
-int16_t height(void);
-int16_t width(void);
+uint32_t ulHeight(void);
+uint32_t ulWidth(void);
     
 uint16_t columns(void);
 uint16_t rows(void);
@@ -68,12 +68,12 @@ uint16_t rows(void);
 //uint8_t getRotation(void);
 
 // get current cursor position (get rotation safe maximum values, using: width() for x, height() for y)
-int16_t getCursorX(void);
-int16_t getCursorY(void);
+uint32_t getCursorX(void);
+uint32_t getCursorY(void);
   
 //void setTextFont(unsigned char* f);
 void drawChar(int16_t x, int16_t y, uint16_t color, uint16_t bg, uint8_t c, uint8_t size);
-void setCursor(int16_t x, int16_t y);
+void setCursor(uint32_t x, uint32_t y);
 void setTextColor(uint16_t c);
 void setTextColorBG(uint16_t c, uint16_t b);
 void setTextSize(uint8_t s);
@@ -83,8 +83,8 @@ void cp437(bool x);
 void setCurrentFont(uint8_t num);
 
 void print(const char *str);
-void printStr(void *str, uint16_t size);
-void printChar(uint8_t c);
-void printCharAt(int16_t x, int16_t y, uint8_t c);
+void printStr(void *str, uint32_t size);
+void printChar(uint32_t c);
+void printCharAt(uint32_t x, uint32_t y, uint32_t c);
 
 #endif /* _GFX_H */

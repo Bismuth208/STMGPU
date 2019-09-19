@@ -83,11 +83,11 @@ void vCallbackFrom_USART1_IRQ(void)
 
 __attribute__((noreturn)) void run_GPU(void)
 {
-  uint16_t avaliableData = 0;
+  uint32_t ulAvaliableData = 0;
 //  cmdBuffer_t *pCMD = 0;
 
   for (;;) {
-    avaliableData = GPU_INTERFACE_GET_AVALIABLE_DATA();
+    ulAvaliableData = GPU_INTERFACE_GET_AVALIABLE_DATA();
 
 #ifdef USART1_USE_PROTOCOL_V1
     if(avaliableData == 0) {
@@ -106,15 +106,15 @@ __attribute__((noreturn)) void run_GPU(void)
     {
       // this rules protect GPIO from toggling every time or send message
       // and try to hold buffer always filled by some data
-      if ((avaliableData > CALC_MAX_FILL_SIZE) && (!bsyGPUBufferFlag)) { // buffer is allmost full, and no bsy flag
+      if ((ulAvaliableData > CALC_MAX_FILL_SIZE) && (!bsyGPUBufferFlag)) { // buffer is allmost full, and no bsy flag
         setBusyStatus(1);
-      } else if ((avaliableData < CALC_MIN_FILL_SIZE) && (bsyGPUBufferFlag)) { // buffer is allmost empty, and bsy flag
+      } else if ((ulAvaliableData < CALC_MIN_FILL_SIZE) && (bsyGPUBufferFlag)) { // buffer is allmost empty, and bsy flag
         setBusyStatus(0);
       }
     }
 #endif
 
-    if (avaliableData) {
+    if (ulAvaliableData) {
 #ifdef USART1_USE_PROTOCOL_V1
       switch(readData8_UART1()) // read command
 #endif
@@ -215,8 +215,8 @@ __attribute__((noreturn)) void run_GPU(void)
         break;
 
         case GET_RESOLUTION: { // maybe only one command what send something to CPU
-          cmdBuffer.par1 = height();
-          cmdBuffer.par2 = width();
+          cmdBuffer.par1 = (uint16_t) _ulHeight;
+          cmdBuffer.par2 = (uint16_t) _ulWidth;
           GPU_INTERFACE_SEND_ARR_DATA_8(cmdBuffer.data, 4); // return screen size to CPU
         }
         break;
@@ -230,8 +230,8 @@ __attribute__((noreturn)) void run_GPU(void)
         break;
 
         case DRW_PRNT: {
-          uint16_t strSize = GPU_INTERFACE_GET_DATA_8();
-          printStr(cmdBufferStr, strSize);
+          uint32_t ulStrSize = GPU_INTERFACE_GET_DATA_8();
+          printStr(cmdBufferStr, ulStrSize);
           memset(cmdBufferStr, 0x00, MAX_TEXT_SIZE);
         }
         break;
@@ -406,7 +406,8 @@ __attribute__((noreturn)) void run_GPU(void)
 
         case DRW_TLE_8: {
           GPU_INTERFACE_GET_P_BUFFER_DATA(5);
-          drawTile8x8(cmdBuffer.data);
+          Tile_t xTile = { .ulPosX = cmdBuffer.par1, .ulPosY = cmdBuffer.par2, .ulIndex = cmdBuffer.par3 };
+          drawTile8x8(&xTile);
 
 //        pcmdBuffer = GPU_INTERFACE_GET_P_BUFFER_DATA(&cmdBuffer->data, 5);
 //        drawTile8x8(pcmdBuffer->data);
@@ -444,7 +445,8 @@ __attribute__((noreturn)) void run_GPU(void)
 
         case DRW_TLE_16: {
           GPU_INTERFACE_GET_P_BUFFER_DATA(5);
-          drawTile16x16(cmdBuffer.data);
+          Tile_t xTile = { .ulPosX = cmdBuffer.par1, .ulPosY = cmdBuffer.par2, .ulIndex = cmdBuffer.par3 };
+          drawTile16x16(&xTile);
         }
         break;
 
@@ -479,7 +481,8 @@ __attribute__((noreturn)) void run_GPU(void)
 
         case DRW_TLE_32: {
           GPU_INTERFACE_GET_P_BUFFER_DATA(5);
-          drawTile32x32(cmdBuffer.data);
+          Tile_t xTile = { .ulPosX = cmdBuffer.par1, .ulPosY = cmdBuffer.par2, .ulIndex = cmdBuffer.par3 };
+          drawTile32x32(&xTile);
         }
         break;
 #endif /* STM32F10X_HD */

@@ -39,6 +39,13 @@
 #define TILE_8x8_WINDOW_SIZE       7
 #define TILE_16x16_WINDOW_SIZE    15
 #define TILE_32x32_WINDOW_SIZE    31
+
+typedef struct {
+  uint32_t ulPosX;
+  uint32_t ulPosY;
+  uint32_t ulIndex;
+} Tile_t;
+
 // -------------------------------------------------------- //
 
 
@@ -60,9 +67,9 @@ uint8_t *getArrTilePointer32x32(uint8_t tileNum);
 uint8_t *getMapArrPointer(void);
 
 // draw tiles located in RAM
-void drawTile8x8(void *tileData);
-void drawTile16x16(void *tileData);
-void drawTile32x32(void *tileData);
+void drawTile8x8(Tile_t *pxTile);
+void drawTile16x16(Tile_t *pxTile);
+void drawTile32x32(Tile_t *pxTile);
 
 void drawBackgroundMap(void);
 

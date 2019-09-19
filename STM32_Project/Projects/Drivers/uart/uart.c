@@ -20,14 +20,14 @@
 #endif
 
 #ifdef USART1_USE_PROTOCOL_V0
-#define RX_AVALIABLE   (((uint16_t)(SERIAL_BUFFER_SIZE + rx_buffer.head - rx_buffer.tail)) % SERIAL_BUFFER_SIZE)
+#define RX_AVALIABLE   (((uint32_t)(SERIAL_BUFFER_SIZE + rx_buffer.head - rx_buffer.tail)) & SERIAL_BUFFER_SIZE_MASK)
 #endif
 
 #define MIN_CUT_DATA_SIZE   3
 
 // ------------------------------------------------------------ //
 
-ring_buffer_t rx_buffer = { 0, 0 };
+volatile ring_buffer_t rx_buffer = { 0, 0 };
 uint8_t rxBuffer[SERIAL_BUFFER_SIZE] = { 0 };
 
 uint8_t *pDestBuf = 0;
@@ -40,7 +40,7 @@ uint8_t ucSearchSyncSeq(void)
   uint8_t ucRes = 0;
 
   do {
-    for (uint16_t i =0; i < SERIAL_BUFFER_SIZE-1; i++) {
+    for (uint32_t i =0; i < SERIAL_BUFFER_SIZE-1; i++) {
       if ( (rxBuffer[i] == 0x42) && (rxBuffer[i+1] == 0xDD) ) {
         ucRes = 1;
         break;
@@ -59,7 +59,7 @@ void setBufferPointer_UART1(void *pBuf)
   pDestBuf = (uint8_t*) pBuf;
 }
 
-uint16_t dataAvailable_UART1(void)
+uint32_t dataAvailable_UART1(void)
 {
 #ifdef USART1_USE_PROTOCOL_V1
   MOVE_DMA_HEAD();
@@ -72,12 +72,15 @@ uint16_t dataAvailable_UART1(void)
 
 }
 
-uint8_t readData8_UART1(void)
+__attribute__((optimize("O2"))) uint8_t readData8_UART1(void)
 {
-  return rxBuffer[rx_buffer.tail++]; // no calculation need, just overflow
+  uint8_t ucTmp = rxBuffer[rx_buffer.tail];
+  rx_buffer.tail = (rx_buffer.tail + 1) & SERIAL_BUFFER_SIZE_MASK;
+
+  return ucTmp;
 }
 
-void cutData(uint8_t *pDest, uint16_t size)
+__attribute__((optimize("O2"))) void cutData(uint8_t *pDest, uint32_t size)
 {
    do {
     do {
@@ -85,7 +88,9 @@ void cutData(uint8_t *pDest, uint16_t size)
       MOVE_DMA_HEAD();
 #endif
     } while (rx_buffer.tail == rx_buffer.head); // wait for something in buf
-    *pDest++ = rxBuffer[rx_buffer.tail++];
+
+    *pDest++ = rxBuffer[rx_buffer.tail];
+    rx_buffer.tail = (rx_buffer.tail + 1) & SERIAL_BUFFER_SIZE_MASK;
   } while (--size);
 }
 
@@ -99,57 +104,69 @@ uint8_t waitCutByte_UART1(void)
 #ifdef USART1_USE_PROTOCOL_V0
   while (!RX_AVALIABLE)
     ; // wait for something in buf
-  return rxBuffer[rx_buffer.tail++];
+
+  uint8_t ucTmp = rxBuffer[rx_buffer.tail];
+  rx_buffer.tail = (rx_buffer.tail + 1) & SERIAL_BUFFER_SIZE_MASK;
+
+  return ucTmp;
 #endif
 }
 
-uint16_t waitCutWord_UART1(void)
+uint32_t waitCutWord_UART1(void)
 {
-  uint16_t wordData = 0;
+  uint32_t wordData = 0;
   cutData((uint8_t*) &wordData, 2);
   return wordData;
 }
 
 // this one use preinited pointer to end data buffer
-void waitCutpBuf_UART1(uint16_t size)
+__attribute__((optimize("O2"))) void waitCutpBuf_UART1(uint32_t size)
 {
 #ifdef USART1_USE_PROTOCOL_V1
   MOVE_DMA_HEAD();
 #endif
 
-  if ((RX_AVALIABLE >= size) && (size >= MIN_CUT_DATA_SIZE)) {
-    if (rx_buffer.tail < ((SERIAL_BUFFER_SIZE - 1) - size)) {
-      memcpy32(pDestBuf, &rxBuffer[rx_buffer.tail], size);
-      rx_buffer.tail += size;
+#if 1
+  if (size >= MIN_CUT_DATA_SIZE) {
+    if (RX_AVALIABLE >= size) {
+      if (rx_buffer.tail < ((SERIAL_BUFFER_SIZE - 1) - size)) {
+        memcpy32(pDestBuf, &rxBuffer[rx_buffer.tail], size);
+        rx_buffer.tail = (rx_buffer.tail + size) & SERIAL_BUFFER_SIZE_MASK;
 
-      return;
+        return;
+      }
     }
   }
+#endif
 
   cutData(pDestBuf, size);
 }
 
-void waitCutBuf_UART1(void *dest, uint16_t size)
+__attribute__((optimize("O2"))) void waitCutBuf_UART1(void *dest, uint32_t size)
 {
 #ifdef USART1_USE_PROTOCOL_V1
   MOVE_DMA_HEAD();
 #endif
 
-  if ((RX_AVALIABLE >= size) && (size >= MIN_CUT_DATA_SIZE)) {
-    if (rx_buffer.tail < ((SERIAL_BUFFER_SIZE - 1) - size)) {
-      memcpy32(dest, &rxBuffer[rx_buffer.tail], size);
-      rx_buffer.tail += size;
+#if 1
+  if (size >= MIN_CUT_DATA_SIZE) {
+    if (RX_AVALIABLE >= size) {
+      if (rx_buffer.tail < ((SERIAL_BUFFER_SIZE - 1) - size)) {
+        memcpy32(dest, &rxBuffer[rx_buffer.tail], size);
+        rx_buffer.tail = (rx_buffer.tail + size) & SERIAL_BUFFER_SIZE_MASK;
 
-      return;
+        return;
+      }
     }
   }
+#endif
 
   cutData(dest, size);
 }
 
 #if 0 // not yet tested
 // in theory returning pointer is faster than memcpy32
-void *waitCutPtrBuf_UART1(uint16_t size)
+void *waitCutPtrBuf_UART1(uint32_t size)
 {
   void *dest = &pDestBuf;
   if((RX_AVALIABLE >= size) && (size >= MIN_CUT_DATA_SIZE)) {
@@ -315,10 +332,11 @@ void init_UART1(uint32_t baud)
 }
 
 #ifdef USART1_USE_PROTOCOL_V0
-void USART1_IRQHandler(void) // get data as fast as possible!
+__attribute__((optimize("O2"))) void USART1_IRQHandler(void) // get data as fast as possible!
 {
   //if(USART1->SR & USART_SR_RXNE ) {
-  rxBuffer[rx_buffer.head++] = USART1->DR;
+  rxBuffer[rx_buffer.head] = USART1->DR;
+  rx_buffer.head = (rx_buffer.head + 1) & SERIAL_BUFFER_SIZE_MASK;
 //  }
 }
 #endif

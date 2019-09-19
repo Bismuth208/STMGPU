@@ -4,6 +4,12 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#ifdef STM32F40XX
+#include <stm32f4xx.h>
+#else
+#include <stm32f10x.h>
+#endif /* STM32F40XX */
+
 #define ILI9341_TFTWIDTH  240
 #define ILI9341_TFTHEIGHT 320
 
@@ -234,7 +240,7 @@
  */
 
 //-------------------------------------------------------------------------------------------//
-extern int16_t _width, _height;
+extern uint32_t _ulWidth, _ulHeight;
 
 #if 0 //USE_FSMC
 
@@ -308,12 +314,13 @@ void writeData(uint8_t d);
 void writeWordData(uint16_t c);
 
 void initLCD(void);
-void setAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1, uint16_t y1);
-void setSqAddrWindow(uint16_t x0, uint16_t y0, uint16_t size);
-void setVAddrWindow(uint16_t x0, uint16_t y0, uint16_t y1);
-void setHAddrWindow(uint16_t x0, uint16_t y0, uint16_t x1);
-void setAddrPixel(uint16_t x0, uint16_t y0);
-void setRotation(uint8_t m);
+void setAddrWindow(uint32_t x0, uint32_t y0, uint32_t x1, uint32_t y1);
+void setSqAddrWindow(uint32_t x0, uint32_t y0, uint32_t size);
+void setVAddrWindow(uint32_t x0, uint32_t y0, uint32_t y1);
+void setHAddrWindow(uint32_t x0, uint32_t y0, uint32_t x1);
+void setAddrPixel(uint32_t x0, uint32_t y0);
+
+void setRotation(uint32_t m);
 void setScrollArea(uint16_t TFA, uint16_t BFA);
 void scrollAddress(uint16_t VSP);
 uint16_t scrollScreen(uint16_t lines, uint16_t yStart);
