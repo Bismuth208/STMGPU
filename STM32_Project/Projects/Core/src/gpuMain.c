@@ -81,7 +81,7 @@ void vCallbackFrom_USART1_IRQ(void)
 }
 #endif
 
-__attribute__((noreturn)) void run_GPU(void)
+__attribute__((noreturn, optimize("O2"))) void run_GPU(void)
 {
   uint32_t ulAvaliableData = 0;
 //  cmdBuffer_t *pCMD = 0;
@@ -451,7 +451,7 @@ __attribute__((noreturn)) void run_GPU(void)
         break;
 
           // ---- tile 32x32 ---- //
-#if defined(STM32F10X_HD) || defined(STM32F40XX)
+#ifdef STM32F40XX // if STM32F401CCU6 64k RAM
         case LDD_TLE_32: {
           // get size of file name, tileset width, ram tile number, tile number in tileset
           GPU_INTERFACE_GET_P_BUFFER_DATA(4);
@@ -485,7 +485,7 @@ __attribute__((noreturn)) void run_GPU(void)
           drawTile32x32(&xTile);
         }
         break;
-#endif /* STM32F10X_HD */
+#endif /* STM32F401CCU6 */
 
         case LDD_TLE_MAP: {
           // get file name and it`s size

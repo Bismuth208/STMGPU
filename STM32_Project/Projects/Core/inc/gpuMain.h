@@ -30,25 +30,6 @@
 
 // Buffer bsy indication, CPU MUST check this pin EVERYTIME before send any command!
 // othervice, undefined behavor, can happen evething (buffer overflow, wrong commands)
-#define GPU_BSY_PIN             GPIO_Pin_11
-#define GPU_BSY_PORT            GPIOA
-
-#define GPU_DEBUG_PORT          GPIOA
-#define GPU_DEBUG_PIN           GPIO_Pin_12
-
-#ifdef STM32F10X_MD  // maple mini board
- #define GPU_BSY_LED_PIN         GPIO_Pin_13
- #define GPU_BSY_LED_PORT        GPIOC
-#endif
-#ifdef STM32F10X_HD  // mini stm32 board
- #define GPU_BSY_LED_PIN         GPIO_Pin_5
- #define GPU_BSY_LED_PORT        GPIOE
-#endif
-#ifdef STM32F40XX
- #define GPU_BSY_LED_PIN         GPIO_Pin_7
- #define GPU_BSY_LED_PORT        GPIOA
-#endif
-
 //#define USE_BSY_PROTECTION      1
 
 // sGPU communication interface definitions (if you need another one)

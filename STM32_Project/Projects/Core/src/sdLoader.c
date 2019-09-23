@@ -103,7 +103,7 @@ pfGetFunc_t getFuncArrTilePointer(uint16_t tleBaseSize)
     pTmpFunc = getArrTilePointer16x16;
   } break;
   
-#if defined(STM32F10X_HD) || defined(STM32F40XX)
+#ifdef STM32F40XX // if STM32F401CCU6 64k RAM
   case TILE_32_BASE_SIZE: {
     pTmpFunc = getArrTilePointer32x32;
   } break;
@@ -383,10 +383,10 @@ void drawBMP16(uint16_t w, uint16_t h)
   
   for(uint16_t row = 0; row < h; row++) { // For each scanline...
     for(uint16_t col = 0; col < w; col += LCD_BUFFER_SIZE) {
-#if defined(STM32F10X_MD) || defined(STM32F10X_HD)
+#ifdef STM32F10X_MD
       // little protection...
       while(DMA1_Channel3->CNDTR > LCD_BMP16_1_2LINE_SIZE);
-#else
+#elif STM32F40XX // if STM32F401CCU6 64k RAM
       // TODO: add DMA_Channel_3
 #endif
       // read pixels into the buffer

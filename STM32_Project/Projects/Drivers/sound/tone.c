@@ -20,35 +20,11 @@ volatile const notes_t *pNotes;
 notes_t soundBuffer[SOUND_BUF_SIZE]; // SOUND_BUF_SIZE * 3 bytes == actual size
 //notes_t soundBuffer[SOUND_BUF_PATTERNS][SOUND_BUF_SIZE];
 
-GPIO_InitTypeDef soundPort;
-
 // -------------------------------------------------------- //
 
 // Initialize sound output
-void init_Sound(void) 
-{  
-#if defined(STM32F10X_MD) || defined(STM32F10X_HD)
-  RCC->APB2ENR |= RCC_APB2Periph_AFIO;        // enable remap config for GPIO
-  RCC->APB1ENR |= RCC_APB1Periph_TIM3;        // enable TIM3 peripheral
-#else
-  RCC_APB1PeriphClockCmd(RCC_APB1Periph_TIM3, ENABLE);
-#endif
-  
-  // configure GPIO
-#if defined(STM32F10X_MD) || defined(STM32F10X_HD)
-  soundPort.GPIO_Mode  = GPIO_Mode_AF_PP;
-#else
-  soundPort.GPIO_Mode = GPIO_Mode_AF;
-  soundPort.GPIO_OType = GPIO_OType_PP;
-  soundPort.GPIO_PuPd = GPIO_PuPd_NOPULL;
-#endif
-  soundPort.GPIO_Speed = GPIO_Speed_2MHz;
-  soundPort.GPIO_Pin   = SOUND_PIN;
-#if defined(STM32F10X_MD) || defined(STM32F10X_HD)
-  GPIO_PinRemapConfig(GPIO_PartialRemap_TIM3, ENABLE); // remap PA7 to PB5
-#endif
-  GPIO_Init(SOUND_GPIO, &soundPort);
-  
+void vInit_Sound(void)
+{
   // Configure timer
   TIM_TimeBaseInitTypeDef timer3Init;
   timer3Init.TIM_CounterMode = TIM_CounterMode_Up;        /* Select the Counter Mode */
@@ -93,18 +69,6 @@ void reloadTIMxValue_Sound(uint16_t freq, uint16_t duration)
 void playNote_Sound(uint16_t freq, uint16_t duration)
 {
   if (CHECK_FREQ(freq) || (duration)) {
-    
-    if(!playingState) { // prevent from reinit
-      // enable pin
-#if defined(STM32F10X_MD) || defined(STM32F10X_HD)
-      soundPort.GPIO_Mode  = GPIO_Mode_AF_PP;
-#else
-      soundPort.GPIO_Mode = GPIO_Mode_AF;
-      soundPort.GPIO_OType = GPIO_OType_PP;
-      soundPort.GPIO_PuPd = GPIO_PuPd_NOPULL;
-#endif
-      GPIO_Init(SOUND_GPIO, &soundPort);
-    }
     beepDuration = BEEP_LONG(freq, duration);
     
     // calc reload value
@@ -154,8 +118,8 @@ void disable_Sound(void)
   TIM3->CR1 &= ~TIM_CR1_CEN; // disable timer
   
   // disable sound pin
-  soundPort.GPIO_Mode  = GPIO_Mode_AIN; // pin as analog input
-  GPIO_Init(SOUND_GPIO, &soundPort);
+//  soundPort.GPIO_Mode  = GPIO_Mode_AIN; // pin as analog input
+//  GPIO_Init(SOUND_GPIO, &soundPort);
 }
 
 // -------------------------------------------------------- //

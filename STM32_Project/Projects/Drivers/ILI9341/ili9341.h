@@ -10,6 +10,8 @@
 #include <stm32f10x.h>
 #endif /* STM32F40XX */
 
+#include "gpio_list.h"
+
 #define ILI9341_TFTWIDTH  240
 #define ILI9341_TFTHEIGHT 320
 
@@ -93,25 +95,7 @@
 #define TFT_TOP_FIXED_AREA 0 // Number of lines in top fixed area (lines counted from top of screen)
 
 //-------------------------------------------------------------------------------------------//
-//nss - pb10; dc - pb11; res - pb1
-#define TFT_SS_PIN      GPIO_Pin_10     //CS
-#define TFT_DC_PIN      GPIO_Pin_11     //DC
-#define TFT_RES_PIN     GPIO_Pin_1      //RES on PB1 (pro and mini)
-
-#if defined(STM32F40XX)
-#define LCD_BACKLIGHT_PIN  GPIO_Pin_1
-#define BACKLIGHT_GPIO     GPIOB
-#endif
-
-#if defined(STM32F10X_MD) || defined(STM32F10X_HD)
-#define LCD_BACKLIGHT_PIN  GPIO_Pin_6
-#define BACKLIGHT_GPIO     GPIOB
-#endif
-
-#define GPIO_SET_PIN(GPIOx, GPIO_Pin)     GPIO_SetBits(GPIOx, GPIO_Pin);
-#define GPIO_RESET_PIN(GPIOx, GPIO_Pin)   GPIO_ResetBits(GPIOx, GPIO_Pin);
-
-#if defined(STM32F40XX) || defined(STM32F10X_HD)
+#ifdef STM32F40XX // if STM32F401CCU6 64k RAM
 #define USE_FSMC      1
 #else
 #define USE_FSMC      0
@@ -139,7 +123,7 @@
 //#define SET_TFT_CS_LOW   GPIO_RESET_PIN(GPIOB, TFT_SS_PIN)
 #endif /* USE_FSMC */
 
-#if defined(STM32F10X_MD) || defined(STM32F10X_HD)
+#ifdef STM32F10X_MD
 #define SET_TFT_RES_HI     GPIO_SET_PIN(GPIOB, TFT_RES_PIN)
 #define SET_TFT_RES_LOW    GPIO_RESET_PIN(GPIOB, TFT_RES_PIN)
 #else
@@ -313,7 +297,9 @@ void writeCommand(uint8_t c);
 void writeData(uint8_t d);
 void writeWordData(uint16_t c);
 
-void initLCD(void);
+void vInit_TFT(void);
+void vInit_BacklightTFT(void);
+
 void setAddrWindow(uint32_t x0, uint32_t y0, uint32_t x1, uint32_t y1);
 void setSqAddrWindow(uint32_t x0, uint32_t y0, uint32_t size);
 void setVAddrWindow(uint32_t x0, uint32_t y0, uint32_t y1);

@@ -16,16 +16,10 @@
  #define TILES_NUM_16x16        10
 #endif /* STM32F10X_MD */
 
-#ifdef STM32F10X_HD // if STM32F103VET6 64k RAM
+#ifdef STM32F40XX // if if STM32F401CCU6 64k RAM
  #define TILES_NUM_8x8          160
  #define TILES_NUM_16x16        80
  #define TILES_NUM_32x32        10
-#endif /* STM32F10X_HD */
-
-#ifdef STM32F40XX // if STM32F407VET6 128k RAM
- #define TILES_NUM_8x8          192
- #define TILES_NUM_16x16        128
- #define TILES_NUM_32x32        48
 #endif /* STM32F40XX */
 
 #define BACKGROUND_SIZE_W       40

@@ -1,12 +1,6 @@
 #ifndef _TONE_H
 #define _TONE_H
 
-
-// -------------------------------------------------------- //
-// Buzzer on PB5 -> TIM3_CH2
-#define SOUND_PIN      GPIO_Pin_5
-#define SOUND_GPIO     GPIOB
-
 #define SOUND_BUF_SIZE      50  // size for note patterns
 #define SOUND_BUF_PATTERNS  3    // number of sound patterns
 
@@ -44,7 +38,7 @@ extern notes_t soundBuffer[SOUND_BUF_SIZE];
 // -------------------------------------------------------- //
 
 // Function prototypes
-void init_Sound(void);
+void vInit_Sound(void);
 void playNote_Sound(uint16_t freq, uint16_t duration);
 void disable_Sound(void);
 

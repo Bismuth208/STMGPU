@@ -74,7 +74,7 @@ void execCommands(const uint8_t *addr)
   writeCommand(ILI9341_DISPON);    // Display on
 }
 
-#if defined(STM32F10X_MD) || defined(STM32F10X_HD)
+#ifdef STM32F10X_MD
 void hardRstTFT(void)
 {
   // toggle RST low to reset
@@ -82,34 +82,12 @@ void hardRstTFT(void)
   SET_TFT_RES_LOW; _delayMS(5);
   SET_TFT_RES_HI; _delayMS(1);
 }
-
-void initTFT_GPIO()
-{
-  GPIO_InitTypeDef GPIO_InitStruct;
-  GPIO_InitStruct.GPIO_Mode = GPIO_Mode_Out_PP;     // Mode: output "Push-Pull"
-  GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;// Set speed
-#if USE_FSMC
-  GPIO_InitStruct.GPIO_Pin = TFT_RES_PIN;
-#else
-  GPIO_InitStruct.GPIO_Pin = TFT_DC_PIN | TFT_RES_PIN | TFT_SS_PIN;
-#endif
-  GPIO_Init(GPIOB, &GPIO_InitStruct);        // Aply settings to port B
-}
 #endif
 
 // TODO: on Pro version add backlight control
-void init_LCDBacklight()
+void vInit_BacklightTFT(void)
 {
-#if defined(STM32F10X_MD) || defined(STM32F10X_HD)
-  RCC->APB1ENR |= RCC_APB1Periph_TIM4;        // enable TIM4 peripheral
-
-  // configure GPIO
-  GPIO_InitTypeDef backlightPort;
-  backlightPort.GPIO_Mode = GPIO_Mode_AF_PP;
-  backlightPort.GPIO_Speed = GPIO_Speed_2MHz;
-  backlightPort.GPIO_Pin = LCD_BACKLIGHT_PIN;
-  GPIO_Init(BACKLIGHT_GPIO, &backlightPort);
-
+#ifdef STM32F10X_MD
   // Configure timer
   TIM_TimeBaseInitTypeDef timer4Init;
   timer4Init.TIM_CounterMode = TIM_CounterMode_Up; /* Select the Counter Mode */
@@ -129,30 +107,13 @@ void init_LCDBacklight()
 
   TIM_Cmd(TIM4, ENABLE);
 #else
-  GPIO_InitTypeDef backlightPort;
-  backlightPort.GPIO_Mode = GPIO_Mode_OUT;
-  backlightPort.GPIO_OType = GPIO_OType_PP;
-  backlightPort.GPIO_Pin = GPIO_Pin_1;
-  backlightPort.GPIO_PuPd = GPIO_PuPd_NOPULL;
-  backlightPort.GPIO_Speed = GPIO_Speed_2MHz;
-  GPIO_Init(GPIOB, &backlightPort);
 
-  GPIO_SetBits(GPIOB, GPIO_Pin_1); // enable backlight
 #endif
 }
 
-void initLCD(void)
+void vInit_TFT(void)
 {
-#if USE_FSMC
-  init_FSMC();
-  init_DMA_FSMC(); //TODO: make it work!!!
-#else
-  init_SPI1();
-  init_DMA1_SPI1();
-#endif
-#if defined(STM32F10X_MD) || defined(STM32F10X_HD)
-  initTFT_GPIO();
-
+#ifdef STM32F10X_MD
   SET_TFT_RES_LOW;
   GRAB_TFT_CS;   // maybe remove this? And connect CS to Vcc?
   SET_TFT_DC_HI;// set data
@@ -160,7 +121,6 @@ void initLCD(void)
   hardRstTFT();
 #endif
 
-  init_LCDBacklight();
   execCommands(initSequence);
 }
 
@@ -364,7 +324,7 @@ void setDispBrightness(uint16_t brightness)
   curBrightnessValue = brightness;
 
   // calc reload value
-#if defined(STM32F10X_MD) || defined(STM32F10X_HD)
+#ifdef STM32F10X_MD
   TIM4->ARR = RELOAD_TIMx_VAL(TIM4, brightness);
   TIM4->CCR2 = TIM4->ARR >> 1; // set 50% duty cycle
 #else
@@ -407,7 +367,7 @@ void makeFadeBrightness(void)
   }
 
   // calc reload value
-#if defined(STM32F10X_MD) || defined(STM32F10X_HD)
+#ifdef STM32F10X_MD
   TIM4->ARR = RELOAD_TIMx_VAL(TIM4, curBrightnessValue);
   TIM4->CCR2 = TIM4->ARR >> 1; // set 50% duty cycle
 #else

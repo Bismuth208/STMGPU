@@ -40,29 +40,9 @@ __IO uint16_t CR1_backup_16b_PS0 = 0;
 __IO uint16_t CR1_backup_8b_PS2 = 0;
 #endif
 
-//---------------------------------------------------------------------------------------------//
-
-void init_GPIO_SPI1(void)
-{
-  GPIO_InitTypeDef GPIO_InitStruct;
-  
-  //GPIO_PinRemapConfig(GPIO_Remap_SWJ_JTAGDisable, ENABLE);  //disable JTAG, SW left enabled
-  //GPIO_PinRemapConfig(GPIO_Remap_SPI1, ENABLE);
-  
-  GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF_PP;      // Alternate fun mode
-  GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
-  GPIO_InitStruct.GPIO_Pin = GPIO_Pin_SPI_LCD_MOSI | GPIO_Pin_SPI_LCD_SCK ;
-  GPIO_Init(GPIO_SPI_LCD, &GPIO_InitStruct);        // apply settings
-}
-
 //--------------------------------------- SPI_1 ------------------------------------------------//
-void init_SPI1(void)
+void vInit_SPI1(void)
 {
-  // Enable clock for SPI1
-  SET_BIT(RCC->APB2ENR, RCC_APB2ENR_SPI1EN);
-  
-  init_GPIO_SPI1();
-  
 #if !USE_CALC_REG_SPI1
   uint16_t tmpreg = (uint16_t)((uint32_t)SPI_Direction_1Line_Tx |       // .SPI_Direction
                         SPI_Mode_Master |                       // .SPI_Mode
@@ -162,10 +142,8 @@ void repeatData16_SPI1(uint16_t data, uint32_t size)
 #endif
 
 //----------------------------- DMA SECTION ----------------------------------//
-void init_DMA1_SPI1(void)
+void vInit_DMA1_SPI1(void)
 {
-  RCC->AHBENR |= RCC_AHBPeriph_DMA1;    // enable clocks to DMA1
-
 #if !USE_CALC_REG_SPI1
   uint32_t tmpreg = ( DMA_DIR_PeripheralDST |   // .DMA_DIR
             DMA_Mode_Normal |                   // .DMA_Mode
@@ -215,9 +193,9 @@ void setMemoryBaseAddr_DMA1_SPI1(void *addr)
 }
 
 __attribute__((optimize("O2"))) void repeatData16_DMA1_SPI1(uint32_t color, uint32_t transferSize)
-{  
+{
   SPI1->CR1 = CR1_backup_16b_PS0;
-  
+
   ulDataBuffer = color;   // store data or, you can lost it
 
   DMA1_Channel3->CMAR = (uint32_t) &(ulDataBuffer);         // apply DMA_MemoryBaseAddr

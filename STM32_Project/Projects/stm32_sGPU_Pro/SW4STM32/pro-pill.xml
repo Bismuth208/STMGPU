@@ -10,10 +10,10 @@
 ]>
 
 <targetDefinitions>
-  <board id="stm32_nrf2401">
-    <name>STM32_nrf2401</name>
-    <dbgIF>JTAG</dbgIF>
+  <board id="pro-pill">
+    <name>Pro-Pill</name>
+    <dbgIF>SWD</dbgIF>
     <dbgDEV>ST-Link</dbgDEV>
-    <mcuId>stm32f407vetx</mcuId>
+    <mcuId>stm32f401CCUx</mcuId>
   </board>
 </targetDefinitions>

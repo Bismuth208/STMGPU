@@ -14,7 +14,7 @@
 #include "integer.h"
   
 /* SD card is connected to SPI1, PA4-7 */
-#if defined(STM32F10X_MD) || defined(STM32F10X_HD)
+#ifdef STM32F10X_MD
 #define CARD_SUPPLY_SWITCHABLE   0
 #define SOCKET_WP_CONNECTED      0 /* write-protect socket-switch */
 #define SOCKET_CP_CONNECTED      0 /* card-present socket-switch */
@@ -163,7 +163,7 @@ enum sd_speed { SD_SPEED_INVALID, SD_SPEED_400KHZ, SD_SPEED_25MHZ };
 
 
 /*---------------------------------------*/
-void sd_spi_init(void);
+void vInit_SPI2(void);
 void spi_set_speed(enum sd_speed speed);
 u8 spi_txrx(u8 data);
 u8 crc7_one(u8 t, u8 data);

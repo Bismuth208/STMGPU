@@ -132,6 +132,11 @@
 			<locationURI>PARENT-2-PROJECT_LOC/Core/inc/STMsGPU_Palette.h</locationURI>
 		</link>
 		<link>
+			<name>Core/inc/gpio_list.h</name>
+			<type>1</type>
+			<locationURI>PARENT-2-PROJECT_LOC/Core/inc/gpio_list.h</locationURI>
+		</link>
+		<link>
 			<name>Core/inc/gpuMain.h</name>
 			<type>1</type>
 			<locationURI>PARENT-2-PROJECT_LOC/Core/inc/gpuMain.h</locationURI>

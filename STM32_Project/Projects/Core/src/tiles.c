@@ -33,11 +33,11 @@ uint16_t lastTile16x16[TILE_ARR_16X16_SIZE] = {0};   // 512
 uint8_t lastTileNum8x8 = 0xFF;   // \__ 0xff mean: not used
 uint8_t lastTileNum16x16 = 0xFF; // /
 
-#if defined(STM32F10X_HD) || defined(STM32F40XX)
+#ifdef STM32F40XX // if STM32F401CCU6 64k RAM
 uint8_t tileArr32x32[TILES_NUM_32x32][TILE_ARR_32X32_SIZE] = {0};
 uint16_t lastTile32x32[TILE_ARR_32X32_SIZE];   // 2048
 uint8_t lastTileNum32x32 = 0xFF;
-#endif  /* STM32F10X_HD */
+#endif  /* STM32F401CCU6 */
 
 
 // on screen tile map background
@@ -61,7 +61,7 @@ void initRaycasterPointers(void)
   
   setTileArrayPonter((uint8_t*)tileArr8x8, 1);
   setTileArrayPonter((uint8_t*)tileArr16x16, 2);
-#if defined(STM32F10X_HD) || defined(STM32F40XX)
+#ifdef STM32F40XX // if STM32F401CCU6 64k RAM
   setTileArrayPonter((uint8_t*)tileArr32x32, 3);
 #endif
 }
@@ -119,12 +119,12 @@ uint8_t *getArrTilePointer16x16(uint8_t tileNum)
   return (uint8_t *)&tileArr16x16[tileNum];
 }
 
-#if defined(STM32F10X_HD) || defined(STM32F40XX)
+#ifdef STM32F40XX // if STM32F401CCU6 64k RAM
 uint8_t *getArrTilePointer32x32(uint8_t tileNum)
 {
   return (uint8_t *)&tileArr32x32[tileNum];
 }
-#endif /* STM32F10X_HD */
+#endif /* STM32F401CCU6 */
 
 uint8_t *getMapArrPointer(void)
 {
@@ -170,7 +170,7 @@ void drawTile16x16(Tile_t *pxTile)
 }
 
 
-#if defined(STM32F10X_HD) || defined(STM32F40XX)
+#ifdef STM32F40XX // if STM32F401CCU6 64k RAM
 void drawTile32x32(Tile_t *pxTile)
 {
   // little trick, if tile same, just redraw it
@@ -189,7 +189,7 @@ void drawTile32x32(Tile_t *pxTile)
   setSqAddrWindow(pxTile->ulPosX, pxTile->ulPosY, TILE_32x32_WINDOW_SIZE);
   SEND_ARR16_FAST(lastTile32x32, TILE_ARR_32X32_SIZE);
 }
-#endif /* STM32F10X_HD */
+#endif /* STM32F401CCU6 */
 
 // -------------------------------------------------------- //
 

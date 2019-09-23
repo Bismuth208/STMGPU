@@ -217,11 +217,9 @@ void init_UART1_DMA_Rx(void)
 {
   DMA_InitTypeDef DMA_UART_Rx_settings;
 
-#if defined(STM32F10X_MD) || defined(STM32F10X_HD)
+#ifdef STM32F10X_MD
 
-#else
-  RCC_AHB1PeriphClockCmd(RCC_AHB1Periph_DMA2, ENABLE);
-
+#elif STM32F40XX // if STM32F401CCU6 64k RAM
   DMA_UART_Rx_settings.DMA_BufferSize = sizeof(rxBuffer);
   DMA_UART_Rx_settings.DMA_Channel = DMA_Channel_4;
   DMA_UART_Rx_settings.DMA_DIR = DMA_DIR_PeripheralToMemory;
@@ -274,43 +272,6 @@ void init_UART1_Rx(void)
 
 void init_UART1(uint32_t baud)
 {
-  RCC_APB2PeriphClockCmd(RCC_APB2Periph_USART1, ENABLE);
-
-  GPIO_InitTypeDef GPIO_InitStruct;
-
-#if defined(STM32F10X_MD) || defined(STM32F10X_HD)
-  // set PA10 as input UART (RxD)
-  GPIO_InitStruct.GPIO_Pin = GPIO_Pin_10;
-  GPIO_InitStruct.GPIO_Speed = GPIO_Speed_10MHz;
-  GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IPD;
-  GPIO_Init(GPIOA, &GPIO_InitStruct);
-
-  // set PA9 as output UART (TxD)
-  GPIO_InitStruct.GPIO_Pin = GPIO_Pin_9;
-  GPIO_InitStruct.GPIO_Speed = GPIO_Speed_2MHz;
-  GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF_PP;
-  GPIO_Init(GPIOA, &GPIO_InitStruct);
-#else
-  // set PA10 as input UART (RxD)
-  GPIO_InitStruct.GPIO_Pin = GPIO_Pin_10;
-  GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
-  GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF;
-  GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
-  GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_DOWN;
-  GPIO_Init(GPIOA, &GPIO_InitStruct);
-
-  // set PA9 as output UART (TxD)
-  GPIO_InitStruct.GPIO_Pin = GPIO_Pin_9;
-  GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;
-  GPIO_InitStruct.GPIO_Mode = GPIO_Mode_AF;
-  GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
-  GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_DOWN;
-  GPIO_Init(GPIOA, &GPIO_InitStruct);
-
-  GPIO_PinAFConfig(GPIOA, GPIO_PinSource9, GPIO_AF_USART1);
-  GPIO_PinAFConfig(GPIOA, GPIO_PinSource10, GPIO_AF_USART1);
-#endif
-
   // setup UART1
   USART_InitTypeDef USART_InitStruct;
   USART_InitStruct.USART_BaudRate = baud;
@@ -335,6 +296,8 @@ void init_UART1(uint32_t baud)
 __attribute__((optimize("O2"))) void USART1_IRQHandler(void) // get data as fast as possible!
 {
   //if(USART1->SR & USART_SR_RXNE ) {
+//  USART1->SR = (uint16_t)~USART_FLAG_RXNE;
+
   rxBuffer[rx_buffer.head] = USART1->DR;
   rx_buffer.head = (rx_buffer.head + 1) & SERIAL_BUFFER_SIZE_MASK;
 //  }

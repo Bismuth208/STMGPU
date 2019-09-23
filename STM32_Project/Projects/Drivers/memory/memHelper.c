@@ -51,7 +51,7 @@ __attribute__((optimize("O2"))) void memset32(void *dst, uint32_t src, size_t le
   }
 }
 
-#if defined(STM32F10X_MD) || defined(STM32F10X_HD)
+#ifdef STM32F10X_MD
 void init_DMA_memset(void)
 {
   uint32_t tmpreg = ( DMA_DIR_PeripheralDST |  // .DMA_DIR

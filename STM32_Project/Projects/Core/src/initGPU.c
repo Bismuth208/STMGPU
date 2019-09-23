@@ -79,47 +79,6 @@ void sync_CPU(void)
   fillScreen(COLOR_BLACK);
 }
 
-void init_GPU_GPIO(void)
-{
-  GPIO_InitTypeDef GPIO_InitStruct;
-
-#ifdef STM32F40XX
-  GPIO_InitStruct.GPIO_Mode = GPIO_Mode_OUT;
-  GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
-  GPIO_InitStruct.GPIO_Pin = GPU_BSY_PIN;
-  GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_NOPULL;
-  GPIO_InitStruct.GPIO_Speed = GPIO_Speed_2MHz;
-  GPIO_Init(GPU_BSY_PORT, &GPIO_InitStruct);
-
-  GPIO_InitStruct.GPIO_Pin = GPU_BSY_LED_PIN;
-  GPIO_Init(GPU_BSY_LED_PORT, &GPIO_InitStruct);
-  GPIO_SetBits(GPU_BSY_LED_PORT, GPU_BSY_LED_PIN);      // turn off
-
-  GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN;
-//  GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;
-  GPIO_InitStruct.GPIO_Pin = (GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_2);
-  GPIO_InitStruct.GPIO_PuPd = GPIO_PuPd_DOWN;
-  GPIO_InitStruct.GPIO_Speed = GPIO_Speed_2MHz;
-  GPIO_Init(GPIOA, &GPIO_InitStruct);
-
-#else
-  GPIO_InitStruct.GPIO_Mode = GPIO_Mode_Out_PP;      // Mode: output "Push-Pull"
-  GPIO_InitStruct.GPIO_Speed = GPIO_Speed_50MHz;// Set speed
-  GPIO_InitStruct.GPIO_Pin = GPU_BSY_PIN;
-  GPIO_Init(GPU_BSY_PORT, &GPIO_InitStruct);// Apply settings
-
-  GPIO_InitStruct.GPIO_Pin = GPU_BSY_LED_PIN;// LED BSY PIN
-  GPIO_Init(GPU_BSY_LED_PORT, &GPIO_InitStruct);// Apply settings
-  GPIO_SetBits(GPU_BSY_LED_PORT, GPU_BSY_LED_PIN);// turn off
-
-  // Now init baud rate selection GPIO
-  GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IPD;// Mode: input "Pull-down"
-  GPIO_InitStruct.GPIO_Speed = GPIO_Speed_2MHz;// Set speed
-  GPIO_InitStruct.GPIO_Pin = (GPIO_Pin_0 | GPIO_Pin_1 | GPIO_Pin_2);
-  GPIO_Init(GPIOA, &GPIO_InitStruct);// Apply settings
-#endif
-}
-
 void init_GPU_UART(void)
 {
   print(T_SELECT_WAY T_UART_WAY);
@@ -177,10 +136,8 @@ void init_GPU(void)
   print(T_SGPU_REGISRERS_VER "\n");
 
   init_sdCard();
-  init_Sound();
   playNotes_Sound(startupSound);
 
-  init_GPU_GPIO();
   init_GPU_UART();    // setup access to low level interface
   //init_DMA_memset();
 

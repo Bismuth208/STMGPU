@@ -5,11 +5,8 @@
 #ifdef STM32F10X_MD // if STM32F103C8T6 20k RAM
  #define MAX_SPRITE_NUM          45
 #endif
-#ifdef STM32F10X_HD // if STM32F103VET6 64k RAM
+#ifdef STM32F40XX // if if STM32F401CCU6 64k RAM
  #define MAX_SPRITE_NUM          125
-#endif
-#ifdef STM32F40XX // if STM32F407VET6 128k RAM
- #define MAX_SPRITE_NUM          184
 #endif
 
 // number of pixels in given sprite
