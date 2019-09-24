@@ -50,19 +50,19 @@ void setBusyStatus(uint8_t status)
   if (status) {
     // say to CPU: "I`m bsy, do not send the data!"
     if (bsyInterfaceFlag) {
-      GPIO_SetBits(GPU_BSY_PORT, GPU_BSY_PIN);
+      GPIO_SET_PIN(GPU_BSY_PORT, GPU_BSY_PIN);
     } else {
       GPU_INTERFACE_SEND_DATA_8(BSY_MSG_CODE_WAIT);
     }
-    GPIO_ResetBits(GPU_BSY_LED_PORT, GPU_BSY_LED_PIN);
+    GPIO_RESET_PIN(GPU_BSY_LED_PORT, GPU_BSY_LED_PIN);
   } else {
     // say to CPU: "I`m free, now send the data!"
     if (bsyInterfaceFlag) {
-      GPIO_ResetBits(GPU_BSY_PORT, GPU_BSY_PIN);
+      GPIO_RESET_PIN(GPU_BSY_PORT, GPU_BSY_PIN);
     } else {
       GPU_INTERFACE_SEND_DATA_8(BSY_MSG_CODE_READY);
     }
-    GPIO_SetBits(GPU_BSY_LED_PORT, GPU_BSY_LED_PIN);
+    GPIO_SET_PIN(GPU_BSY_LED_PORT, GPU_BSY_LED_PIN);
   }
 }
 
@@ -71,11 +71,11 @@ void vCallbackFrom_USART1_IRQ(void)
 {
   // say to CPU: "I`m bsy, do not send the data!"
   if(bsyInterfaceFlag) {
-    GPIO_SetBits(GPU_BSY_PORT, GPU_BSY_PIN);
+    GPIO_SET_PIN(GPU_BSY_PORT, GPU_BSY_PIN);
   } else {
     GPU_INTERFACE_SEND_DATA_8(BSY_MSG_CODE_WAIT);
   }
-  GPIO_ResetBits(GPU_BSY_LED_PORT, GPU_BSY_LED_PIN);
+  GPIO_RESET_PIN(GPU_BSY_LED_PORT, GPU_BSY_LED_PIN);
   bsyGPUBufferFlag = 1;
   ucResetDataBuff = 1;
 }
@@ -710,9 +710,9 @@ __attribute__((noreturn, optimize("O2"))) void run_GPU(void)
         case SET_DBG_GPIO_PIN: {
           uint8_t state = GPU_INTERFACE_GET_DATA_8();
           if (state) {
-            GPIO_SetBits(GPU_DEBUG_PORT, GPU_DEBUG_PIN);
+            GPIO_SET_PIN(GPU_DEBUG_PORT, GPU_DEBUG_PIN);
           } else {
-            GPIO_ResetBits(GPU_DEBUG_PORT, GPU_DEBUG_PIN);
+            GPIO_RESET_PIN(GPU_DEBUG_PORT, GPU_DEBUG_PIN);
           }
         }
         break;

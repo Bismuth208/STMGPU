@@ -91,7 +91,8 @@ __attribute__((optimize("O2"))) void cutData(uint8_t *pDest, uint32_t size)
 
     *pDest++ = rxBuffer[rx_buffer.tail];
     rx_buffer.tail = (rx_buffer.tail + 1) & SERIAL_BUFFER_SIZE_MASK;
-  } while (--size);
+    --size;
+  } while (size);
 }
 
 uint8_t waitCutByte_UART1(void)

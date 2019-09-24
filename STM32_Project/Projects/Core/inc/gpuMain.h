@@ -20,7 +20,7 @@
 #define MAX_TEXT_SIZE   192
 
 //===========================================================================//
-#define MAX_FILL_BUF    75      // in percent, warning if buffer overfilled
+#define MAX_FILL_BUF    40      // in percent, warning if buffer overflowed
 #define MIN_FILL_BUF    1
 
 #define CALC_BUF_FILL(a)   ((SERIAL_BUFFER_SIZE/100)*a)

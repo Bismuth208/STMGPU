@@ -10,6 +10,7 @@
 #include "diskio.h"
 #include "sdcard_spi.h"
 #include "integer.h"
+#include "gpio_list.h"
 
 /*
 * Code is split into 2 parts:

@@ -16,8 +16,8 @@
 #define _GPIO_LIST_H
 
 
-#define GPIO_SET_PIN(GPIOx, GPIO_Pin)     GPIO_SetBits(GPIOx, GPIO_Pin);
-#define GPIO_RESET_PIN(GPIOx, GPIO_Pin)   GPIO_ResetBits(GPIOx, GPIO_Pin);
+#define GPIO_SET_PIN(GPIOx, GPIO_Pin)     (GPIOx->BSRR = GPIO_Pin) //GPIO_SetBits(GPIOx, GPIO_Pin);
+#define GPIO_RESET_PIN(GPIOx, GPIO_Pin)   (GPIOx->BRR = GPIO_Pin) //GPIO_ResetBits(GPIOx, GPIO_Pin);
 
 // -------------------------------------------------------- //
 // Buzzer on PB5 -> TIM3_CH2

@@ -105,7 +105,7 @@ void vInitGPIO(void)
 
   GPIO_InitStruct.GPIO_Pin = GPU_BSY_LED_PIN;// LED BSY PIN
   GPIO_Init(GPU_BSY_LED_PORT, &GPIO_InitStruct);// Apply settings
-  GPIO_SetBits(GPU_BSY_LED_PORT, GPU_BSY_LED_PIN);// turn off
+  GPIO_SET_PIN(GPU_BSY_LED_PORT, GPU_BSY_LED_PIN);// turn off
 
   // Now init baud rate selection GPIO
   GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IPD;// Mode: input "Pull-down"
@@ -123,7 +123,7 @@ void vInitGPIO(void)
 
   GPIO_InitStruct.GPIO_Pin = GPU_BSY_LED_PIN;
   GPIO_Init(GPU_BSY_LED_PORT, &GPIO_InitStruct);
-  GPIO_SetBits(GPU_BSY_LED_PORT, GPU_BSY_LED_PIN);      // turn off
+  GPIO_SET_PIN(GPU_BSY_LED_PORT, GPU_BSY_LED_PIN);      // turn off
 
   GPIO_InitStruct.GPIO_Mode = GPIO_Mode_IN;
 //  GPIO_InitStruct.GPIO_OType = GPIO_OType_PP;

@@ -71,8 +71,8 @@
 #endif
 
 
-#define spi_cs_low() GPIO_SetBits(GPIO_SPI_SD_CS, GPIO_Pin_SPI_SD_CS);
-#define spi_cs_high() GPIO_ResetBits(GPIO_SPI_SD_CS, GPIO_Pin_SPI_SD_CS);
+#define spi_cs_low() GPIO_SET_PIN(GPIO_SPI_SD_CS, GPIO_Pin_SPI_SD_CS);
+#define spi_cs_high() GPIO_RESET_PIN(GPIO_SPI_SD_CS, GPIO_Pin_SPI_SD_CS);
     
 #define WAIT_FOR_RX while((SPI_SD->SR & SPI_I2S_FLAG_RXNE) == 0)
   
